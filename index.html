@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO & Security Tags -->
+  <meta name="description" content="Portfolio IT Professional - Web Development, UI/UX Design & Network Engineering"
+    id="metaDescription" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+  <meta name="keywords" content="Portfolio, IT Professional, Web Developer, UI/UX Designer, Network Engineer, Ayek" />
+  <meta name="author" content="Ayek" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://ayek.dev" />
+
+  <meta property="og:title" content="Ayek — IT Professional Portfolio" id="ogTitle" />
+  <meta property="og:description"
+    content="Seorang IT Enthusiast yang passionate di bidang Web Development, UI/UX Design, dan Network Engineering."
+    id="ogDescription" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <title>Ayek — IT Professional Portfolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Preload Critical Fonts -->
+  <link rel="preload"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500&display=swap"
+    as="style">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <meta name="theme-color" content="#06060a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 font-family=%22monospace%22 fill=%22%237c4dff%22>&lt;/&gt;</text></svg>">
+</head>
+
+<body data-theme="dark">
+  <div id="app">
+    <!-- Mobile Nav Overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <a href="#hero" class="nav-logo" aria-label="Ayek Home"><span class="logo-bracket">&lt;</span><span
+            id="navName">Ayek</span><span class="logo-bracket">/&gt;</span></a>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#hero" class="nav-link active" data-section="hero">Home</a></li>
+          <li><a href="#about" class="nav-link" data-section="about">About</a></li>
+          <li><a href="#resume" class="nav-link" data-section="resume">Resume</a></li>
+          <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
+          <li><a href="/blog.html" class="nav-link" data-section="blog">Blog</a></li>
+          <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+          <li><a href="/admin.html" class="nav-link" data-section="admin">Admin</a></li>
+          <li>
+            <button class="theme-toggle" id="themeToggle" aria-label="Ganti Tema">
+              <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+          </li>
+        </ul>
+        <button class="nav-toggle" id="navToggle"
+          aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+
+    <main>
+
+      <section class="hero reveal" id="hero">
+        <div class="hero-bg-grid"></div>
+
+        <!-- 3D Floating Code Decorations -->
+        <div class="hero-float hero-float--1" aria-hidden="true">&lt;/&gt;</div>
+        <div class="hero-float hero-float--2" aria-hidden="true">{ }</div>
+        <div class="hero-float hero-float--3" aria-hidden="true">01</div>
+        <div class="hero-float hero-float--4" aria-hidden="true">&&</div>
+        <div class="hero-float hero-float--5" aria-hidden="true">( )</div>
+
+        <div class="hero-container">
+          <div class="hero-content">
+            <div class="hero-badge"><span class="badge-dot"></span> <span id="heroBadgeText">Available for work</span>
+            </div>
+            <h1 class="hero-title">
+              <span class="hero-line">Hi, Saya</span>
+              <span class="hero-line hero-name"><span class="gradient-text" id="heroNameText">Ayek</span></span>
+              <span class="hero-line hero-role" id="heroRole">IT Professional</span>
+            </h1>
+            <p class="hero-description" id="heroBioText">
+              Seorang IT Enthusiast yang passionate di bidang <strong>Web Development</strong>, <strong>UI/UX
+                Design</strong>, dan <strong>Network Engineering</strong>.
+            </p>
+            <div class="hero-cta">
+              <a href="#projects" class="btn btn-primary"><span>Lihat Karya</span></a>
+              <a href="#contact" class="btn btn-outline"><span>Hubungi Saya</span></a>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-item"><span class="stat-number" id="statProjects">0</span><span
+                  class="stat-label">Projects</span></div>
+              <div class="stat-item"><span class="stat-number" id="statDesigns">0</span><span
+                  class="stat-label">Designs</span></div>
+              <div class="stat-item"><span class="stat-number" id="statNetworks">0</span><span
+                  class="stat-label">Networks</span></div>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <!-- CSS 3D Rotating Code Cube -->
+            <div class="cube-scene">
+              <div class="cube">
+                <div class="cube-face cube-front"><span>&lt;/&gt;</span></div>
+                <div class="cube-face cube-back"><span>{ }</span></div>
+                <div class="cube-face cube-right"><span>JS</span></div>
+                <div class="cube-face cube-left"><span>CSS</span></div>
+                <div class="cube-face cube-top"><span>API</span></div>
+                <div class="cube-face cube-bottom"><span>SQL</span></div>
+              </div>
+            </div>
+            <div class="code-window">
+              <div class="code-header">
+                <div class="code-dots"><span class="dot red"></span><span class="dot yellow"></span><span
+                    class="dot green"></span></div><span class="code-title">profile.js</span>
+              </div>
+              <pre class="code-body"><code id="codeBody"></code></pre>
+            </div>
+          </div>
+        </div>
+
+
+      </section>
+
+      <section class="section about reveal" id="about">
+        <div class="section-container">
+          <div class="section-header" style="margin-top: 20px; margin-bottom: 20px;">
+            <span class="section-tag">&lt;about&gt;</span>
+            <h2 class="section-title">Tentang <span class="gradient-text">Saya</span></h2>
+          </div>
+          <div class="about-grid">
+            <div class="about-card">
+              <div class="terminal-window">
+                <div class="terminal-header">
+                  <div class="code-dots"><span class="dot red"></span><span class="dot yellow"></span><span
+                      class="dot green"></span></div><span class="code-title">terminal</span>
+                </div>
+                <div class="terminal-body" id="terminalBody">
+                  <div id="terminalHistory">
+                    <div class="terminal-line"><span class="terminal-prompt">$</span> whoami</div>
+                    <div class="terminal-output" id="termWhoami">ayek — IT Professional</div>
+                  </div>
+                  <div class="terminal-input-line">
+                    <span class="terminal-prompt">$</span>
+                    <span id="terminalCurrentText"></span>
+                    <input type="text" id="terminalInput" autofocus autocomplete="off" spellcheck="false"
+                      aria-label="Terminal Input">
+                    <span class="terminal-cursor">_</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="about-text">
+              <div id="cvDownloadContainer" style="margin-top: 24px; display: none;">
+                <a href="#" id="cvDownloadBtn" target="_blank" class="btn btn-primary">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Download CV</span>
+                </a>
+              </div>
+
+              <div class="about-highlights">
+                <div class="highlight-item">
+                  <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m12 19 7-7 3 3-7 7-3-3z" />
+                      <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                      <path d="m2 2 7.586 7.586" />
+                      <circle cx="11" cy="11" r="2" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4>Design</h4>
+                    <p>UI/UX, Graphic Design</p>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4>Development</h4>
+                    <p>Full-Stack Web</p>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                      <path
+                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4>Networking</h4>
+                    <p>Infrastruktur</p>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                      <line x1="16" y1="13" x2="8" y2="13" />
+                      <line x1="16" y1="17" x2="8" y2="17" />
+                      <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4>Administrasi</h4>
+                    <p>Manajemen Data</p>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path
+                        d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4>IT Support</h4>
+                    <p>Technical Troubleshooting</p>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4>Streamer</h4>
+                    <p>Content Creator</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section resume reveal" id="resume" style="background: var(--bg-secondary);">
+        <div class="section-container">
+          <div class="section-header text-center" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
+            <span class="section-tag">&lt;resume&gt;</span>
+            <h2 class="section-title">Perjalanan <span class="gradient-text">Karir</span></h2>
+          </div>
+          <div class="timeline-grid">
+            <div class="timeline-column">
+              <h3 class="timeline-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  style="display:inline; vertical-align:text-bottom; margin-right:8px;">
+                  <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+                Pengalaman
+              </h3>
+              <div class="timeline-list" id="experienceList"></div>
+            </div>
+            <div class="timeline-column">
+              <h3 class="timeline-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  style="display:inline; vertical-align:text-bottom; margin-right:8px;">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+                Pendidikan
+              </h3>
+              <div class="timeline-list" id="educationList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section projects reveal" id="projects">
+        <div class="section-container">
+          <div class="section-header text-center" style="text-align: center;">
+            <span class="section-tag">&lt;projects&gt;</span>
+            <h2 class="section-title">Karya <span class="gradient-text">Terbaru</span></h2>
+          </div>
+          <div class="project-filters" id="projectFilters" style="justify-content: center;">
+            <button class="filter-btn active" data-filter="all">Semua</button>
+            <button class="filter-btn" data-filter="design">Design</button>
+            <button class="filter-btn" data-filter="web">Website</button>
+            <button class="filter-btn" data-filter="network">Network</button>
+            <button class="filter-btn" data-filter="certificate">Sertifikat</button>
+          </div>
+          <div class="projects-grid" id="projectsGrid"></div>
+        </div>
+      </section>
+
+    <section class="section testimonials reveal" id="testimonials" style="background: var(--bg-secondary); overflow: hidden;">
+      <div class="section-container">
+        <div class="section-header text-center" style="max-width: 600px; margin: 0 auto 40px;">
+          <span class="section-tag">&lt;testimonials&gt;</span>
+          <h2 class="section-title">Apa Kata <span class="gradient-text">Mereka</span></h2>
+          <p class="opacity-75 mt-4">Lihat bagaimana pengalaman mereka bekerja bersama saya dalam membangun solusi digital.</p>
+        </div>
+
+        <!-- Horizontal Slider Container -->
+        <div class="testimonial-slider-container mt-6 relative overflow-hidden" style="padding: 20px 0; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
+          <div class="testi-track" id="testiTrack"></div>
+        </div>
+      </div>
+    </section>
+
+      <section class="section contact reveal" id="contact">
+        <div class="section-container">
+          <div class="section-header text-center" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
+            <span class="section-tag">&lt;contact&gt;</span>
+            <h2 class="section-title">Hubungi <span class="gradient-text">Saya</span></h2>
+          </div>
+          <div class="contact-flex" style="display: flex; justify-content: center;">
+            <form class="contact-form" id="contactForm" style="width: 100%; max-width: 800px;">
+              <div class="form-group"><label for="contactName">Nama</label><input type="text" id="contactName" required
+                  placeholder="Masukkan nama Anda">
+              </div>
+              <div class="form-group"><label for="contactFormEmail">Email</label><input type="email"
+                  id="contactFormEmail" required placeholder="nama@email.com"></div>
+              <div class="form-group" style="display:none;"><label for="contactHoneypot">Jangan isi ini</label><input
+                  type="text" id="contactHoneypot" tabindex="-1" autocomplete="off"></div>
+              <div class="form-group"><label for="contactMessage">Pesan</label><textarea id="contactMessage" rows="5"
+                  required placeholder="Tuliskan pesan Anda di sini..."></textarea></div>
+              <button type="submit" class="btn btn-primary btn-full"><span>Kirim Pesan</span></button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer reveal">
+      <div class="footer-container">
+        <div class="footer-content-grid">
+          <div class="footer-info">
+            <h3 class="footer-logo">
+              <span class="logo-bracket">&lt;</span><span id="footerName">Ayek</span><span class="logo-bracket">/&gt;</span>
+            </h3>
+            <p class="footer-bio">IT Professional specializing in Web Development, UI/UX Design, and Network Engineering. Building digital solutions with precision and passion.</p>
+            <div class="footer-socials-icons" id="footerSocialsIcons">
+              <!-- Social icons will be injected by JS or hardcoded -->
+            </div>
+          </div>
+          
+          <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#projects">Projects</a></li>
+              <li><a href="#resume">Resume</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-contact">
+            <h4>Get In Touch</h4>
+            <ul>
+              <li>
+                <span>📍</span>
+                <span id="contactLocation">Indonesia</span>
+              </li>
+              <li>
+                <span>📧</span>
+                <span id="contactEmail">ayek@example.com</span>
+              </li>
+              <li>
+                <span>📱</span>
+                <span id="contactWhatsapp">+62 ...</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2026 Ayek Portfolio. All rights reserved.</p>
+          <p>Built with <span style="color: var(--accent);">Love</span> & <span style="color: var(--accent);">Code</span></p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- PROJECT DETAIL MODAL -->
+  <div class="project-modal" id="projectDetailModal" aria-modal="true" role="dialog">
+    <div class="pm-content">
+      <button class="pm-close" id="pmClose" aria-label="Tutup Detail Proyek">&times;</button>
+      <div class="pm-hero" id="pmHero"></div>
+      <div class="pm-body">
+        <h2 id="pmTitle" style="font-size: 2.5rem; margin-bottom: 10px;"></h2>
+        <div class="pm-meta">
+          <div class="pm-meta-item"><span>Kategori</span><strong id="pmCategory"></strong></div>
+          <div class="pm-meta-item"><span>Tahun</span><strong id="pmYear"></strong></div>
+          <div class="pm-meta-item"><span>Stack</span><strong id="pmStack"></strong></div>
+        </div>
+        <div class="pm-description" id="pmDescription"></div>
+        <div class="pm-gallery" id="pmGallery"></div>
+        <div style="margin-top: 40px;" id="pmLinkArea"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHATBOT UI -->
+  <div class="chatbot-wrapper" id="chatbotWrapper">
+    <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open Chat">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    </button>
+
+    <div class="chatbot-window" id="chatbotWindow">
+      <div class="chatbot-header">
+        <div class="chatbot-header-info">
+          <span class="chatbot-dot"></span>
+          <div>
+            <strong>Ayek Bot</strong>
+            <span>Online</span>
+          </div>
+        </div>
+        <button class="chatbot-close" id="chatbotClose" aria-label="Tutup Chatbot">&times;</button>
+      </div>
+      <div class="chatbot-messages" id="chatbotMessages">
+        <div class="msg-bot">Halo! Ada yang bisa saya bantu? Tanya saya tentang "projek", "kontak", "keahlian", atau
+          "harga".</div>
+      </div>
+      <form class="chatbot-input" id="chatbotForm">
+        <input type="text" id="chatbotInput" placeholder="Ketik pesan..." autocomplete="off">
+        <button type="submit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

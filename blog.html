@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO & Security Tags -->
+  <meta name="description" content="Kumpulan artikel dan edukasi seputar Web Development, Design, dan IT oleh Ayek." />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+  <meta name="robots" content="index, follow" />
+
+  <title>Blog — Ayek Portfolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <meta name="theme-color" content="#06060a" />
+
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 font-family=%22monospace%22 fill=%22%237c4dff%22>&lt;/&gt;</text></svg>">
+</head>
+
+<body data-theme="dark">
+  <div id="app">
+    <!-- Mobile Nav Overlay -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-logo" aria-label="Ayek Home"><span class="logo-bracket">&lt;</span><span
+            id="navName">Ayek</span><span class="logo-bracket">/&gt;</span></a>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="/" class="nav-link" data-section="hero">Home</a></li>
+          <li><a href="/#about" class="nav-link" data-section="about">About</a></li>
+          <li><a href="/#resume" class="nav-link" data-section="resume">Resume</a></li>
+          <li><a href="/#projects" class="nav-link" data-section="projects">Projects</a></li>
+          <li><a href="/blog.html" class="nav-link active" data-section="blog">Blog</a></li>
+          <li><a href="/#contact" class="nav-link" data-section="contact">Contact</a></li>
+          <li><a href="/admin.html" class="nav-link" data-section="admin">Admin</a></li>
+          <li>
+            <button class="theme-toggle" id="themeToggle" aria-label="Ganti Tema">
+              <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            </button>
+          </li>
+        </ul>
+        <button class="nav-toggle" id="navToggle"
+          aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+
+    <main style="padding-top: 100px;">
+      <!-- BLOG SECTION -->
+      <section class="section blog" id="blog">
+        <div class="section-container">
+          <div class="section-header">
+            <span class="section-tag">&lt;blog&gt;</span>
+            <h2 class="section-title">Artikel <span class="gradient-text">& Edukasi</span></h2>
+            <p class="opacity-75 mt-4">Berbagi wawasan seputar teknologi, desain, dan pengembangan perangkat lunak.</p>
+          </div>
+          <div class="blog-grid" id="blogGrid">
+            <div class="loader"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-left">
+          <h3><span class="logo-bracket">&lt;</span><span id="footerName">Ayek</span><span
+              class="logo-bracket">/&gt;</span></h3>
+          <p>&copy; 2026 Ayek Portfolio. Built with <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)"
+              stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="display:inline; vertical-align:text-bottom; margin: 0 2px;">
+              <path
+                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg></p>
+        </div>
+        <div class="footer-socials" id="footerSocials"></div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

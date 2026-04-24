@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Ayek Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/admin.css">
+  <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+</head>
+
+<body>
+  <div id="adminApp">
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+      <div class="login-card">
+        <div class="login-header">
+          <h1><span class="logo-bracket">&lt;</span>Admin<span class="logo-bracket">/&gt;</span></h1>
+          <p>Masuk ke panel admin portofolio</p>
+        </div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="loginBtn"><span>Masuk</span></button>
+          <p class="login-error" id="loginError"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-dashboard" id="adminDashboard" style="display:none;">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <h2><span class="logo-bracket">&lt;</span>Admin<span class="logo-bracket">/&gt;</span></h2>
+        </div>
+        <nav class="sidebar-nav">
+          <button class="sidebar-link active" data-page="dashboard"><span>📊</span> Dashboard</button>
+          <button class="sidebar-link" data-page="projects"><span>📁</span> Projects</button>
+          <button class="sidebar-link" data-page="articles"><span>✍️</span> Blog / Articles</button>
+          <button class="sidebar-link" data-page="profile"><span>👤</span> Profile</button>
+          <button class="sidebar-link" data-page="resume"><span>📜</span> Resume / Timeline</button>
+          <button class="sidebar-link" data-page="testimonials"><span>💬</span> Testimonials</button>
+          <button class="sidebar-link" data-page="messages"><span>📧</span> Messages</button>
+          <button class="sidebar-link" data-page="chatbot"><span>🤖</span> Chatbot</button>
+          <button class="sidebar-link" data-page="certificates"><span>🎓</span> Sertifikat</button>
+        </nav>
+        <button class="sidebar-logout" id="logoutBtn"><span>🚪</span> Logout</button>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <button class="sidebar-toggle" id="sidebarToggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          </button>
+          <h2 id="pageTitle">Dashboard</h2>
+          <div class="admin-user" id="adminUserInfo">Admin</div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <div class="admin-page active" id="pageDashboard">
+          <div class="welcome-section" style="margin-bottom: 40px;">
+            <h1 style="font-size: 2rem; margin-bottom: 10px;">Selamat Datang, <span class="gradient-text">Admin</span> 👋</h1>
+            <p style="color: var(--text-secondary);">Kelola portofolio Anda dengan mudah di sini.</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>Total Projects</h3><span id="dashTotalProjects">0</span>
+            </div>
+            <div class="stat-card">
+              <h3>Total Articles</h3><span id="dashTotalArticles">0</span>
+            </div>
+            <div class="stat-card">
+              <h3>Total Messages</h3><span id="dashTotalMessages">0</span>
+            </div>
+          </div>
+
+          <div class="quick-actions" style="margin-top: 40px;">
+            <h3 style="margin-bottom: 20px;">Aksi Cepat</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+              <button class="btn btn-outline" onclick="showPage('projects')" style="justify-content: flex-start; padding: 20px;">
+                <span style="font-size: 1.2rem;">📁</span>
+                <div style="text-align: left;">
+                  <div style="font-weight: 700;">Tambah Project</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Publikasikan karya baru</div>
+                </div>
+              </button>
+              <button class="btn btn-outline" onclick="showPage('articles')" style="justify-content: flex-start; padding: 20px;">
+                <span style="font-size: 1.2rem;">✍️</span>
+                <div style="text-align: left;">
+                  <div style="font-weight: 700;">Tulis Artikel</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Bagikan insight terbaru</div>
+                </div>
+              </button>
+              <button class="btn btn-outline" onclick="showPage('messages')" style="justify-content: flex-start; padding: 20px;">
+                <span style="font-size: 1.2rem;">📧</span>
+                <div style="text-align: left;">
+                  <div style="font-weight: 700;">Cek Pesan</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Respon kontak masuk</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROJECTS -->
+        <div class="admin-page" id="pageProjects">
+          <div class="page-actions"><button class="btn btn-primary" id="addProjectBtn"><span>+ Tambah
+                Project</span></button></div>
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Judul</th>
+                  <th>Kategori</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="projectsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ARTICLES -->
+        <div class="admin-page" id="pageArticles">
+          <div class="page-actions"><button class="btn btn-primary" id="addArticleBtn"><span>+ Buat
+                Artikel</span></button></div>
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Judul</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="articlesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="admin-page" id="pageProfile">
+          <form id="profileForm" class="admin-form">
+            <div class="form-row">
+              <div class="form-group"><label>Nama</label><input type="text" id="profileName"></div>
+              <div class="form-group"><label>Title</label><input type="text" id="profileTitle"></div>
+            </div>
+            <div class="form-group"><label>Bio</label><textarea id="profileBio" rows="4"></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label>Email</label><input type="email" id="profileEmail"></div>
+              <div class="form-group"><label>WhatsApp</label><input type="text" id="profileWhatsapp"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>GitHub</label><input type="text" id="profileGithub"></div>
+              <div class="form-group"><label>LinkedIn</label><input type="text" id="profileLinkedin"></div>
+            </div>
+            <div class="form-group"><label>URL CV (PDF)</label><input type="text" id="profileCvUrl"></div>
+            <button type="submit" class="btn btn-primary"><span>Simpan Profile</span></button>
+          </form>
+        </div>
+
+        <!-- RESUME (Experience & Education) -->
+        <div class="admin-page" id="pageResume">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <h3>Pengalaman Kerja (Experience)</h3>
+            <button class="btn btn-primary btn-sm" id="addExpBtn">+ Tambah</button>
+          </div>
+          <div class="projects-table-wrap" style="margin-bottom: 40px;">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Posisi</th>
+                  <th>Perusahaan</th>
+                  <th>Tahun</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="experienceTableBody"></tbody>
+            </table>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+            <h3>Pendidikan (Education)</h3>
+            <button class="btn btn-primary btn-sm" id="addEduBtn">+ Tambah</button>
+          </div>
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Gelar / Jurusan</th>
+                  <th>Institusi</th>
+                  <th>Tahun</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="educationTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TESTIMONIALS -->
+        <div class="admin-page" id="pageTestimonials">
+          <div class="page-actions"><button class="btn btn-primary" id="addTestiBtn"><span>+ Tambah
+                Testimoni</span></button></div>
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Klien</th>
+                  <th>Peran</th>
+                  <th>Testimoni</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="testimonialsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="admin-page" id="pageMessages">
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Pengirim</th>
+                  <th>Email</th>
+                  <th>Pesan</th>
+                  <th>Tanggal</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="messagesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CHATBOT -->
+        <div class="admin-page" id="pageChatbot">
+          <div class="page-actions"><button class="btn btn-primary" id="addKeywordBtn"><span>+ Tambah Kata
+                Kunci</span></button></div>
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Kata Kunci</th>
+                  <th>Respon</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="chatbotTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CERTIFICATES -->
+        <div class="admin-page" id="pageCertificates">
+          <div class="page-actions"><button class="btn btn-primary" id="addCertificateBtn"><span>+ Tambah
+                Sertifikat</span></button></div>
+          <div class="projects-table-wrap">
+            <table class="projects-table">
+              <thead>
+                <tr>
+                  <th>Judul Sertifikat</th>
+                  <th>Penerbit</th>
+                  <th>Tahun</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="certificatesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- PROJECT MODAL -->
+      <div class="modal-overlay" id="projectModal">
+        <div class="modal-content">
+          <h3>Tambah/Edit Project</h3>
+          <form id="projectForm" class="admin-form">
+            <input type="hidden" id="projectId">
+            <div class="form-group"><label>Judul</label><input type="text" id="projectTitle" required></div>
+            <div class="form-row">
+              <div class="form-group"><label>Kategori</label>
+                <select id="projectCategory">
+                  <option value="web">Web</option>
+                  <option value="design">Design</option>
+                  <option value="network">Network</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Tahun</label><input type="text" id="projectYear"></div>
+            </div>
+            <div class="form-group"><label>Thumbnail URL (Opsional)</label><input type="text" id="projectThumbnail"></div>
+            <div class="form-group"><label>Atau Upload Thumbnail</label><input type="file" id="projectThumbFile" accept="image/*"></div>
+            <div class="form-group"><label>Deskripsi Singkat</label><textarea id="projectDesc" rows="2"></textarea>
+            </div>
+            <div class="form-group"><label>Case Study (Detail)</label><textarea id="projectCaseStudy" rows="5"
+                placeholder="Jelaskan proses pengerjaan..."></textarea></div>
+            <div class="form-group"><label>Tech Stack (comma separated)</label><input type="text" id="projectTech">
+            </div>
+            <div class="form-group"><label>Link Demo</label><input type="text" id="projectUrl"></div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-outline" onclick="closeModal('projectModal')">Batal</button>
+              <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ARTICLE MODAL -->
+      <div class="modal-overlay" id="articleModal">
+        <div class="modal-content">
+          <h3>Tulis Artikel</h3>
+          <form id="articleForm" class="admin-form">
+            <input type="hidden" id="articleId">
+            <div class="form-group"><label>Judul Artikel</label><input type="text" id="articleTitle" required></div>
+            <div class="form-group"><label>Slug (URL)</label><input type="text" id="articleSlug" required></div>
+            <div class="form-group"><label>Thumbnail URL</label><input type="text" id="articleThumb"></div>
+            <div class="form-group"><label>Konten (HTML/Markdown)</label><textarea id="articleContent" rows="10"
+                required></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label>Kategori</label><input type="text" id="articleCategory"></div>
+              <div class="form-group" style="flex-direction:row; gap:10px;"><label>Publish</label><input type="checkbox"
+                  id="articlePublished" checked></div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-outline" onclick="closeModal('articleModal')">Batal</button>
+              <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- EXPERIENCE MODAL -->
+    <div class="modal-overlay" id="experienceModal">
+      <div class="modal-content">
+        <h3>Tambah/Edit Pengalaman</h3>
+        <form id="experienceForm" class="admin-form">
+          <input type="hidden" id="expId">
+          <div class="form-group"><label>Posisi / Title</label><input type="text" id="expTitle" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Perusahaan</label><input type="text" id="expCompany" required></div>
+            <div class="form-group"><label>Tahun (misal: 2020 - 2023)</label><input type="text" id="expYear"></div>
+          </div>
+          <div class="form-group"><label>Deskripsi Singkat</label><textarea id="expDesc" rows="3"></textarea></div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeModal('experienceModal')">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- EDUCATION MODAL -->
+    <div class="modal-overlay" id="educationModal">
+      <div class="modal-content">
+        <h3>Tambah/Edit Pendidikan</h3>
+        <form id="educationForm" class="admin-form">
+          <input type="hidden" id="eduId">
+          <div class="form-group"><label>Gelar / Jurusan</label><input type="text" id="eduDegree" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Institusi</label><input type="text" id="eduInstitution" required></div>
+            <div class="form-group"><label>Tahun</label><input type="text" id="eduYear"></div>
+          </div>
+          <div class="form-group"><label>Deskripsi Singkat</label><textarea id="eduDesc" rows="3"></textarea></div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeModal('educationModal')">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- TESTIMONIAL MODAL -->
+    <div class="modal-overlay" id="testimonialModal">
+      <div class="modal-content">
+        <h3>Tambah/Edit Testimoni</h3>
+        <form id="testimonialForm" class="admin-form">
+          <input type="hidden" id="testiId">
+          <div class="form-row">
+            <div class="form-group"><label>Nama Klien</label><input type="text" id="testiName" required></div>
+            <div class="form-group"><label>Peran / Perusahaan</label><input type="text" id="testiRole"></div>
+          </div>
+          <div class="form-group"><label>Isi Testimoni</label><textarea id="testiContent" rows="4" required></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeModal('testimonialModal')">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- CHATBOT MODAL -->
+    <div class="modal-overlay" id="chatbotModal">
+      <div class="modal-content">
+        <h3>Tambah/Edit Kata Kunci</h3>
+        <form id="chatbotForm" class="admin-form">
+          <input type="hidden" id="keywordId">
+          <div class="form-group"><label>Kata Kunci (Koma dipisah jika banyak, misal: harga,biaya)</label><input
+              type="text" id="botKeyword" required></div>
+          <div class="form-group"><label>Respon Bot</label><textarea id="botResponse" rows="4" required></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeModal('chatbotModal')">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- CERTIFICATES MODAL -->
+    <div class="modal-overlay" id="certificateModal">
+      <div class="modal-content">
+        <h3>Tambah/Edit Sertifikat</h3>
+        <form id="certificateForm" class="admin-form">
+          <input type="hidden" id="certificateId">
+          <div class="form-group"><label>Judul Sertifikat</label><input type="text" id="certTitle" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Penerbit (Issuer)</label><input type="text" id="certIssuer" required></div>
+            <div class="form-group"><label>Tahun</label><input type="text" id="certYear"></div>
+          </div>
+          <div class="form-group"><label>URL Gambar Sertifikat (Opsional)</label><input type="text" id="certImage"></div>
+          <div class="form-group"><label>Atau Upload Gambar</label><input type="file" id="certFile" accept="image/*"></div>
+          <div class="form-group"><label>URL Kredensial (Link Validasi)</label><input type="text" id="certCredential">
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeModal('certificateModal')">Batal</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+  </div>
+  <script type="module" src="/src/admin.js"></script>
+</body>
+
+</html>
