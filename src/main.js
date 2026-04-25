@@ -20,6 +20,30 @@ const escapeHTML = str => {
   return div.innerHTML
 }
 
+async function trackEvent(eventName, eventData = {}) {
+  try {
+    await supabase.from('analytics').insert([{ event_name: eventName, event_data: eventData }])
+  } catch (err) { /* silent fail for analytics */ }
+}
+
+function showSkeletons(containerId, count = 3) {
+  const container = document.getElementById(containerId)
+  if (!container) return
+  let html = ''
+  for (let i = 0; i < count; i++) {
+    html += `
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-badge"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 70%;"></div>
+      </div>
+    `
+  }
+  container.innerHTML = html
+}
+
 // ===== CUSTOM ALERTS =====
 window.showCustomAlert = function (type, message) {
   const container = document.getElementById('alertContainer');
@@ -83,18 +107,32 @@ window.showCustomAlert = function (type, message) {
 function initTheme() {
   const themeToggle = document.getElementById('themeToggle')
   const body = document.body
-  const icon = document.getElementById('themeIcon')
 
-  const savedTheme = localStorage.getItem('portfolio-theme') || 'dark'
-  body.setAttribute('data-theme', savedTheme)
-  updateThemeIcon(savedTheme)
+  const getPreferredTheme = () => {
+    const saved = localStorage.getItem('portfolio-theme')
+    if (saved) return saved
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  }
 
-  themeToggle.addEventListener('click', () => {
-    const currentTheme = body.getAttribute('data-theme')
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+  const currentTheme = getPreferredTheme()
+  body.setAttribute('data-theme', currentTheme)
+  updateThemeIcon(currentTheme)
+
+  themeToggle?.addEventListener('click', () => {
+    const theme = body.getAttribute('data-theme')
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
     body.setAttribute('data-theme', newTheme)
     localStorage.setItem('portfolio-theme', newTheme)
     updateThemeIcon(newTheme)
+  })
+
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+    if (!localStorage.getItem('portfolio-theme')) {
+      const newTheme = e.matches ? 'light' : 'dark'
+      body.setAttribute('data-theme', newTheme)
+      updateThemeIcon(newTheme)
+    }
   })
 }
 
@@ -301,6 +339,7 @@ let displayedProjectsCount = 6
 
 async function loadProjects() {
   const grid = document.getElementById('projectsGrid')
+  if (grid) showSkeletons('projectsGrid', 6)
   try {
     const { data: projData } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
     const { data: certData } = await supabase.from('certificates').select('*').order('created_at', { ascending: false })
@@ -395,6 +434,7 @@ window.openProjectDetail = async (id) => {
 
   modal.classList.add('active')
   document.body.style.overflow = 'hidden'
+  trackEvent('project_view', { id })
 }
 
 const pmCloseBtn = document.getElementById('pmClose')
@@ -441,6 +481,7 @@ async function loadDynamicContent() {
       if (p.cv_url && elCVBtn && elCVCont) {
         elCVBtn.href = p.cv_url
         elCVCont.style.display = 'block'
+        elCVBtn.addEventListener('click', () => trackEvent('cv_click'))
       }
 
       if (p.linkedin && elLinkedInBtn && elLinkedInCont) {
@@ -555,6 +596,7 @@ function initFilters() {
 // ===== BLOG ARTICLES =====
 async function loadArticles() {
   const grid = document.getElementById('blogGrid')
+  if (grid) showSkeletons('blogGrid', 3)
   if (!grid) return
 
   const loader = document.getElementById('blogLoader')
@@ -742,8 +784,17 @@ function initContact() {
       return // Silently ignore bot submissions
     }
 
+    // Turnstile check
+    const turnstileResponse = form.querySelector('[name="cf-turnstile-response"]')?.value
+    if (!turnstileResponse) {
+      showCustomAlert('warning', 'Harap selesaikan verifikasi keamanan (CAPTCHA).')
+      return
+    }
+
     const btn = form.querySelector('button[type="submit"]')
     const originalBtnText = btn.innerHTML
+    btn.disabled = true
+    btn.innerHTML = '<span>Mengirim...</span>'
 
     const name = document.getElementById('contactName').value
     const email = document.getElementById('contactFormEmail').value
@@ -762,6 +813,17 @@ function initContact() {
       if (error) throw error
 
       showCustomAlert('success', 'Success - Pesan berhasil dikirim! Terima kasih.')
+      
+      // EmailJS Notification
+      if (typeof emailjs !== 'undefined') {
+        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+          from_name: name,
+          from_email: email,
+          message: message,
+          to_name: "Ayek",
+        }).catch(err => console.error('EmailJS error:', err));
+      }
+      
       form.reset()
     } catch (err) {
       console.error(err)
@@ -851,4 +913,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollFeatures()
   initHeroTyping()
   initYear()
+
+  trackEvent('page_view', { path: window.location.pathname })
 })

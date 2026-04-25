@@ -96,35 +96,30 @@
             <div class="stat-card">
               <h3>Total Messages</h3><span id="dashTotalMessages">0</span>
             </div>
+            <div class="stat-card">
+              <h3>Total Views</h3><span id="dashTotalViews">0</span>
+            </div>
+            <div class="stat-card">
+              <h3>CV Clicks</h3><span id="dashCvClicks">0</span>
+            </div>
           </div>
 
-          <div class="quick-actions" style="margin-top: 40px;">
-            <h3 style="margin-bottom: 20px;">Aksi Cepat</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-              <button class="btn btn-outline" onclick="showPage('projects')"
-                style="justify-content: flex-start; padding: 20px;">
-                <span style="font-size: 1.2rem;">📁</span>
-                <div style="text-align: left;">
-                  <div style="font-weight: 700;">Tambah Project</div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Publikasikan karya baru</div>
-                </div>
-              </button>
-              <button class="btn btn-outline" onclick="showPage('articles')"
-                style="justify-content: flex-start; padding: 20px;">
-                <span style="font-size: 1.2rem;">✍️</span>
-                <div style="text-align: left;">
-                  <div style="font-weight: 700;">Tulis Artikel</div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Bagikan insight terbaru</div>
-                </div>
-              </button>
-              <button class="btn btn-outline" onclick="showPage('messages')"
-                style="justify-content: flex-start; padding: 20px;">
-                <span style="font-size: 1.2rem;">📧</span>
-                <div style="text-align: left;">
-                  <div style="font-weight: 700;">Cek Pesan</div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Respon kontak masuk</div>
-                </div>
-              </button>
+
+
+          <div class="activity-log" style="margin-top: 40px;">
+            <h3 style="margin-bottom: 20px;">Aktivitas Terbaru</h3>
+            <div class="projects-table-wrap">
+              <table class="projects-table">
+                <thead>
+                  <tr>
+                    <th>Aksi</th>
+                    <th>Waktu</th>
+                  </tr>
+                </thead>
+                <tbody id="activityLogBody">
+                  <tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">Memuat aktivitas...</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

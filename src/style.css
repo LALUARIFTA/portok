@@ -2629,3 +2629,48 @@ body.no-scroll {
 #scrollProgress {
   pointer-events: none;
 }
+
+/* ===== SKELETON LOADING ===== */
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--border) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.skeleton-image {
+  height: 200px;
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 65%;
+}
+
+.skeleton-text {
+  height: 14px;
+  width: 90%;
+}
+
+.skeleton-badge {
+  height: 20px;
+  width: 80px;
+  border-radius: 20px;
+}

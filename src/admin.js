@@ -20,6 +20,33 @@ const escapeHTML = str => {
   return div.innerHTML
 }
 
+async function logActivity(action) {
+  try {
+    await supabase.from('activity_log').insert([{ action }])
+    if (document.getElementById('activityLogBody')) loadActivityLog()
+  } catch (err) { console.warn('Activity log failed - table might not exist') }
+}
+
+async function loadActivityLog() {
+  const tbody = document.getElementById('activityLogBody')
+  if (!tbody) return
+  try {
+    const { data } = await supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(8)
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">Belum ada aktivitas.</td></tr>'
+      return
+    }
+    tbody.innerHTML = data.map(l => `
+      <tr>
+        <td style="font-size:0.85rem; font-weight:500;">${escapeHTML(l.action)}</td>
+        <td style="font-size:0.75rem; color:var(--text-muted);">${new Date(l.created_at).toLocaleTimeString('id-ID')} - ${new Date(l.created_at).toLocaleDateString('id-ID')}</td>
+      </tr>
+    `).join('')
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.75rem;">Gagal memuat log. Buat tabel "activity_log" di Supabase.</td></tr>'
+  }
+}
+
 // ===== CUSTOM ALERTS =====
 window.showCustomAlert = function (type, message) {
   const container = document.getElementById('alertContainer');
@@ -104,6 +131,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 function initDashboard() {
   initSidebar()
   loadStats()
+  loadActivityLog()
   loadProjects()
   loadArticles()
   loadProfile()
@@ -124,12 +152,26 @@ function initSidebar() {
 }
 
 async function loadStats() {
-  const { count: pCount } = await supabase.from('projects').select('*', { count: 'exact', head: true })
-  const { count: aCount } = await supabase.from('articles').select('*', { count: 'exact', head: true })
-  const { count: mCount } = await supabase.from('messages').select('*', { count: 'exact', head: true })
-  document.getElementById('dashTotalProjects').textContent = pCount || 0
-  document.getElementById('dashTotalArticles').textContent = aCount || 0
-  document.getElementById('dashTotalMessages').textContent = mCount || 0
+  try {
+    const { count: pCount } = await supabase.from('projects').select('*', { count: 'exact', head: true })
+    const { count: aCount } = await supabase.from('articles').select('*', { count: 'exact', head: true })
+    const { count: mCount } = await supabase.from('messages').select('*', { count: 'exact', head: true })
+    
+    // Analytics (Try catch because table might not exist yet)
+    let vCount = 0, cCount = 0
+    try {
+      const { count: views } = await supabase.from('analytics').select('*', { count: 'exact', head: true }).eq('event_name', 'page_view')
+      const { count: clicks } = await supabase.from('analytics').select('*', { count: 'exact', head: true }).eq('event_name', 'cv_click')
+      vCount = views || 0
+      cCount = clicks || 0
+    } catch (e) { console.warn('Analytics table not found') }
+
+    document.getElementById('dashTotalProjects').textContent = pCount || 0
+    document.getElementById('dashTotalArticles').textContent = aCount || 0
+    document.getElementById('dashTotalMessages').textContent = mCount || 0
+    document.getElementById('dashTotalViews').textContent = vCount
+    document.getElementById('dashCvClicks').textContent = cCount
+  } catch (err) { console.error('Stats error:', err) }
 }
 
 // ===== PROJECTS =====
@@ -210,6 +252,7 @@ document.getElementById('projectForm').addEventListener('submit', async e => {
     else await supabase.from('projects').insert(payload)
 
     document.getElementById('projectThumbFile').value = '' // Clear file input
+    logActivity(`Menyimpan project: ${payload.title}`)
     closeModal('projectModal')
     loadProjects()
     showCustomAlert('success', 'Project berhasil disimpan!')
@@ -303,6 +346,7 @@ document.getElementById('articleForm').addEventListener('submit', async e => {
     else await supabase.from('articles').insert(payload)
 
     document.getElementById('articleThumbFile').value = '' // Clear file input
+    logActivity(`Menyimpan artikel: ${payload.title}`)
     closeModal('articleModal')
     loadArticles()
     showCustomAlert('success', 'Artikel berhasil disimpan!')
@@ -549,6 +593,7 @@ document.getElementById('profileForm').addEventListener('submit', async e => {
 
     document.getElementById('profileCvFile').value = ''
     document.getElementById('profileCvUrl').value = cvUrl
+    logActivity(`Memperbarui profile`)
     showCustomAlert('success', 'Profile disimpan!')
   } catch (err) {
     console.error(err)
