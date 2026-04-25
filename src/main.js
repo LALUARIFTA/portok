@@ -1,5 +1,113 @@
 import { supabase } from './supabase.js'
 
+// ===== I18N (Translations) =====
+const translations = {
+  id: {
+    nav_home: "Beranda",
+    nav_about: "Tentang",
+    nav_resume: "Riwayat",
+    nav_projects: "Proyek",
+    nav_blog: "Blog",
+    nav_contact: "Kontak",
+    nav_admin: "Admin",
+    hero_hi: "Hi, Saya",
+    hero_role: "IT Professional",
+    about_tag: "<tentang>",
+    about_title: "Tentang Saya",
+    cv_download: "Unduh CV",
+    skill_design_title: "Desain",
+    skill_design_desc: "UI/UX, Desain Grafis",
+    skill_dev_title: "Development",
+    skill_dev_desc: "Full-Stack Web",
+    skill_net_title: "Networking",
+    skill_net_desc: "Infrastruktur Jaringan",
+    skill_admin_title: "Administrasi",
+    skill_admin_desc: "Manajemen Data",
+    skill_support_title: "IT Support",
+    skill_support_desc: "Teknis & Troubleshooting",
+    skill_streamer_title: "Streamer",
+    skill_streamer_desc: "Konten Kreator",
+    resume_tag: "<riwayat>",
+    resume_title: "Perjalanan Karir",
+    resume_exp_title: "Pengalaman Kerja",
+    resume_edu_title: "Pendidikan",
+    linkedin_view: "Lihat di LinkedIn",
+    projects_tag: "<proyek>",
+    projects_title: "Karya Terbaru",
+    filter_all: "Semua",
+    filter_design: "Desain",
+    filter_web: "Website",
+    filter_network: "Network",
+    filter_cert: "Sertifikat",
+    load_more: "Lihat Lebih Banyak",
+    testimonials_tag: "<testimoni>",
+    testimonials_title: "Apa Kata Mereka",
+    testimonials_desc: "Pengalaman mereka bekerja bersama saya.",
+    contact_tag: "<kontak>",
+    contact_title: "Hubungi Saya",
+    form_name: "Nama",
+    form_email: "Email",
+    form_msg: "Pesan",
+    form_btn: "Kirim Pesan",
+    footer_nav: "Navigasi",
+    footer_services: "Layanan",
+    footer_others: "Lainnya"
+  },
+  en: {
+    nav_home: "Home",
+    nav_about: "About",
+    nav_resume: "Resume",
+    nav_projects: "Projects",
+    nav_blog: "Blog",
+    nav_contact: "Contact",
+    nav_admin: "Admin",
+    hero_hi: "Hi, I am",
+    hero_role: "IT Professional",
+    about_tag: "<about>",
+    about_title: "About Me",
+    cv_download: "Download CV",
+    skill_design_title: "Design",
+    skill_design_desc: "UI/UX, Graphic Design",
+    skill_dev_title: "Development",
+    skill_dev_desc: "Full-Stack Web",
+    skill_net_title: "Networking",
+    skill_net_desc: "Infrastructure",
+    skill_admin_title: "Administration",
+    skill_admin_desc: "Data Management",
+    skill_support_title: "IT Support",
+    skill_support_desc: "Technical Troubleshooting",
+    skill_streamer_title: "Streamer",
+    skill_streamer_desc: "Content Creator",
+    resume_tag: "<resume>",
+    resume_title: "Career Journey",
+    resume_exp_title: "Work Experience",
+    resume_edu_title: "Education",
+    linkedin_view: "View on LinkedIn",
+    projects_tag: "<projects>",
+    projects_title: "Latest Works",
+    filter_all: "All",
+    filter_design: "Design",
+    filter_web: "Website",
+    filter_network: "Network",
+    filter_cert: "Certificates",
+    load_more: "Load More",
+    testimonials_tag: "<testimonials>",
+    testimonials_title: "What They Say",
+    testimonials_desc: "Their experience working with me.",
+    contact_tag: "<contact>",
+    contact_title: "Get In Touch",
+    form_name: "Name",
+    form_email: "Email",
+    form_msg: "Message",
+    form_btn: "Send Message",
+    footer_nav: "Navigation",
+    footer_services: "Services",
+    footer_others: "Others"
+  }
+}
+
+let currentLang = localStorage.getItem('portfolio-lang') || 'id'
+
 // ===== PAGE LOADER =====
 window.addEventListener('load', () => {
   const loader = document.getElementById('page-loader');
@@ -970,5 +1078,33 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroTyping()
   initYear()
 
+  initI18n()
   trackEvent('page_view', { path: window.location.pathname })
 })
+
+function initI18n() {
+  const btn = document.getElementById('langToggle')
+  const display = document.getElementById('langDisplay')
+  
+  if (btn && display) {
+    display.textContent = currentLang.toUpperCase()
+    
+    btn.addEventListener('click', () => {
+      currentLang = currentLang === 'id' ? 'en' : 'id'
+      localStorage.setItem('portfolio-lang', currentLang)
+      display.textContent = currentLang.toUpperCase()
+      applyTranslations()
+    })
+  }
+  
+  applyTranslations()
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    if (translations[currentLang][key]) {
+      el.textContent = translations[currentLang][key]
+    }
+  })
+}

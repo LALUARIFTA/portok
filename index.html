@@ -100,28 +100,33 @@
         <a href="#hero" class="nav-logo" aria-label="Ayek Home"><span class="logo-bracket">&lt;</span><span
             id="navName">Ayek</span><span class="logo-bracket">/&gt;</span></a>
         <ul class="nav-links" id="navLinks">
-          <li><a href="#hero" class="nav-link active" data-section="hero">Home</a></li>
-          <li><a href="#about" class="nav-link" data-section="about">About</a></li>
-          <li><a href="#resume" class="nav-link" data-section="resume">Resume</a></li>
-          <li><a href="#projects" class="nav-link" data-section="projects">Projects</a></li>
-          <li><a href="/blog.html" class="nav-link" data-section="blog">Blog</a></li>
-          <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
-          <li><a href="/admin.html" class="nav-link" data-section="admin">Admin</a></li>
+          <li><a href="#hero" class="nav-link active" data-section="hero" data-i18n="nav_home">Home</a></li>
+          <li><a href="#about" class="nav-link" data-section="about" data-i18n="nav_about">About</a></li>
+          <li><a href="#resume" class="nav-link" data-section="resume" data-i18n="nav_resume">Resume</a></li>
+          <li><a href="#projects" class="nav-link" data-section="projects" data-i18n="nav_projects">Projects</a></li>
+          <li><a href="/blog.html" class="nav-link" data-section="blog" data-i18n="nav_blog">Blog</a></li>
+          <li><a href="#contact" class="nav-link" data-section="contact" data-i18n="nav_contact">Contact</a></li>
+          <li><a href="/admin.html" class="nav-link" data-section="admin" data-i18n="nav_admin">Admin</a></li>
           <li>
-            <button class="theme-toggle" id="themeToggle" aria-label="Ganti Tema">
-              <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            </button>
+            <div style="display:flex;gap:10px;align-items:center;margin-left:10px;">
+              <button class="lang-toggle" id="langToggle" aria-label="Ganti Bahasa" style="background:none;border:1px solid var(--border);color:var(--text-primary);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:0.75rem;font-weight:700;min-width:40px;">
+                <span id="langDisplay">EN</span>
+              </button>
+              <button class="theme-toggle" id="themeToggle" aria-label="Ganti Tema">
+                <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              </button>
+            </div>
           </li>
         </ul>
         <button class="nav-toggle" id="navToggle"
@@ -146,10 +151,10 @@
             <div class="hero-badge"><span class="badge-dot"></span> <span id="heroBadgeText">Available for work</span>
             </div>
             <h1 class="hero-title">
-              <span class="hero-line">Hi, Saya</span>
+              <span class="hero-line" data-i18n="hero_hi">Hi, Saya</span>
               <span class="hero-line hero-name"><span class="gradient-text" id="heroNameText">Ayek</span></span>
               <span class="hero-line hero-role"><span id="heroRole"
-                  style="border-right:2px solid var(--accent);padding-right:4px;animation:blink-cursor 0.8s step-end infinite;">IT
+                  style="border-right:2px solid var(--accent);padding-right:4px;animation:blink-cursor 0.8s step-end infinite;" data-i18n="hero_role">IT
                   Professional</span></span>
             </h1>
             <p class="hero-description" id="heroBioText">
@@ -200,8 +205,8 @@
           <div class="section-header"
             style="margin-top: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
             <div>
-              <span class="section-tag">&lt;about&gt;</span>
-              <h2 class="section-title" style="margin-bottom: 0;">Tentang <span class="gradient-text">Saya</span></h2>
+              <span class="section-tag" data-i18n="about_tag">&lt;about&gt;</span>
+              <h2 class="section-title" style="margin-bottom: 0;" data-i18n="about_title">Tentang Saya</h2>
             </div>
             <div id="cvDownloadContainer">
               <a href="https://xgsuoivedppftgmewlcx.supabase.co/storage/v1/object/public/portfolio/cv/0.572751462094714.pdf"
@@ -211,7 +216,7 @@
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-                <span>Download CV</span>
+                <span data-i18n="cv_download">Download CV</span>
               </a>
             </div>
           </div>
@@ -252,8 +257,8 @@
                     </svg>
                   </div>
                   <div>
-                    <h4>Design</h4>
-                    <p>UI/UX, Graphic Design</p>
+                    <h4 data-i18n="skill_design_title">Design</h4>
+                    <p data-i18n="skill_design_desc">UI/UX, Graphic Design</p>
                   </div>
                 </div>
                 <div class="highlight-item">
@@ -265,8 +270,8 @@
                     </svg>
                   </div>
                   <div>
-                    <h4>Development</h4>
-                    <p>Full-Stack Web</p>
+                    <h4 data-i18n="skill_dev_title">Development</h4>
+                    <p data-i18n="skill_dev_desc">Full-Stack Web</p>
                   </div>
                 </div>
                 <div class="highlight-item">
@@ -280,8 +285,8 @@
                     </svg>
                   </div>
                   <div>
-                    <h4>Networking</h4>
-                    <p>Infrastruktur</p>
+                    <h4 data-i18n="skill_net_title">Networking</h4>
+                    <p data-i18n="skill_net_desc">Infrastruktur</p>
                   </div>
                 </div>
                 <div class="highlight-item">
@@ -296,8 +301,8 @@
                     </svg>
                   </div>
                   <div>
-                    <h4>Administrasi</h4>
-                    <p>Manajemen Data</p>
+                    <h4 data-i18n="skill_admin_title">Administrasi</h4>
+                    <p data-i18n="skill_admin_desc">Manajemen Data</p>
                   </div>
                 </div>
                 <div class="highlight-item">
@@ -309,8 +314,8 @@
                     </svg>
                   </div>
                   <div>
-                    <h4>IT Support</h4>
-                    <p>Technical Troubleshooting</p>
+                    <h4 data-i18n="skill_support_title">IT Support</h4>
+                    <p data-i18n="skill_support_desc">Technical Troubleshooting</p>
                   </div>
                 </div>
                 <div class="highlight-item">
@@ -322,8 +327,8 @@
                     </svg>
                   </div>
                   <div>
-                    <h4>Streamer</h4>
-                    <p>Content Creator</p>
+                    <h4 data-i18n="skill_streamer_title">Streamer</h4>
+                    <p data-i18n="skill_streamer_desc">Content Creator</p>
                   </div>
                 </div>
               </div>
@@ -334,13 +339,13 @@
 
       <section class="section resume reveal" id="resume" style="background: var(--bg-secondary);">
         <div class="section-container">
-          <div class="section-header text-center" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
-            <span class="section-tag">&lt;resume&gt;</span>
-            <h2 class="section-title">Perjalanan <span class="gradient-text">Karir</span></h2>
+          <div class="section-header" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
+            <span class="section-tag" data-i18n="resume_tag">&lt;resume&gt;</span>
+            <h2 class="section-title" data-i18n="resume_title">Perjalanan Karir</h2>
           </div>
           <div class="timeline-grid">
             <div class="timeline-column">
-              <h3 class="timeline-title">
+              <h3 class="timeline-title" data-i18n="resume_exp_title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round"
                   style="display:inline; vertical-align:text-bottom; margin-right:8px;">
@@ -352,7 +357,7 @@
               <div class="timeline-list" id="experienceList"></div>
             </div>
             <div class="timeline-column">
-              <h3 class="timeline-title">
+              <h3 class="timeline-title" data-i18n="resume_edu_title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round"
                   style="display:inline; vertical-align:text-bottom; margin-right:8px;">
@@ -374,7 +379,7 @@
                 <rect width="4" height="12" x="2" y="9" />
                 <circle cx="4" cy="4" r="2" />
               </svg>
-              Lihat Selengkapnya di LinkedIn
+              <span data-i18n="linkedin_view">Lihat Selengkapnya di LinkedIn</span>
             </a>
           </div>
         </div>
@@ -382,20 +387,20 @@
 
       <section class="section projects reveal" id="projects">
         <div class="section-container">
-          <div class="section-header text-center" style="text-align: center;">
-            <span class="section-tag">&lt;projects&gt;</span>
-            <h2 class="section-title">Karya <span class="gradient-text">Terbaru</span></h2>
+          <div class="section-header" style="text-align: center;">
+            <span class="section-tag" data-i18n="projects_tag">&lt;projects&gt;</span>
+            <h2 class="section-title" data-i18n="projects_title">Karya Terbaru</h2>
           </div>
           <div class="project-filters" id="projectFilters" style="justify-content: center;">
-            <button class="filter-btn active" data-filter="all">Semua</button>
-            <button class="filter-btn" data-filter="design">Design</button>
-            <button class="filter-btn" data-filter="web">Website</button>
-            <button class="filter-btn" data-filter="network">Network</button>
-            <button class="filter-btn" data-filter="certificate">Sertifikat</button>
+            <button class="filter-btn active" data-filter="all" data-i18n="filter_all">Semua</button>
+            <button class="filter-btn" data-filter="design" data-i18n="filter_design">Design</button>
+            <button class="filter-btn" data-filter="web" data-i18n="filter_web">Website</button>
+            <button class="filter-btn" data-filter="network" data-i18n="filter_network">Network</button>
+            <button class="filter-btn" data-filter="certificate" data-i18n="filter_cert">Sertifikat</button>
           </div>
           <div class="projects-grid" id="projectsGrid"></div>
           <div id="loadMoreContainer" style="display: none; justify-content: center; margin-top: 40px;">
-            <button id="loadMoreProjectsBtn" class="btn btn-outline" style="min-width: 200px;">Lihat Lebih
+            <button id="loadMoreProjectsBtn" class="btn btn-outline" style="min-width: 200px;" data-i18n="load_more">Lihat Lebih
               Banyak</button>
           </div>
         </div>
@@ -405,9 +410,9 @@
         style="background: var(--bg-secondary); overflow: hidden;">
         <div class="section-container">
           <div class="section-header text-center" style="max-width: 600px; margin: 0 auto 40px;">
-            <span class="section-tag">&lt;testimonials&gt;</span>
-            <h2 class="section-title">Apa Kata <span class="gradient-text">Mereka</span></h2>
-            <p class="opacity-75 mt-4">Lihat bagaimana pengalaman mereka bekerja bersama saya dalam membangun solusi
+            <span class="section-tag" data-i18n="testimonials_tag">&lt;testimonials&gt;</span>
+            <h2 class="section-title" data-i18n="testimonials_title">Apa Kata Mereka</h2>
+            <p class="opacity-75 mt-4" data-i18n="testimonials_desc">Lihat bagaimana pengalaman mereka bekerja bersama saya dalam membangun solusi
               digital.</p>
           </div>
 
@@ -422,26 +427,26 @@
       <section class="section contact reveal" id="contact">
         <div class="section-container">
           <div class="section-header text-center" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
-            <span class="section-tag">&lt;contact&gt;</span>
+            <span class="section-tag" data-i18n="contact_tag">&lt;contact&gt;</span>
           </div>
           <div class="contact-flex"
             style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; justify-content: center;">
             <form class="contact-form" id="contactForm" style="flex: 1; min-width: 300px; max-width: 600px;">
-              <div class="form-group"><label for="contactName">Nama</label><input type="text" id="contactName" required
+              <div class="form-group"><label for="contactName" data-i18n="form_name">Nama</label><input type="text" id="contactName" required
                   placeholder="Masukkan nama Anda">
               </div>
-              <div class="form-group"><label for="contactFormEmail">Email</label><input type="email"
+              <div class="form-group"><label for="contactFormEmail" data-i18n="form_email">Email</label><input type="email"
                   id="contactFormEmail" required placeholder="nama@email.com"></div>
-              <div class="form-group" style="display:none;"><label for="contactHoneypot">Jangan isi ini</label><input
+              <div class="form-group" style="display:none;"><label for="contactHoneypot" data-i18n="form_honeypot">Jangan isi ini</label><input
                   type="text" id="contactHoneypot" tabindex="-1" autocomplete="off"></div>
-              <div class="form-group"><label for="contactMessage">Pesan</label><textarea id="contactMessage" rows="5"
+              <div class="form-group"><label for="contactMessage" data-i18n="form_msg">Pesan</label><textarea id="contactMessage" rows="5"
                   required placeholder="Tuliskan pesan Anda di sini..."></textarea></div>
-              <button type="submit" class="btn btn-primary btn-full"><span>Kirim Pesan</span></button>
+              <button type="submit" class="btn btn-primary btn-full"><span data-i18n="form_btn">Kirim Pesan</span></button>
             </form>
 
             <div class="wallet-wrapper"
               style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
-              <h2 class="section-title" style="margin-bottom: 10px;">Hubungi <span class="gradient-text">Saya</span>
+              <h2 class="section-title" style="margin-bottom: 10px;" data-i18n="contact_title">Hubungi Saya
               </h2>
               <p
                 style="color: var(--text-muted); font-size: 0.95rem; text-align: center; max-width: 320px; margin-bottom: 30px; line-height: 1.5;">
