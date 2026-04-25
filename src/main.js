@@ -1071,6 +1071,9 @@ function initPixelArt() {
   const container = document.getElementById('pixelArtContainer');
   if (!container) return;
 
+  container.style.opacity = '0';
+  container.style.transition = 'opacity 1.5s ease-in-out';
+
   new PixelatedCanvas({
     src: myPhoto,
     container: container,
@@ -1091,6 +1094,11 @@ function initPixelArt() {
     sampleAverage: true,
     tintStrength: 0
   });
+
+  // Fade in after a short delay to allow sampling to start
+  setTimeout(() => {
+    container.style.opacity = '1';
+  }, 500);
 }
 
 
