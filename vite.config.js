@@ -15,4 +15,16 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      '/api/ai': {
+        target: 'https://integrate.api.nvidia.com/v1',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ai/, ''),
+        headers: {
+          'Origin': 'https://integrate.api.nvidia.com'
+        }
+      }
+    }
+  }
 })

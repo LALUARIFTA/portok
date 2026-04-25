@@ -761,9 +761,8 @@ async function initChatbot() {
       3. Jangan menjawab hal di luar portofolio jika tidak relevan.
       4. Jawablah dengan singkat dan padat.`
 
-      // NVIDIA / DeepSeek API Implementation
-      // WARNING: Client-side API key is insecure. For production, use a backend proxy.
-      const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+      // NVIDIA / DeepSeek API via Local Proxy (Fixes CORS)
+      const response = await fetch("/api/ai/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -775,13 +774,22 @@ async function initChatbot() {
             { role: "system", content: systemPrompt },
             { role: "user", content: text }
           ],
-          temperature: 0.7,
-          max_tokens: 1024,
-          stream: true
+          temperature: 0.6,
+          max_tokens: 16384,
+          stream: true,
+          extra_body: {
+            chat_template_kwargs: {
+              thinking: true,
+              reasoning_effort: "high"
+            }
+          }
         })
       })
 
-      if (!response.ok) throw new Error('API Error')
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.message || 'API Error')
+      }
 
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
@@ -801,9 +809,12 @@ async function initChatbot() {
             if (dataStr === '[DONE]') break
             try {
               const data = JSON.parse(dataStr)
-              const content = data.choices[0].delta.content
-              if (content) {
-                fullContent += content
+              const delta = data.choices[0].delta
+              const content = delta.content || ""
+              const reasoning = delta.reasoning || delta.reasoning_content || ""
+              
+              if (reasoning || content) {
+                fullContent += (reasoning + content)
                 botMsgEl.textContent = fullContent
                 messages.scrollTop = messages.scrollHeight
               }
@@ -813,7 +824,7 @@ async function initChatbot() {
       }
     } catch (err) {
       console.error('Chat error:', err)
-      botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya. Silakan coba lagi nanti.'
+      botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya (CORS/API Error). Silakan coba lagi nanti.'
     }
   })
 }
