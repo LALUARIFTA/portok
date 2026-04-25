@@ -1,10 +1,10 @@
 import { supabase } from './supabase.js'
 import { initThreeJSBackground } from './three-bg.js'
-import { initCareerGame } from './career-game.js'
+
 import gsap from 'gsap'
 import emailjs from '@emailjs/browser'
 import { PixelatedCanvas } from './pixel-art.js'
-import myPhoto from './assets/me.png'
+import myPhoto from './assets/me.webp'
 
 // Initialize EmailJS
 emailjs.init("YOUR_PUBLIC_KEY")
@@ -471,7 +471,7 @@ function renderProjects() {
   grid.innerHTML = toDisplay.map((p, i) => `
     <div class="project-card reveal" style="animation-delay:${(i % 6) * 0.1}s" onclick="window.openProjectDetail('${p.id}')">
       <div class="project-thumb">
-        ${p.thumbnail && p.thumbnail.toLowerCase().endsWith('.pdf') ? `<div style="height:100%; display:flex; align-items:center; justify-content:center; background:var(--bg-secondary); color:var(--text-muted);"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>` : `<img src="${p.thumbnail || 'https://via.placeholder.com/400x300'}" alt="Thumbnail for ${p.title}" loading="lazy">`}
+        ${p.thumbnail && p.thumbnail.toLowerCase().endsWith('.pdf') ? `<div style="height:100%; display:flex; align-items:center; justify-content:center; background:var(--bg-secondary); color:var(--text-muted);"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>` : `<img src="${p.thumbnail || 'https://via.placeholder.com/400x300'}" alt="Thumbnail for ${p.title}" loading="lazy" onload="this.classList.add('loaded')">`}
         <div class="project-overlay"></div>
         <span class="project-category-badge">${p.category === 'certificate' ? 'Sertifikat' : p.category}</span>
       </div>
@@ -1056,14 +1056,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initYear()
   initI18n()
   initLightbox()
-  initPdfPreview()
+
   initScrambleEffects()
   loadProfile()
   initPerspectiveMarquee()
   trackEvent('page_view', { path: window.location.pathname })
 
   // Initialize Career Game (pass data after it loads)
-  initCareerGame(portfolioContext.resume)
+
   initPixelArt()
 })
 
@@ -1116,36 +1116,7 @@ async function loadProfile() {
   } catch (err) { console.error('Profile error:', err) }
 }
 
-function initPdfPreview() {
-  const modal = document.getElementById('pdfModal')
-  const btn = document.getElementById('cvPreviewBtn')
-  const close = document.getElementById('pdfClose')
-  const frame = document.getElementById('pdfFrame')
 
-  if (!modal || !btn || !close || !frame) return
-
-  btn.addEventListener('click', () => {
-    const url = window.portfolioProfile?.cv_url || document.getElementById('cvDownloadBtn')?.href
-    if (url && url !== '#' && url !== '') {
-      frame.src = url
-      modal.classList.add('active')
-      document.body.style.overflow = 'hidden'
-    } else {
-      showCustomAlert('warning', 'CV tidak ditemukan.')
-    }
-  })
-
-  const closeModal = () => {
-    modal.classList.remove('active')
-    document.body.style.overflow = ''
-    frame.src = ''
-  }
-
-  close.addEventListener('click', closeModal)
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal()
-  })
-}
 
 function initI18n() {
   const btn = document.getElementById('langToggle')

@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- SEO & Security Tags -->
-  <meta name="description" content="Portfolio IT Professional - Web Development, UI/UX Design & Network Engineering"
+  <meta name="description"
+    content="Portfolio profesional Ayek, seorang IT Enthusiast dengan keahlian di bidang Web Development (Full-Stack), UI/UX Design, dan Network Engineering. Lihat karya, pengalaman, dan hubungi saya untuk kolaborasi."
     id="metaDescription" />
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co https://challenges.cloudflare.com; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co https://api.emailjs.com https://integrate.api.nvidia.com https://generativelanguage.googleapis.com;" />
@@ -21,7 +22,8 @@
     content="Seorang IT Enthusiast yang passionate di bidang Web Development, UI/UX Design, dan Network Engineering."
     id="ogDescription" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/og-image.jpg" />
+  <meta property="og:url" content="https://ayek.dev" />
+  <meta property="og:image" content="/og-image.webp" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <title>Ayek — IT Professional Portfolio</title>
@@ -46,12 +48,24 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Ayek",
-    "jobTitle": "IT Professional",
-    "url": "https://ayek.dev",
-    "sameAs": [],
-    "knowsAbout": ["Web Development", "UI/UX Design", "Network Engineering"]
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "url": "https://ayek.dev",
+        "name": "Ayek - IT Support Portfolio",
+        "description": "Portfolio Support Ayek, seorang IT Enthusiast dengan keahlian di bidang Web Development, UI/UX Design, dan Network Engineering."
+      },
+      {
+        "@type": "Person",
+        "name": "Ayek",
+        "jobTitle": "IT Professional",
+        "url": "https://ayek.dev",
+        "image": "https://ayek.dev/og-image.webp",
+        "sameAs": [],
+        "knowsAbout": ["Web Development", "Full-Stack", "UI/UX Design", "Network Engineering", "IT Support"],
+        "description": "Seorang IT Enthusiast yang passionate di bidang Web Development, UI/UX Design, dan Network Engineering."
+      }
+    ]
   }
   </script>
 </head>
@@ -159,14 +173,17 @@
             <div class="hero-cta">
               <a href="#projects" class="btn btn-primary"><span>Lihat Karya</span></a>
               <a href="#contact" class="btn btn-outline"><span>Hubungi Saya</span></a>
-              <button id="careerGameBtn" class="btn btn-primary"
-                style="display:flex; align-items:center; gap:10px; font-size: 0.95rem; padding: 12px 28px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-                <span>Mainkan Petualangan Karir Saya!</span>
-              </button>
+              <div id="cvDownloadContainer" style="display:flex; gap:10px; align-items: center;">
+                <a href="#" id="cvDownloadBtn" target="_blank" class="btn btn-outline">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span data-i18n="cv_download">Download CV</span>
+                </a>
+              </div>
+
             </div>
             <div class="hero-stats">
               <div class="stat-item"><span class="stat-number" id="statProjects">0</span><span
@@ -207,23 +224,7 @@
               <span class="section-tag" data-i18n="about_tag">&lt;about&gt;</span>
               <h2 class="section-title" style="margin-bottom: 0;" data-i18n="about_title">Tentang Saya</h2>
             </div>
-            <div id="cvDownloadContainer" style="display:flex; gap:10px; margin-left: auto; align-items: center;">
-              <button id="cvPreviewBtn" class="btn btn-outline btn-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                <span data-i18n="cv_preview">Preview CV</span>
-              </button>
-              <a href="#" id="cvDownloadBtn" target="_blank" class="btn btn-primary btn-sm">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span data-i18n="cv_download">Download CV</span>
-              </a>
-            </div>
+
           </div>
           <div class="about-grid">
             <div class="about-card">
@@ -664,23 +665,6 @@
     <div id="lightboxCaption" class="lightbox-caption"></div>
   </div>
 
-  <!-- CAREER ADVENTURE GAME MODAL -->
-  <div id="careerGameModal" class="career-game-modal">
-    <button id="careerGameClose" class="career-game-close" aria-label="Tutup Game">&times;</button>
-    <canvas id="careerGameCanvas"></canvas>
-    <!-- Info popup for milestones -->
-    <div id="careerGameInfo" class="career-game-info">
-      <h3 id="careerGameInfoTitle"></h3>
-      <p id="careerGameInfoDesc"></p>
-      <button id="careerGameInfoClose" class="btn btn-primary btn-sm">Lanjutkan →</button>
-    </div>
-    <!-- Mobile controls -->
-    <div class="career-game-mobile-controls">
-      <button id="gameLeft" class="game-ctrl-btn" aria-label="Move Left">◀</button>
-      <button id="gameJump" class="game-ctrl-btn game-ctrl-jump" aria-label="Jump">▲</button>
-      <button id="gameRight" class="game-ctrl-btn" aria-label="Move Right">▶</button>
-    </div>
-  </div>
 
   <script type="module" src="/src/main.js"></script>
 </body>
