@@ -401,13 +401,16 @@ function initTerminal() {
   }
 
   const commands = {
-    help: () => 'Available commands: <span style="color:var(--accent-light)">whoami</span>, <span style="color:var(--accent-light)">projects</span>, <span style="color:var(--accent-light)">skills</span>, <span style="color:var(--accent-light)">clear</span>, <span style="color:var(--accent-light)">contact</span>',
-    whoami: () => document.getElementById('termWhoami')?.innerHTML || 'ayek — IT Professional',
+    help: () => 'Available commands: <span style="color:var(--accent-light)">whoami</span>, <span style="color:var(--accent-light)">about</span>, <span style="color:var(--accent-light)">projects</span>, <span style="color:var(--accent-light)">skills</span>, <span style="color:var(--accent-light)">socials</span>, <span style="color:var(--accent-light)">contact</span>, <span style="color:var(--accent-light)">date</span>, <span style="color:var(--accent-light)">clear</span>',
+    whoami: () => 'ayek — IT Professional & Creative Developer',
+    about: () => 'Saya adalah IT Professional yang berdedikasi untuk membangun pengalaman digital yang bersih dan fungsional.',
     skills: () => 'Frontend: <span style="color:#eab308">HTML, CSS, JS, React</span>\nBackend: <span style="color:#eab308">Node.js, Supabase</span>\nTools: <span style="color:#eab308">Git, Vite, Linux</span>',
-    projects: () => `Total projects: <span style="color:var(--accent-light)">${allProjects.length}</span>. Type <span style="color:#eab308">"ls projects"</span> to see list.`,
-    'ls projects': () => allProjects.slice(0, 5).map(p => `- ${p.title}`).join('\n') + (allProjects.length > 5 ? '\n...and more.' : ''),
+    projects: () => `Sedang ingin melihat karya saya? Silakan scroll ke bawah ke bagian Portofolio untuk tampilan visual, atau ketik <span style="color:#eab308">"ls projects"</span> untuk daftar teks.`,
+    'ls projects': () => allProjects.length > 0 ? allProjects.slice(0, 5).map(p => `- ${p.title}`).join('\n') + (allProjects.length > 5 ? '\n...and more.' : '') : 'Belum ada proyek yang dimuat.',
+    socials: () => 'LinkedIn: <a href="https://linkedin.com/in/lalu-arif" target="_blank" style="color:var(--accent);">lalu-arif</a>\nGitHub: <a href="#" target="_blank" style="color:var(--accent);">ayek-dev</a>',
+    contact: () => 'Email: <span style="color:#eab308">gawah@example.com</span> (atau gunakan form di bawah).',
+    date: () => new Date().toLocaleString(),
     clear: () => { history.innerHTML = ''; return '' },
-    contact: () => 'Email: <span style="color:#eab308">ayek@example.com</span>\nWhatsApp: <span style="color:#eab308">+62 8xx-xxxx-xxxx</span>',
   }
 
   input.addEventListener('keydown', (e) => {
@@ -1083,7 +1086,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollFeatures()
   initHeroTyping()
   initYear()
-  initTerminal()
   initI18n()
   initLightbox()
   initPdfPreview()
@@ -1091,73 +1093,6 @@ document.addEventListener('DOMContentLoaded', () => {
   trackEvent('page_view', { path: window.location.pathname })
 })
 
-
-function initTerminal() {
-  const terminal = document.getElementById('terminalBody')
-  const input = document.getElementById('terminalInput')
-  const history = document.getElementById('terminalHistory')
-  const currentText = document.getElementById('terminalCurrentText')
-
-  if (!terminal || !input) return
-
-  // Focus input when clicking anywhere in terminal
-  terminal.addEventListener('click', () => input.focus())
-
-  // Sync display span with actual input
-  input.addEventListener('input', () => {
-    currentText.textContent = input.value
-  })
-
-  input.addEventListener('keydown', async (e) => {
-    if (e.key === 'Enter') {
-      const command = input.value.trim().toLowerCase()
-      if (command) {
-        // Add to history
-        const line = document.createElement('div')
-        line.className = 'terminal-line'
-        line.innerHTML = `<span class="terminal-prompt">$</span> ${escapeHTML(command)}`
-        history.appendChild(line)
-
-        // Process command
-        const output = document.createElement('div')
-        output.className = 'terminal-output'
-        output.innerHTML = await processCommand(command)
-        history.appendChild(output)
-
-        // Scroll to bottom
-        terminal.scrollTop = terminal.scrollHeight
-      }
-      input.value = ''
-      currentText.textContent = ''
-    }
-  })
-
-  async function processCommand(cmd) {
-    switch (cmd) {
-      case 'help':
-        return 'Available commands: about, projects, contact, skills, clear, socials, whoami, date'
-      case 'whoami':
-        return 'ayek — IT Professional & Creative Developer'
-      case 'about':
-        return 'Saya adalah IT Professional yang berdedikasi untuk membangun pengalaman digital yang bersih dan fungsional.'
-      case 'projects':
-        return 'Sedang ingin melihat karya saya? Silakan scroll ke bawah ke bagian Portofolio untuk tampilan visual, atau ketik "skills" untuk daftar teknologi saya.'
-      case 'skills':
-        return 'Frontend: React, Vite, CSS3. Backend: Supabase, Node.js. Others: Networking, IT Support.'
-      case 'contact':
-        return 'Email: gawah@example.com (atau gunakan form di bagian bawah halaman ini).'
-      case 'socials':
-        return 'LinkedIn: <a href="https://linkedin.com/in/lalu-arif" target="_blank" style="color:var(--accent);">lalu-arif</a><br>GitHub: <a href="#" target="_blank" style="color:var(--accent);">ayek-dev</a>'
-      case 'clear':
-        history.innerHTML = ''
-        return ''
-      case 'date':
-        return new Date().toLocaleString()
-      default:
-        return `Command not found: ${cmd}. Type 'help' for available commands.`
-    }
-  }
-}
 
 async function loadProfile() {
   try {
