@@ -54,7 +54,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'JetBrains Mono', monospace;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -184,7 +184,7 @@ body.no-scroll {
   background: var(--glass);
   border: 1px solid var(--border);
   color: var(--text-primary);
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   padding: 8px;
   border-radius: 50%;
   display: flex;
@@ -203,7 +203,7 @@ body.no-scroll {
   display: none;
   background: none;
   border: none;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   padding: 8px;
   width: 36px;
   height: 36px;
@@ -242,13 +242,13 @@ body.no-scroll {
   backdrop-filter: blur(4px);
   z-index: 999;
   opacity: 0;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
   transition: opacity 0.4s;
 }
 
 .nav-overlay.active {
   opacity: 1;
-  pointer-events: all;
+  poJetBrains Mono-events: all;
 }
 
 /* Mobile Menu Animation */
@@ -449,7 +449,7 @@ body.no-scroll {
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   transition: var(--transition);
   border: none;
 }
@@ -580,7 +580,7 @@ body.no-scroll {
   color: var(--accent);
   opacity: 0.12;
   z-index: 1;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
   animation: float3d 6s ease-in-out infinite;
   text-shadow: 0 0 20px var(--accent-glow);
 }
@@ -740,7 +740,7 @@ body.no-scroll {
   align-items: center;
   z-index: 1;
   filter: drop-shadow(0 0 30px rgba(124, 77, 255, 0.2));
-  pointer-events: auto;
+  poJetBrains Mono-events: auto;
 }
 
 /* Code Window */
@@ -928,7 +928,7 @@ body.no-scroll {
   width: 1px;
   opacity: 0;
   position: absolute;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
 }
 
 .terminal-cursor {
@@ -1069,7 +1069,7 @@ body.no-scroll {
   color: var(--text-secondary);
   padding: 8px 20px;
   border-radius: 100px;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   transition: var(--transition);
   font-weight: 500;
   font-size: 0.9rem;
@@ -1094,7 +1094,7 @@ body.no-scroll {
   overflow: hidden;
   border: 1px solid var(--border);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   position: relative;
 }
 
@@ -1106,7 +1106,7 @@ body.no-scroll {
   background: linear-gradient(135deg, rgba(124, 77, 255, 0.08), transparent);
   opacity: 0;
   transition: opacity 0.4s;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
   z-index: 1;
 }
 
@@ -1237,7 +1237,7 @@ body.no-scroll {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   font-size: 1.5rem;
 }
 
@@ -1371,7 +1371,7 @@ body.no-scroll {
   color: var(--accent);
   opacity: 0.04;
   line-height: 1;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
 }
 
 .testi-card:hover {
@@ -1750,7 +1750,7 @@ body.no-scroll {
   background: var(--accent);
   color: white;
   border: none;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   box-shadow: 0 10px 25px rgba(108, 60, 233, 0.4);
   display: flex;
   align-items: center;
@@ -1782,13 +1782,13 @@ body.no-scroll {
   transform: scale(0);
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  pointer-events: none;
+  poJetBrains Mono-events: none;
 }
 
 .chatbot-window.active {
   transform: scale(1);
   opacity: 1;
-  pointer-events: all;
+  poJetBrains Mono-events: all;
 }
 
 .chatbot-header {
@@ -1834,7 +1834,7 @@ body.no-scroll {
   border: none;
   color: var(--text-muted);
   font-size: 1.5rem;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   transition: color 0.3s;
 }
 
@@ -1916,7 +1916,7 @@ body.no-scroll {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2047,7 +2047,7 @@ body.no-scroll {
   height: 80px;
   width: 100%;
   padding-top: 20px;
-  font-family: "Poppins", sans-serif;
+  font-family: 'JetBrains Mono', monospace;
   justify-content: flex-start;
 }
 
@@ -2065,7 +2065,7 @@ body.no-scroll {
   align-items: center;
   flex-direction: column;
   box-shadow: var(--shadow);
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   color: var(--text-primary);
 }
@@ -2080,7 +2080,7 @@ body.no-scroll {
   border-radius: 5px;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   opacity: 0;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -2100,7 +2100,7 @@ body.no-scroll {
   top: -45px;
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
+  poJetBrains Mono-events: auto;
 }
 
 .footer-socials-icons .icon:hover span,
@@ -2187,7 +2187,7 @@ body.no-scroll {
   border: 0.1em solid #333;
   background-color: #1a1a1a;
   color: #0f0;
-  font-family: "Courier New", Courier, monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 1em;
   padding: 1.5em 1em;
   width: 12em;
@@ -2271,7 +2271,7 @@ body.no-scroll {
 
 /* ===== SCROLL PROGRESS BAR ===== */
 #scrollProgress {
-  pointer-events: none;
+  poJetBrains Mono-events: none;
 }
 
 /* ===== SKELETON LOADING ===== */
@@ -2368,7 +2368,7 @@ body.no-scroll {
   right: 30px;
   color: white;
   font-size: 2.5rem;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   z-index: 10;
   width: 50px;
   height: 50px;
@@ -2395,7 +2395,7 @@ body.no-scroll {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2515,7 +2515,7 @@ body.no-scroll {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   font-size: 1.25rem;
   transition: all 0.2s;
 }
@@ -2578,7 +2578,7 @@ body.no-scroll {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2607,14 +2607,14 @@ body.no-scroll {
   backdrop-filter: blur(20px);
   box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
   opacity: 0;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 10002;
 }
 
 .career-game-info.active {
   opacity: 1;
-  pointer-events: all;
+  poJetBrains Mono-events: all;
   transform: translateX(-50%) translateY(0);
 }
 
@@ -2622,7 +2622,7 @@ body.no-scroll {
   color: #c084fc;
   font-size: 1.1rem;
   margin-bottom: 6px;
-  font-family: 'Courier New', monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .career-game-info p {
@@ -2651,7 +2651,7 @@ body.no-scroll {
   border: 2px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   font-size: 1.4rem;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2705,7 +2705,7 @@ body.no-scroll {
   background: transparent;
   overflow: hidden;
   z-index: 5;
-  pointer-events: none;
+  poJetBrains Mono-events: none;
 }
 
 .perspective-marquee-container {
@@ -2719,7 +2719,7 @@ body.no-scroll {
   -webkit-mask-image: linear-gradient(to right, transparent, black 18%, black 82%, transparent), linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
   -webkit-mask-composite: source-in;
   mask-image: linear-gradient(to right, transparent, black 18%, black 82%, transparent), linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
-  mask-composite: intersect;
+  mask-composite: JetBrains Monosect;
 }
 
 .marquee-content {
@@ -2790,7 +2790,7 @@ body.no-scroll {
   height: 2.5rem;
   min-width: 2.5rem;
   padding: 0 0.5rem;
-  cursor: pointer;
+  cursor: poJetBrains Mono;
   color: var(--text-primary);
   background: transparent;
   border: 1px solid transparent;
@@ -2807,7 +2807,7 @@ body.no-scroll {
 }
 
 .pagination-link:disabled {
-  pointer-events: none;
+  poJetBrains Mono-events: none;
   opacity: 0.5;
 }
 
