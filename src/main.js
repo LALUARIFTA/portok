@@ -1,4 +1,13 @@
 import { supabase } from './supabase.js'
+import { initThreeJSBackground } from './three-bg.js'
+import { initCareerGame } from './career-game.js'
+import gsap from 'gsap'
+import emailjs from '@emailjs/browser'
+import { PixelatedCanvas } from './pixel-art.js'
+import myPhoto from './assets/me.png'
+
+// Initialize EmailJS
+emailjs.init("YOUR_PUBLIC_KEY")
 
 // ===== I18N (Translations) =====
 const translations = {
@@ -322,49 +331,7 @@ function initNav() {
   }))
 }
 
-// ===== HERO CODE ANIMATION =====
-const codeLines = [
-  '<span style="color:#c084fc">const</span> <span style="color:#38bdf8">ayek</span> = {',
-  '  <span style="color:#22c55e">name</span>: <span style="color:#eab308">"Ayek"</span>,',
-  '  <span style="color:#22c55e">role</span>: <span style="color:#eab308">"IT Professional"</span>,',
-  '  <span style="color:#22c55e">status</span>: <span style="color:#eab308">"Open for Work"</span>,',
-  '  <span style="color:#22c55e">expertise</span>: [<span style="color:#eab308">"Web"</span>, <span style="color:#eab308">"Design"</span>, <span style="color:#eab308">"Net"</span>]',
-  '};'
-]
 
-function typeCode() {
-  const el = document.getElementById('codeBody')
-  if (!el) return
-  let lineIdx = 0, charIdx = 0, html = ''
-
-  function tick() {
-    if (lineIdx >= codeLines.length) return
-    const plain = codeLines[lineIdx].replace(/<[^>]*>/g, '')
-    charIdx++
-
-    if (charIdx > plain.length) {
-      html += codeLines[lineIdx] + '\n'
-      lineIdx++; charIdx = 0
-      el.innerHTML = html + '<span class="terminal-cursor">_</span>'
-      setTimeout(tick, 200)
-    } else {
-      const partial = buildPartial(codeLines[lineIdx], charIdx)
-      el.innerHTML = html + partial + '<span class="terminal-cursor">_</span>'
-      setTimeout(tick, 50)
-    }
-  }
-  tick()
-}
-
-function buildPartial(tagged, len) {
-  let plain = 0, result = '', inTag = false
-  for (let i = 0; i < tagged.length && plain < len; i++) {
-    if (tagged[i] === '<') { inTag = true; result += '<'; continue }
-    if (inTag) { result += tagged[i]; if (tagged[i] === '>') inTag = false; continue }
-    result += tagged[i]; plain++
-  }
-  return result
-}
 
 // ===== INTERACTIVE TERMINAL =====
 function initTerminal() {
@@ -401,7 +368,7 @@ function initTerminal() {
   }
 
   const commands = {
-    help: () => 'Available commands: <span style="color:var(--accent-light)">whoami</span>, <span style="color:var(--accent-light)">about</span>, <span style="color:var(--accent-light)">projects</span>, <span style="color:var(--accent-light)">skills</span>, <span style="color:var(--accent-light)">socials</span>, <span style="color:var(--accent-light)">contact</span>, <span style="color:var(--accent-light)">date</span>, <span style="color:var(--accent-light)">clear</span>',
+    help: () => 'Available commands: <span style="color:var(--accent-light)">sudo</span>, <span style="color:var(--accent-light)">whoami</span>, <span style="color:var(--accent-light)">about</span>, <span style="color:var(--accent-light)">projects</span>, <span style="color:var(--accent-light)">skills</span>, <span style="color:var(--accent-light)">socials</span>, <span style="color:var(--accent-light)">contact</span>, <span style="color:var(--accent-light)">date</span>, <span style="color:var(--accent-light)">clear</span>, <span style="color:var(--text-muted); opacity: 0.5;">???</span>',
     whoami: () => 'ayek — IT Professional & Creative Developer',
     about: () => 'Saya adalah IT Professional yang berdedikasi untuk membangun pengalaman digital yang bersih dan fungsional.',
     skills: () => 'Frontend: <span style="color:#eab308">HTML, CSS, JS, React</span>\nBackend: <span style="color:#eab308">Node.js, Supabase</span>\nTools: <span style="color:#eab308">Git, Vite, Linux</span>',
@@ -409,6 +376,12 @@ function initTerminal() {
     'ls projects': () => allProjects.length > 0 ? allProjects.slice(0, 5).map(p => `- ${p.title}`).join('\n') + (allProjects.length > 5 ? '\n...and more.' : '') : 'Belum ada proyek yang dimuat.',
     socials: () => 'LinkedIn: <a href="https://linkedin.com/in/lalu-arif" target="_blank" style="color:var(--accent);">lalu-arif</a>\nGitHub: <a href="#" target="_blank" style="color:var(--accent);">ayek-dev</a>',
     contact: () => 'Email: <span style="color:#eab308">gawah@example.com</span> (atau gunakan form di bawah).',
+    sudo: () => 'nice try, but you are not in the sudoers file. This incident will be reported. 🚨',
+    'sudo rm -rf /': () => '<span style="color: red;">[ERROR] Permission denied. Don\'t try to destroy my portfolio!</span>',
+    astrid: () => '<span style="color: #ec4899;">💖 Astrid terdeteksi! Pasangan dan istri tercinta Ayek. Have a great day!</span>',
+    play: () => 'Loading mini-game... <br>[█░░░░░░░░░] 10%<br>[████░░░░░░] 40%<br>[█████████░] 90%<br><span style="color: red;">[FATAL ERROR] Not enough RAM to run Doom.</span>',
+    matrix: () => '<span style="color: #22c55e;">Wake up, Neo...<br>The Matrix has you...<br>Follow the white rabbit. 🐇</span>',
+    secret: () => '🎉 <b>Easter Egg Ditemukan!</b> Anda memang teliti. Sebagai hadiah, ini sebuah pantun untuk Anda:<br><i>Jalan-jalan ke kota tua,<br>Jangan lupa membeli kaca.<br>Website ini memang biasa,<br>Tapi dibuat sepenuh jiwa.</i>',
     date: () => new Date().toLocaleString(),
     clear: () => { history.innerHTML = ''; return '' },
   }
@@ -449,7 +422,9 @@ let portfolioContext = {
   resume: { experience: [], education: [] }
 }
 let currentProjectFilter = 'all'
-let displayedProjectsCount = 6
+let currentProjectPage = 1
+const projectsPerPage = 6
+const paginationItemsToDisplay = 5
 
 async function loadProjects() {
   const grid = document.getElementById('projectsGrid')
@@ -488,7 +463,10 @@ function renderProjects() {
   if (!grid) return
 
   const filtered = currentProjectFilter === 'all' ? allProjects : allProjects.filter(p => p.category === currentProjectFilter)
-  const toDisplay = filtered.slice(0, displayedProjectsCount)
+  
+  const startIndex = (currentProjectPage - 1) * projectsPerPage;
+  const endIndex = startIndex + projectsPerPage;
+  const toDisplay = filtered.slice(startIndex, endIndex)
 
   grid.innerHTML = toDisplay.map((p, i) => `
     <div class="project-card reveal" style="animation-delay:${(i % 6) * 0.1}s" onclick="window.openProjectDetail('${p.id}')">
@@ -506,14 +484,7 @@ function renderProjects() {
     </div>
   `).join('')
 
-  const loadMoreContainer = document.getElementById('loadMoreContainer')
-  if (loadMoreContainer) {
-    if (filtered.length > displayedProjectsCount) {
-      loadMoreContainer.style.display = 'flex'
-    } else {
-      loadMoreContainer.style.display = 'none'
-    }
-  }
+  renderPagination(filtered.length)
 
   initReveal() // Re-init for dynamic content
 }
@@ -702,12 +673,7 @@ function initFilters() {
     btn.classList.add('active')
     const filter = btn.dataset.filter
     currentProjectFilter = filter
-    displayedProjectsCount = 6
-    renderProjects()
-  })
-
-  document.getElementById('loadMoreProjectsBtn')?.addEventListener('click', () => {
-    displayedProjectsCount += 6
+    currentProjectPage = 1
     renderProjects()
   })
 }
@@ -871,7 +837,8 @@ async function initChatbot() {
       - Project: ${portfolioContext.projects.map(p => p.title).join(', ')}
       - Pengalaman: ${portfolioContext.resume.experience.map(e => e.role + ' di ' + e.company).join(', ')}
       - Pendidikan: ${portfolioContext.resume.education.map(e => e.degree + ' - ' + e.institution).join(', ')}
-      
+      - Pasangan: sudah punya ia bernama astrid.
+      - Menikah: sudah menikah dengan astrid.
       Aturan:
       1. Jawab dengan ramah, profesional, dan gunakan Bahasa Indonesia.
       2. Jika ditanya tentang kontak, berikan email: ${portfolioContext.profile?.email || ''} atau WhatsApp: ${portfolioContext.profile?.whatsapp || ''}.
@@ -986,14 +953,12 @@ function initContact() {
       showCustomAlert('success', 'Success - Pesan berhasil dikirim! Terima kasih.')
 
       // EmailJS Notification
-      if (typeof emailjs !== 'undefined') {
-        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-          from_name: name,
-          from_email: email,
-          message: message,
-          to_name: "Ayek",
-        }).catch(err => console.error('EmailJS error:', err));
-      }
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_name: "Ayek",
+      }).catch(err => console.error('EmailJS error:', err));
 
       form.reset()
     } catch (err) {
@@ -1069,10 +1034,15 @@ function initYear() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+  initThreeJSBackground('#hero, .section')
+
+  // Page Transition (GSAP)
+  gsap.from("main", { opacity: 0, duration: 1.2, ease: "power2.out" })
+  gsap.from(".hero-container", { y: 40, opacity: 0, duration: 1, delay: 0.3, ease: "back.out(1.5)" })
+
   initTheme()
   initNav()
   initReveal()
-  typeCode()
   initFilters()
   loadProjects()
   loadArticles()
@@ -1089,8 +1059,39 @@ document.addEventListener('DOMContentLoaded', () => {
   initPdfPreview()
   initScrambleEffects()
   loadProfile()
+  initPerspectiveMarquee()
   trackEvent('page_view', { path: window.location.pathname })
+
+  // Initialize Career Game (pass data after it loads)
+  initCareerGame(portfolioContext.resume)
+  initPixelArt()
 })
+
+function initPixelArt() {
+  const container = document.getElementById('pixelArtContainer');
+  if (!container) return;
+
+  new PixelatedCanvas({
+    src: myPhoto,
+    container: container,
+    width: 1600,
+    height: 2000,
+    cellSize: 5,
+    dotScale: 0.9,
+    shape: "square",
+    backgroundColor: "transparent",
+    dropoutStrength: 0.3,
+    interactive: true,
+    distortionStrength: 5,
+    distortionRadius: 120,
+    distortionMode: "swirl",
+    followSpeed: 0.15,
+    jitterStrength: 2,
+    jitterSpeed: 2,
+    sampleAverage: true,
+    tintStrength: 0
+  });
+}
 
 
 async function loadProfile() {
@@ -1325,3 +1326,190 @@ function initLightbox() {
     if (e.key === 'ArrowRight') navigate(1)
   })
 }
+
+// ===== PERSPECTIVE MARQUEE LOGIC =====
+function initPerspectiveMarquee() {
+  const container = document.getElementById('perspectiveMarquee');
+  if (!container) return;
+
+  const items = ["React", "Figma", "Cisco", "Node.js", "UI/UX", "MikroTik", "Python", "Linux"];
+  const fontSize = window.innerWidth < 768 ? 48 : 84;
+  const pixelsPerFrame = 2;
+  const speed = 1;
+  const itemPadding = fontSize * 0.9;
+  
+  // Approximate item width (60% of font size is average char width)
+  const approxItemWidth = items.reduce(
+    (acc, item) => acc + item.length * fontSize * 0.6 + itemPadding,
+    0,
+  );
+
+  // Setup HTML
+  container.innerHTML = `
+    <div class="marquee-content">
+      <div class="marquee-track" id="marqueeTrack"></div>
+    </div>
+  `;
+
+  const track = document.getElementById('marqueeTrack');
+  const renderedItems = [...items, ...items, ...items];
+  
+  renderedItems.forEach((item, i) => {
+    const span = document.createElement('span');
+    span.className = 'marquee-item';
+    span.textContent = item;
+    span.style.fontSize = `${fontSize}px`;
+    span.style.paddingRight = `${itemPadding}px`;
+    track.appendChild(span);
+  });
+
+  const spans = track.querySelectorAll('.marquee-item');
+  let frame = 0;
+
+  function animate() {
+    frame += speed;
+    const offset = -((frame * pixelsPerFrame) % approxItemWidth);
+    track.style.transform = `translateX(${offset}px)`;
+
+    const containerWidth = container.clientWidth;
+    const halfWidth = containerWidth / 2;
+
+    spans.forEach((span, i) => {
+      // Approximate center of each item
+      const itemCenter = i * (approxItemWidth / items.length) + (approxItemWidth / items.length / 2) + offset;
+      const norm = (itemCenter - halfWidth) / halfWidth;
+      const distance = Math.min(1, Math.abs(norm));
+      
+      const blurPx = distance * 6;
+      const opacity = 1 - distance * 0.4;
+      
+      span.style.filter = `blur(${blurPx}px)`;
+      span.style.opacity = opacity;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+// ===== PAGINATION LOGIC =====
+function renderPagination(totalItems) {
+  const container = document.getElementById('paginationContainer');
+  const content = document.getElementById('paginationContent');
+  if (!container || !content) return;
+
+  const totalPages = Math.ceil(totalItems / projectsPerPage);
+  
+  if (totalPages <= 1) {
+    container.style.display = 'none';
+    return;
+  }
+  
+  container.style.display = 'flex';
+  content.innerHTML = '';
+
+  const showLeftEllipsis = currentProjectPage - 1 > paginationItemsToDisplay / 2;
+  const showRightEllipsis = totalPages - currentProjectPage + 1 > paginationItemsToDisplay / 2;
+
+  let pages = [];
+  if (totalPages <= paginationItemsToDisplay) {
+    pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  } else {
+    const halfDisplay = Math.floor(paginationItemsToDisplay / 2);
+    let start = currentProjectPage - halfDisplay;
+    let end = currentProjectPage + halfDisplay;
+
+    start = Math.max(1, start);
+    end = Math.min(totalPages, end);
+
+    if (start === 1) end = paginationItemsToDisplay;
+    if (end === totalPages) start = totalPages - paginationItemsToDisplay + 1;
+
+    if (showLeftEllipsis) start++;
+    if (showRightEllipsis) end--;
+
+    pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  // Previous Button
+  const prevLi = document.createElement('li');
+  prevLi.className = 'pagination-item';
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'pagination-link';
+  prevBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>';
+  prevBtn.disabled = currentProjectPage === 1;
+  prevBtn.onclick = () => {
+    currentProjectPage = Math.max(currentProjectPage - 1, 1);
+    renderProjects();
+    document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+  };
+  prevLi.appendChild(prevBtn);
+  content.appendChild(prevLi);
+
+  // Left Ellipsis
+  if (showLeftEllipsis) {
+    const firstLi = document.createElement('li');
+    firstLi.className = 'pagination-item';
+    firstLi.innerHTML = `<button class="pagination-link" onclick="window.goToPage(1)">1</button>`;
+    content.appendChild(firstLi);
+    
+    const elLi = document.createElement('li');
+    elLi.className = 'pagination-item';
+    elLi.innerHTML = `<span class="pagination-ellipsis"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-horizontal"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>`;
+    content.appendChild(elLi);
+  }
+
+  // Page Numbers
+  pages.forEach(page => {
+    const li = document.createElement('li');
+    li.className = 'pagination-item';
+    const btn = document.createElement('button');
+    btn.className = `pagination-link ${currentProjectPage === page ? 'active' : ''}`;
+    btn.textContent = page;
+    btn.onclick = () => {
+      currentProjectPage = page;
+      renderProjects();
+      document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+    };
+    li.appendChild(btn);
+    content.appendChild(li);
+  });
+
+  // Right Ellipsis
+  if (showRightEllipsis) {
+    const elLi = document.createElement('li');
+    elLi.className = 'pagination-item';
+    elLi.innerHTML = `<span class="pagination-ellipsis"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-more-horizontal"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></span>`;
+    content.appendChild(elLi);
+    
+    const lastLi = document.createElement('li');
+    lastLi.className = 'pagination-item';
+    lastLi.innerHTML = `<button class="pagination-link" onclick="window.goToPage(${totalPages})">${totalPages}</button>`;
+    content.appendChild(lastLi);
+  }
+
+  // Next Button
+  const nextLi = document.createElement('li');
+  nextLi.className = 'pagination-item';
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'pagination-link';
+  nextBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>';
+  nextBtn.disabled = currentProjectPage === totalPages;
+  nextBtn.onclick = () => {
+    currentProjectPage = Math.min(currentProjectPage + 1, totalPages);
+    renderProjects();
+    document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+  };
+  nextLi.appendChild(nextBtn);
+  content.appendChild(nextLi);
+}
+
+window.goToPage = (page) => {
+  currentProjectPage = page;
+  renderProjects();
+  document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+};
+
+
+

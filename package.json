@@ -17,6 +17,7 @@
     "wrangler": "^4.85.0"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@supabase/supabase-js": "^2.104.1",
     "@tailwindcss/vite": "^4.2.4",
     "gsap": "^3.15.0",

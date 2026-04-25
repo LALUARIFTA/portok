@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "portok",
+  "main": "src/worker.js",
   "compatibility_date": "2026-04-24",
   "observability": {
     "enabled": true
@@ -11,5 +12,8 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
-  ]
+  ],
+  "vars": {
+    "VITE_NVIDIA_API_KEY": "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"
+  }
 }

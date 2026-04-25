@@ -11,13 +11,6 @@
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co https://challenges.cloudflare.com; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co https://api.emailjs.com https://integrate.api.nvidia.com https://generativelanguage.googleapis.com;" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script type="text/javascript">
-    (function () {
-      // Note: You will need to replace this with your actual Public Key from EmailJS dashboard
-      if (typeof emailjs !== 'undefined') emailjs.init("YOUR_PUBLIC_KEY");
-    })();
-  </script>
   <meta name="keywords" content="Portfolio, IT Professional, Web Developer, UI/UX Designer, Network Engineer, Ayek" />
   <meta name="author" content="Ayek" />
   <meta name="robots" content="index, follow" />
@@ -166,6 +159,14 @@
             <div class="hero-cta">
               <a href="#projects" class="btn btn-primary"><span>Lihat Karya</span></a>
               <a href="#contact" class="btn btn-outline"><span>Hubungi Saya</span></a>
+              <button id="careerGameBtn" class="btn btn-primary"
+                style="display:flex; align-items:center; gap:10px; font-size: 0.95rem; padding: 12px 28px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Mainkan Petualangan Karir Saya!</span>
+              </button>
             </div>
             <div class="hero-stats">
               <div class="stat-item"><span class="stat-number" id="statProjects">0</span><span
@@ -177,32 +178,28 @@
             </div>
           </div>
           <div class="hero-visual">
+            <div id="pixelArtContainer" class="pixel-art-container"></div>
             <!-- CSS 3D Rotating Code Cube -->
-            <div class="cube-scene">
-              <div class="cube">
-                <div class="cube-face cube-front"><span>&lt;/&gt;</span></div>
-                <div class="cube-face cube-back"><span>{ }</span></div>
-                <div class="cube-face cube-right"><span>JS</span></div>
-                <div class="cube-face cube-left"><span>CSS</span></div>
-                <div class="cube-face cube-top"><span>API</span></div>
-                <div class="cube-face cube-bottom"><span>SQL</span></div>
-              </div>
-            </div>
-            <div class="code-window">
-              <div class="code-header">
-                <div class="code-dots"><span class="dot red"></span><span class="dot yellow"></span><span
-                    class="dot green"></span></div><span class="code-title">profile.js</span>
-              </div>
-              <pre class="code-body"><code id="codeBody"></code></pre>
-            </div>
+
+
           </div>
         </div>
 
 
       </section>
+      
+      <!-- Perspective Marquee Section -->
+      <section class="marquee-wrapper">
+        <div id="perspectiveMarquee" class="perspective-marquee-container"></div>
+      </section>
 
       <section class="section about reveal" id="about">
-        <div class="grid-background" aria-hidden="true"></div>
+        <div class="hero-bg-grid"></div>
+        <div class="hero-float hero-float--1" aria-hidden="true">&lt;/&gt;</div>
+        <div class="hero-float hero-float--2" aria-hidden="true">{ }</div>
+        <div class="hero-float hero-float--3" aria-hidden="true">01</div>
+        <div class="hero-float hero-float--4" aria-hidden="true">&&</div>
+        <div class="hero-float hero-float--5" aria-hidden="true">( )</div>
         <div class="section-container" style="position: relative; z-index: 1;">
           <div class="section-header"
             style="margin-top: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
@@ -341,12 +338,20 @@
                 </div>
               </div>
 
+
+
             </div>
           </div>
         </div>
       </section>
 
-      <section class="section resume reveal" id="resume" style="background: var(--bg-secondary);">
+      <section class="section resume reveal" id="resume">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-float hero-float--1" aria-hidden="true">&lt;/&gt;</div>
+        <div class="hero-float hero-float--2" aria-hidden="true">{ }</div>
+        <div class="hero-float hero-float--3" aria-hidden="true">01</div>
+        <div class="hero-float hero-float--4" aria-hidden="true">&&</div>
+        <div class="hero-float hero-float--5" aria-hidden="true">( )</div>
         <div class="section-container">
           <div class="section-header" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
             <span class="section-tag" data-i18n="resume_tag">&lt;resume&gt;</span>
@@ -379,22 +384,19 @@
             </div>
           </div>
 
-          <div id="resumeLinkedInContainer" style="display: none; justify-content: center; margin-top: 50px;">
-            <a id="resumeLinkedInBtn" href="#" target="_blank" class="btn btn-outline"
-              style="min-width: 240px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                <rect width="4" height="12" x="2" y="9" />
-                <circle cx="4" cy="4" r="2" />
-              </svg>
-              <span data-i18n="linkedin_view">Lihat Selengkapnya di LinkedIn</span>
-            </a>
-          </div>
+
+
+
         </div>
       </section>
 
       <section class="section projects reveal" id="projects">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-float hero-float--1" aria-hidden="true">&lt;/&gt;</div>
+        <div class="hero-float hero-float--2" aria-hidden="true">{ }</div>
+        <div class="hero-float hero-float--3" aria-hidden="true">01</div>
+        <div class="hero-float hero-float--4" aria-hidden="true">&&</div>
+        <div class="hero-float hero-float--5" aria-hidden="true">( )</div>
         <div class="section-container">
           <div class="section-header" style="text-align: center;">
             <span class="section-tag" data-i18n="projects_tag">&lt;projects&gt;</span>
@@ -408,16 +410,23 @@
             <button class="filter-btn" data-filter="certificate" data-i18n="filter_cert">Sertifikat</button>
           </div>
           <div class="projects-grid" id="projectsGrid"></div>
-          <div id="loadMoreContainer" style="display: none; justify-content: center; margin-top: 40px;">
-            <button id="loadMoreProjectsBtn" class="btn btn-outline" style="min-width: 200px;"
-              data-i18n="load_more">Lihat Lebih
-              Banyak</button>
+          <div id="paginationContainer" style="display: none; justify-content: center; margin-top: 40px;">
+            <nav aria-label="pagination" class="pagination-nav" id="projectsPagination">
+              <ul class="pagination-content" id="paginationContent">
+                <!-- Pagination items will be generated by JS -->
+              </ul>
+            </nav>
           </div>
         </div>
       </section>
 
-      <section class="section testimonials reveal" id="testimonials"
-        style="background: var(--bg-secondary); overflow: hidden;">
+      <section class="section testimonials reveal" id="testimonials" style="overflow: hidden;">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-float hero-float--1" aria-hidden="true">&lt;/&gt;</div>
+        <div class="hero-float hero-float--2" aria-hidden="true">{ }</div>
+        <div class="hero-float hero-float--3" aria-hidden="true">01</div>
+        <div class="hero-float hero-float--4" aria-hidden="true">&&</div>
+        <div class="hero-float hero-float--5" aria-hidden="true">( )</div>
         <div class="section-container">
           <div class="section-header text-center" style="max-width: 600px; margin: 0 auto 40px;">
             <span class="section-tag" data-i18n="testimonials_tag">&lt;testimonials&gt;</span>
@@ -436,6 +445,12 @@
       </section>
 
       <section class="section contact reveal" id="contact">
+        <div class="hero-bg-grid"></div>
+        <div class="hero-float hero-float--1" aria-hidden="true">&lt;/&gt;</div>
+        <div class="hero-float hero-float--2" aria-hidden="true">{ }</div>
+        <div class="hero-float hero-float--3" aria-hidden="true">01</div>
+        <div class="hero-float hero-float--4" aria-hidden="true">&&</div>
+        <div class="hero-float hero-float--5" aria-hidden="true">( )</div>
         <div class="section-container">
           <div class="section-header text-center" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
             <span class="section-tag" data-i18n="contact_tag">&lt;contact&gt;</span>
@@ -457,107 +472,9 @@
                   Pesan</span></button>
             </form>
 
-            <div class="wallet-wrapper"
-              style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
-              <h2 class="section-title" style="margin-bottom: 10px;" data-i18n="contact_title">Hubungi Saya
-              </h2>
-              <p
-                style="color: var(--text-muted); font-size: 0.95rem; text-align: center; max-width: 320px; margin-bottom: 30px; line-height: 1.5;">
-                Ingin membuat website? Pembayaran kini lebih mudah dan fleksibel melalui berbagai platform pilihan.</p>
-              <div class="app-container">
-                <div class="wallet">
-                  <div class="wallet-back"></div>
 
-                  <div class="card stripe">
-                    <div class="card-inner">
-                      <div class="card-top">
-                        <span>Stripe</span>
-                        <div class="chip"></div>
-                      </div>
-                      <div class="card-bottom">
-                        <div class="card-info">
-                          <span class="label">Holder</span><span class="value">ALEX SMITH</span>
-                        </div>
-                        <div class="card-number-wrapper">
-                          <span class="hidden-stars">**** 4242</span>
-                          <span class="card-number">5524 9910 4242</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="card wise">
-                    <div class="card-inner">
-                      <div class="card-top">
-                        <span>Wise</span>
-                        <div class="chip"></div>
-                      </div>
-                      <div class="card-bottom">
-                        <div class="card-info">
-                          <span class="label">Business</span><span class="value">STUDIO LLC</span>
-                        </div>
-                        <div class="card-number-wrapper">
-                          <span class="hidden-stars">**** 8810</span>
-                          <span class="card-number">9012 4432 8810</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="card paypal">
-                    <div class="card-inner">
-                      <div class="card-top">
-                        <span>Pay<b style="color:#0079C1">Pal</b></span>
-                        <div class="chip"></div>
-                      </div>
-                      <div class="card-bottom">
-                        <div class="card-info">
-                          <span class="label">Email</span><span class="value">hello@work.com</span>
-                        </div>
-                        <div class="card-number-wrapper">
-                          <span class="hidden-stars">**** 0094</span>
-                          <span class="card-number">3312 0045 0094</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="pocket">
-                    <svg class="pocket-svg" viewBox="0 0 280 160" fill="none">
-                      <path
-                        d="M 0 20 C 0 10, 5 10, 10 10 C 20 10, 25 25, 40 25 L 240 25 C 255 25, 260 10, 270 10 C 275 10, 280 10, 280 20 L 280 120 C 280 155, 260 160, 240 160 L 40 160 C 20 160, 0 155, 0 120 Z"
-                        fill="#1e341e"></path>
-                      <path
-                        d="M 8 22 C 8 16, 12 16, 15 16 C 23 16, 27 29, 40 29 L 240 29 C 253 29, 257 16, 265 16 C 268 16, 272 16, 272 22 L 272 120 C 272 150, 255 152, 240 152 L 40 152 C 25 152, 8 152, 8 120 Z"
-                        stroke="#3d5635" stroke-width="1.5" stroke-dasharray="6 4"></path>
-                    </svg>
-                    <div class="pocket-content">
-                      <div style="position: relative; height: 24px; width: 100%;">
-                        <div class="balance-stars">******</div>
-                        <div class="balance-real">$12,450.00</div>
-                      </div>
-                      <div style="color: #698263; font-size: 12px; font-weight: 500;">
-                        Total Balance
-                      </div>
-                      <div class="eye-icon-wrapper">
-                        <svg class="eye-icon eye-slash" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                          <line x1="3" y1="3" x2="21" y2="21"></line>
-                        </svg>
-                        <svg class="eye-icon eye-open" style="opacity: 0;" width="20" height="20" viewBox="0 0 24 24"
-                          fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
+        </div>
       </section>
     </main>
 
@@ -750,6 +667,24 @@
     <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next image">&#10095;</button>
     <img class="lightbox-content" id="lightboxImg" alt="Fullscreen preview">
     <div id="lightboxCaption" class="lightbox-caption"></div>
+  </div>
+
+  <!-- CAREER ADVENTURE GAME MODAL -->
+  <div id="careerGameModal" class="career-game-modal">
+    <button id="careerGameClose" class="career-game-close" aria-label="Tutup Game">&times;</button>
+    <canvas id="careerGameCanvas"></canvas>
+    <!-- Info popup for milestones -->
+    <div id="careerGameInfo" class="career-game-info">
+      <h3 id="careerGameInfoTitle"></h3>
+      <p id="careerGameInfoDesc"></p>
+      <button id="careerGameInfoClose" class="btn btn-primary btn-sm">Lanjutkan →</button>
+    </div>
+    <!-- Mobile controls -->
+    <div class="career-game-mobile-controls">
+      <button id="gameLeft" class="game-ctrl-btn" aria-label="Move Left">◀</button>
+      <button id="gameJump" class="game-ctrl-btn game-ctrl-jump" aria-label="Jump">▲</button>
+      <button id="gameRight" class="game-ctrl-btn" aria-label="Move Right">▶</button>
+    </div>
   </div>
 
   <script type="module" src="/src/main.js"></script>
