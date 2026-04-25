@@ -839,7 +839,8 @@ async function initChatbot() {
 
   // Menggunakan Environment Variable dari Vite (simpan di .env sebagai VITE_NVIDIA_API_KEY)
   const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
-  const NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
+  // Gunakan proxy lokal yang sudah terkonfigurasi di vite.config.js untuk menghindari CORS
+  const NVIDIA_API_URL = "/api/ai/chat/completions";
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault()
