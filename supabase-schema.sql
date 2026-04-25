@@ -176,7 +176,48 @@ CREATE POLICY "Public Read Certificates" ON certificates FOR SELECT USING (true)
 
 DROP POLICY IF EXISTS "Admin CRUD Certificates" ON certificates;
 CREATE POLICY "Admin CRUD Certificates" ON certificates FOR ALL TO authenticated USING (true);
--- 6. SEED DATA (OPSIONAL)
+-- 6. ANALITIK & STATISTIK (ANALYTICS)
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS analytics (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_name TEXT NOT NULL, -- page_view, cv_click, project_view
+  event_data JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public insert events" ON analytics;
+CREATE POLICY "Allow public insert events" ON analytics FOR INSERT TO anon, authenticated WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow authenticated view events" ON analytics;
+CREATE POLICY "Allow authenticated view events" ON analytics FOR SELECT TO authenticated USING (true);
+
+-- 7. LOG AKTIVITAS ADMIN (ACTIVITY LOG)
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS activity_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  action TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE activity_log ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow authenticated view log" ON activity_log;
+CREATE POLICY "Allow authenticated view log" ON activity_log FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated insert log" ON activity_log;
+CREATE POLICY "Allow authenticated insert log" ON activity_log FOR INSERT TO authenticated WITH CHECK (true);
+
+-- 8. DATABASE GRANTS (PENTING UNTUK AKSES API)
+-- ----------------------------------------------------------
+GRANT INSERT ON TABLE analytics TO anon;
+GRANT INSERT ON TABLE analytics TO authenticated;
+GRANT SELECT ON TABLE analytics TO authenticated;
+GRANT SELECT ON TABLE activity_log TO authenticated;
+GRANT INSERT ON TABLE activity_log TO authenticated;
+
+-- 9. SEED DATA (OPSIONAL)
 -- ----------------------------------------------------------
 INSERT INTO chatbot_keywords (keyword, response) VALUES
 ('halo, hai, hello, hi', 'Halo! Selamat datang di portofolio saya. Ada yang bisa saya bantu hari ini?'),
