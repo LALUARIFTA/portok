@@ -133,6 +133,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 function initDashboard() {
   initSidebar()
   loadStats()
+  loadRecentMessages()
   loadActivityLog()
   loadProjects()
   loadArticles()
@@ -176,6 +177,44 @@ async function loadStats() {
 
     initAnalyticsChart()
   } catch (err) { console.error('Stats error:', err) }
+}
+
+async function loadRecentMessages() {
+  const body = document.getElementById('dashRecentMessagesBody')
+  if (!body) return
+
+  try {
+    const { data: msgs, error } = await supabase
+      .from('messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    if (error) throw error
+
+    if (!msgs || msgs.length === 0) {
+      body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Belum ada pesan.</td></tr>'
+      return
+    }
+
+    body.innerHTML = msgs.map(m => `
+      <tr>
+        <td>
+          <div style="font-weight:700;">${escapeHTML(m.name)}</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHTML(m.email)}</div>
+        </td>
+        <td style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ${escapeHTML(m.message || '')}
+        </td>
+        <td style="font-size:0.8rem; color:var(--text-muted);">
+          ${new Date(m.created_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+        </td>
+      </tr>
+    `).join('')
+  } catch (err) {
+    console.error('Recent messages error:', err)
+    body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--accent);">Gagal memuat pesan.</td></tr>'
+  }
 }
 
 async function initAnalyticsChart() {

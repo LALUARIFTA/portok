@@ -114,6 +114,27 @@
             </div>
           </div>
 
+          <div class="recent-messages-container" style="margin-top: 40px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+              <h3 style="margin:0;">Pesan Terbaru</h3>
+              <a href="#" onclick="showPage('pageMessages')" style="color:var(--accent); text-decoration:none; font-size:0.9rem; font-weight:600;">Lihat Semua</a>
+            </div>
+            <div class="projects-table-wrap">
+              <table class="projects-table">
+                <thead>
+                  <tr>
+                    <th>Pengirim</th>
+                    <th>Pesan</th>
+                    <th>Waktu</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentMessagesBody">
+                  <tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Memuat pesan...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           <div class="activity-log" style="margin-top: 40px;">
             <h3 style="margin-bottom: 20px;">Aktivitas Terbaru</h3>
             <div class="projects-table-wrap">
