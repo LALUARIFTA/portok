@@ -16,6 +16,7 @@ const translations = {
     about_title: "Tentang Saya",
     cv_download: "Unduh CV",
     cv_preview: "Preview CV",
+    tech_skills_title: "Kemahiran Teknis",
     skill_design_title: "Desain",
     skill_design_desc: "UI/UX, Desain Grafis",
     skill_dev_title: "Development",
@@ -68,6 +69,7 @@ const translations = {
     about_title: "About Me",
     cv_download: "Download CV",
     cv_preview: "Preview CV",
+    tech_skills_title: "Technical Proficiency",
     skill_design_title: "Design",
     skill_design_desc: "UI/UX, Graphic Design",
     skill_dev_title: "Development",
@@ -532,8 +534,8 @@ window.openProjectDetail = async (id) => {
   document.getElementById('pmStack').textContent = p.tech_stack || '-'
   document.getElementById('pmDescription').textContent = p.case_study || p.description || 'No detailed case study yet.'
   const isPdf = p.thumbnail && p.thumbnail.toLowerCase().endsWith('.pdf');
-  document.getElementById('pmHero').innerHTML = isPdf 
-    ? `<iframe src="${p.thumbnail}" width="100%" height="400px" style="border:none; border-radius: 12px 12px 0 0;"></iframe>` 
+  document.getElementById('pmHero').innerHTML = isPdf
+    ? `<iframe src="${p.thumbnail}" width="100%" height="400px" style="border:none; border-radius: 12px 12px 0 0;"></iframe>`
     : `<img src="${p.thumbnail}" alt="Hero image for ${p.title}" loading="lazy">`;
 
   // Gallery
@@ -911,7 +913,7 @@ async function initChatbot() {
 
         const chunk = decoder.decode(value)
         const lines = chunk.split('\n')
-        
+
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const dataStr = line.slice(6).trim()
@@ -920,13 +922,13 @@ async function initChatbot() {
               const data = JSON.parse(dataStr)
               const delta = data.choices[0].delta
               const content = delta.content || ""
-              
+
               if (content) {
                 fullContent += content
                 botMsgEl.textContent = fullContent
                 messages.scrollTop = messages.scrollHeight
               }
-            } catch (e) {}
+            } catch (e) { }
           }
         }
       }
@@ -981,7 +983,7 @@ function initContact() {
       if (error) throw error
 
       showCustomAlert('success', 'Success - Pesan berhasil dikirim! Terima kasih.')
-      
+
       // EmailJS Notification
       if (typeof emailjs !== 'undefined') {
         emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
@@ -991,7 +993,7 @@ function initContact() {
           to_name: "Ayek",
         }).catch(err => console.error('EmailJS error:', err));
       }
-      
+
       form.reset()
     } catch (err) {
       console.error(err)
@@ -1089,10 +1091,6 @@ document.addEventListener('DOMContentLoaded', () => {
   trackEvent('page_view', { path: window.location.pathname })
 })
 
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal()
-  })
-}
 
 async function loadProfile() {
   try {
@@ -1101,7 +1099,7 @@ async function loadProfile() {
       window.portfolioProfile = p
       const bioEl = document.getElementById('heroBioText')
       if (bioEl) bioEl.textContent = p.bio
-      
+
       const cvBtn = document.getElementById('cvDownloadBtn')
       if (cvBtn && p.cv_url) cvBtn.href = p.cv_url
     }
@@ -1142,10 +1140,10 @@ function initPdfPreview() {
 function initI18n() {
   const btn = document.getElementById('langToggle')
   const display = document.getElementById('langDisplay')
-  
+
   if (btn && display) {
     display.textContent = currentLang.toUpperCase()
-    
+
     btn.addEventListener('click', () => {
       currentLang = currentLang === 'id' ? 'en' : 'id'
       localStorage.setItem('portfolio-lang', currentLang)
@@ -1153,7 +1151,7 @@ function initI18n() {
       applyTranslations()
     })
   }
-  
+
   applyTranslations()
 }
 
@@ -1181,10 +1179,10 @@ function initLightbox() {
     lbCaption.textContent = caption || ''
     lb.classList.add('active')
     document.body.style.overflow = 'hidden'
-    
+
     currentImages = group
     currentImageIndex = group.indexOf(imgSrc)
-    
+
     if (group.length > 1) {
       lbPrev.style.display = 'flex'
       lbNext.style.display = 'flex'
@@ -1217,14 +1215,14 @@ function initLightbox() {
 
   document.addEventListener('click', (e) => {
     const target = e.target
-    
+
     if (target.parentElement && target.parentElement.id === 'pmGallery' && target.tagName === 'IMG') {
       const allImgs = Array.from(document.querySelectorAll('#pmGallery img')).map(img => img.src)
       openLightbox(target.src, '', allImgs)
     }
-    
+
     if (target.parentElement && target.parentElement.id === 'pmHero' && target.tagName === 'IMG') {
-       openLightbox(target.src, document.getElementById('pmTitle')?.textContent)
+      openLightbox(target.src, document.getElementById('pmTitle')?.textContent)
     }
   })
 
