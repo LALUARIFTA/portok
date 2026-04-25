@@ -1083,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollFeatures()
   initHeroTyping()
   initYear()
-
+  initTerminal()
   initI18n()
   initLightbox()
   initPdfPreview()
@@ -1091,6 +1091,73 @@ document.addEventListener('DOMContentLoaded', () => {
   trackEvent('page_view', { path: window.location.pathname })
 })
 
+
+function initTerminal() {
+  const terminal = document.getElementById('terminalBody')
+  const input = document.getElementById('terminalInput')
+  const history = document.getElementById('terminalHistory')
+  const currentText = document.getElementById('terminalCurrentText')
+
+  if (!terminal || !input) return
+
+  // Focus input when clicking anywhere in terminal
+  terminal.addEventListener('click', () => input.focus())
+
+  // Sync display span with actual input
+  input.addEventListener('input', () => {
+    currentText.textContent = input.value
+  })
+
+  input.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const command = input.value.trim().toLowerCase()
+      if (command) {
+        // Add to history
+        const line = document.createElement('div')
+        line.className = 'terminal-line'
+        line.innerHTML = `<span class="terminal-prompt">$</span> ${escapeHTML(command)}`
+        history.appendChild(line)
+
+        // Process command
+        const output = document.createElement('div')
+        output.className = 'terminal-output'
+        output.innerHTML = await processCommand(command)
+        history.appendChild(output)
+
+        // Scroll to bottom
+        terminal.scrollTop = terminal.scrollHeight
+      }
+      input.value = ''
+      currentText.textContent = ''
+    }
+  })
+
+  async function processCommand(cmd) {
+    switch (cmd) {
+      case 'help':
+        return 'Available commands: about, projects, contact, skills, clear, socials, whoami, date'
+      case 'whoami':
+        return 'ayek — IT Professional & Creative Developer'
+      case 'about':
+        return 'Saya adalah IT Professional yang berdedikasi untuk membangun pengalaman digital yang bersih dan fungsional.'
+      case 'projects':
+        return 'Sedang ingin melihat karya saya? Silakan scroll ke bawah ke bagian Portofolio untuk tampilan visual, atau ketik "skills" untuk daftar teknologi saya.'
+      case 'skills':
+        return 'Frontend: React, Vite, CSS3. Backend: Supabase, Node.js. Others: Networking, IT Support.'
+      case 'contact':
+        return 'Email: gawah@example.com (atau gunakan form di bagian bawah halaman ini).'
+      case 'socials':
+        return 'LinkedIn: <a href="https://linkedin.com/in/lalu-arif" target="_blank" style="color:var(--accent);">lalu-arif</a><br>GitHub: <a href="#" target="_blank" style="color:var(--accent);">ayek-dev</a>'
+      case 'clear':
+        history.innerHTML = ''
+        return ''
+      case 'date':
+        return new Date().toLocaleString()
+      default:
+        return `Command not found: ${cmd}. Type 'help' for available commands.`
+    }
+  }
+}
 
 async function loadProfile() {
   try {
