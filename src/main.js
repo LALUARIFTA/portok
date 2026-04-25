@@ -107,6 +107,8 @@ const translations = {
 }
 
 let currentLang = localStorage.getItem('portfolio-lang') || 'id'
+let currentImages = []
+let currentImageIndex = 0
 
 // ===== PAGE LOADER =====
 window.addEventListener('load', () => {
@@ -1079,6 +1081,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initYear()
 
   initI18n()
+  initLightbox()
   trackEvent('page_view', { path: window.location.pathname })
 })
 
@@ -1106,5 +1109,75 @@ function applyTranslations() {
     if (translations[currentLang][key]) {
       el.textContent = translations[currentLang][key]
     }
+  })
+}
+
+function initLightbox() {
+  const lb = document.getElementById('lightbox')
+  const lbImg = document.getElementById('lightboxImg')
+  const lbCaption = document.getElementById('lightboxCaption')
+  const lbClose = document.getElementById('lightboxClose')
+  const lbPrev = document.getElementById('lightboxPrev')
+  const lbNext = document.getElementById('lightboxNext')
+
+  if (!lb) return
+
+  const openLightbox = (imgSrc, caption, group = []) => {
+    lbImg.src = imgSrc
+    lbCaption.textContent = caption || ''
+    lb.classList.add('active')
+    document.body.style.overflow = 'hidden'
+    
+    currentImages = group
+    currentImageIndex = group.indexOf(imgSrc)
+    
+    if (group.length > 1) {
+      lbPrev.style.display = 'flex'
+      lbNext.style.display = 'flex'
+    } else {
+      lbPrev.style.display = 'none'
+      lbNext.style.display = 'none'
+    }
+  }
+
+  const closeLightbox = () => {
+    lb.classList.remove('active')
+    document.body.style.overflow = ''
+  }
+
+  lbClose?.addEventListener('click', closeLightbox)
+  lb.addEventListener('click', (e) => {
+    if (e.target === lb) closeLightbox()
+  })
+
+  const navigate = (dir) => {
+    if (currentImages.length === 0) return
+    currentImageIndex += dir
+    if (currentImageIndex < 0) currentImageIndex = currentImages.length - 1
+    if (currentImageIndex >= currentImages.length) currentImageIndex = 0
+    lbImg.src = currentImages[currentImageIndex]
+  }
+
+  lbPrev?.addEventListener('click', (e) => { e.stopPropagation(); navigate(-1); })
+  lbNext?.addEventListener('click', (e) => { e.stopPropagation(); navigate(1); })
+
+  document.addEventListener('click', (e) => {
+    const target = e.target
+    
+    if (target.parentElement && target.parentElement.id === 'pmGallery' && target.tagName === 'IMG') {
+      const allImgs = Array.from(document.querySelectorAll('#pmGallery img')).map(img => img.src)
+      openLightbox(target.src, '', allImgs)
+    }
+    
+    if (target.parentElement && target.parentElement.id === 'pmHero' && target.tagName === 'IMG') {
+       openLightbox(target.src, document.getElementById('pmTitle')?.textContent)
+    }
+  })
+
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('active')) return
+    if (e.key === 'Escape') closeLightbox()
+    if (e.key === 'ArrowLeft') navigate(-1)
+    if (e.key === 'ArrowRight') navigate(1)
   })
 }
