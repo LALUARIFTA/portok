@@ -18,6 +18,11 @@
   --radius-md: 14px;
   --radius-lg: 22px;
   --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Glassmorphism Presets */
+  --glass-bg: rgba(14, 14, 20, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 25px;
 }
 
 [data-theme="light"] {
@@ -32,6 +37,10 @@
   --border: rgba(0, 0, 0, 0.08);
   --glass: rgba(0, 0, 0, 0.02);
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-blur: 20px;
 }
 
 * {
@@ -111,11 +120,11 @@ body.no-scroll {
 }
 
 .navbar.scrolled {
-  background: rgba(6, 6, 10, 0.75);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
   padding: 12px 0;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .nav-container {
@@ -1325,14 +1334,16 @@ body.no-scroll {
 }
 
 .pm-content {
-  background: var(--bg-primary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
   width: 100%;
   max-width: 1000px;
   max-height: 90vh;
   border-radius: var(--radius-lg);
   overflow-y: auto;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .pm-close {
@@ -1886,10 +1897,11 @@ body.no-scroll {
   max-width: calc(100vw - 40px);
   height: 450px;
   max-height: calc(100vh - 120px);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1910,9 +1922,9 @@ body.no-scroll {
 }
 
 .chatbot-header {
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.03);
   padding: 15px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1989,10 +2001,11 @@ body.no-scroll {
 }
 
 .msg-bot {
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   align-self: flex-start;
   border-bottom-left-radius: 4px;
+  border: 1px solid var(--glass-border);
 }
 
 .msg-user {
@@ -2005,8 +2018,8 @@ body.no-scroll {
 .chatbot-input {
   display: flex;
   padding: 15px;
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid var(--glass-border);
   gap: 10px;
 }
 
@@ -2802,12 +2815,13 @@ body.no-scroll {
 }
 
 .pdf-content {
-  background: var(--bg-primary);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
   width: 100%;
   max-width: 1100px;
   height: 90vh;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   display: flex;
   direction: column;
   flex-direction: column;
@@ -2817,11 +2831,11 @@ body.no-scroll {
 
 .pdf-header {
   padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .pdf-header h3 {
