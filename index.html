@@ -208,9 +208,15 @@
               <span class="section-tag" data-i18n="about_tag">&lt;about&gt;</span>
               <h2 class="section-title" style="margin-bottom: 0;" data-i18n="about_title">Tentang Saya</h2>
             </div>
-            <div id="cvDownloadContainer">
-              <a href="https://xgsuoivedppftgmewlcx.supabase.co/storage/v1/object/public/portfolio/cv/0.572751462094714.pdf"
-                id="cvDownloadBtn" target="_blank" class="btn btn-primary btn-sm">
+            <div id="cvDownloadContainer" style="display:flex; gap:10px;">
+              <button id="cvPreviewBtn" class="btn btn-outline btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <span data-i18n="cv_preview">Preview CV</span>
+              </button>
+              <a href="#" id="cvDownloadBtn" target="_blank" class="btn btn-primary btn-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
@@ -662,6 +668,19 @@
         </div>
       </div>
     </footer>
+  </div>
+
+  <!-- PDF PREVIEW MODAL -->
+  <div class="pdf-modal" id="pdfModal" aria-modal="true" role="dialog">
+    <div class="pdf-content">
+      <div class="pdf-header">
+        <h3 data-i18n="cv_preview">Preview CV</h3>
+        <button class="pdf-close" id="pdfClose">&times;</button>
+      </div>
+      <div class="pdf-body">
+        <iframe id="pdfFrame" src="" frameborder="0"></iframe>
+      </div>
+    </div>
   </div>
 
   <!-- PROJECT DETAIL MODAL -->

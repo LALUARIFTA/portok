@@ -15,6 +15,7 @@ const translations = {
     about_tag: "<tentang>",
     about_title: "Tentang Saya",
     cv_download: "Unduh CV",
+    cv_preview: "Preview CV",
     skill_design_title: "Desain",
     skill_design_desc: "UI/UX, Desain Grafis",
     skill_dev_title: "Development",
@@ -66,6 +67,7 @@ const translations = {
     about_tag: "<about>",
     about_title: "About Me",
     cv_download: "Download CV",
+    cv_preview: "Preview CV",
     skill_design_title: "Design",
     skill_design_desc: "UI/UX, Graphic Design",
     skill_dev_title: "Development",
@@ -1082,8 +1084,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initI18n()
   initLightbox()
+  initPdfPreview()
+  loadProfile()
   trackEvent('page_view', { path: window.location.pathname })
 })
+
+async function loadProfile() {
+  try {
+    const { data: p } = await supabase.from('profile').select('*').single()
+    if (p) {
+      window.portfolioProfile = p
+      const bioEl = document.getElementById('heroBioText')
+      if (bioEl) bioEl.textContent = p.bio
+      
+      const cvBtn = document.getElementById('cvDownloadBtn')
+      if (cvBtn && p.cv_url) cvBtn.href = p.cv_url
+    }
+  } catch (err) { console.error('Profile error:', err) }
+}
+
+function initPdfPreview() {
+  const modal = document.getElementById('pdfModal')
+  const btn = document.getElementById('cvPreviewBtn')
+  const close = document.getElementById('pdfClose')
+  const frame = document.getElementById('pdfFrame')
+
+  if (!modal || !btn || !close || !frame) return
+
+  btn.addEventListener('click', () => {
+    const url = window.portfolioProfile?.cv_url || document.getElementById('cvDownloadBtn')?.href
+    if (url && url !== '#' && url !== '') {
+      frame.src = url
+      modal.classList.add('active')
+      document.body.style.overflow = 'hidden'
+    } else {
+      showCustomAlert('warning', 'CV tidak ditemukan.')
+    }
+  })
+
+  const closeModal = () => {
+    modal.classList.remove('active')
+    document.body.style.overflow = ''
+    frame.src = ''
+  }
+
+  close.addEventListener('click', closeModal)
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal()
+  })
+}
 
 function initI18n() {
   const btn = document.getElementById('langToggle')
