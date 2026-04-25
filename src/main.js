@@ -837,8 +837,9 @@ async function initChatbot() {
   toggle?.addEventListener('click', () => windowEl.classList.toggle('active'))
   close?.addEventListener('click', () => windowEl.classList.remove('active'))
 
-  const GEMINI_API_KEY = "AIzaSyDV4wauJ3t0e2cZ_x52d_GV9rCVnm4XNvQ";
-  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  // Menggunakan Environment Variable dari Vite (simpan di .env sebagai VITE_NVIDIA_API_KEY)
+  const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
+  const NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault()
@@ -878,43 +879,66 @@ async function initChatbot() {
       3. Jangan menjawab hal di luar portofolio jika tidak relevan.
       4. Jawablah dengan singkat dan padat.`
 
-      const response = await fetch(GEMINI_API_URL, {
+      const response = await fetch(NVIDIA_API_URL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${NVIDIA_API_KEY}`,
+          "Accept": "text/event-stream"
         },
         body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: systemPrompt + "\n\nUser Question: " + text }]
-            }
+          model: "google/gemma-3n-e2b-it",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: text }
           ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          }
+          max_tokens: 1024,
+          temperature: 0.20,
+          top_p: 0.70,
+          stream: true
         })
       })
 
       if (!response.ok) {
-        throw new Error('API Error')
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.message || 'API Error')
       }
 
-      const data = await response.json()
-      const botResponse = data.candidates[0].content.parts[0].text
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let fullContent = ""
+      botMsgEl.innerHTML = "" // Clear typing dots
 
-      botMsgEl.innerHTML = escapeHTML(botResponse).replace(/\n/g, '<br>')
-      messages.scrollTop = messages.scrollHeight
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
 
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6).trim()
+            if (dataStr === '[DONE]') break
+            try {
+              const data = JSON.parse(dataStr)
+              const content = data.choices[0].delta.content || ""
+              if (content) {
+                fullContent += content
+                botMsgEl.innerHTML = escapeHTML(fullContent).replace(/\n/g, '<br>')
+                messages.scrollTop = messages.scrollHeight
+              }
+            } catch (e) { }
+          }
+        }
+      }
     } catch (err) {
       console.error('Chat error:', err)
       botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya. Silakan coba lagi nanti.'
     }
   })
 }
+
 
 
 // ===== CONTACT FORM =====
