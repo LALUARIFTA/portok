@@ -837,6 +837,9 @@ async function initChatbot() {
   toggle?.addEventListener('click', () => windowEl.classList.toggle('active'))
   close?.addEventListener('click', () => windowEl.classList.remove('active'))
 
+  const GEMINI_API_KEY = "AIzaSyDV4wauJ3t0e2cZ_x52d_GV9rCVnm4XNvQ";
+  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const text = input.value.trim()
@@ -849,7 +852,12 @@ async function initChatbot() {
 
     // Add typing container
     const botMsgId = 'bot-' + Date.now()
-    messages.innerHTML += `<div class="msg-bot" id="${botMsgId}"><span class="typing-dots"><span>.</span><span>.</span><span>.</span></span></div>`
+    messages.innerHTML += `
+      <div class="msg-bot" id="${botMsgId}">
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>`
     messages.scrollTop = messages.scrollHeight
     const botMsgEl = document.getElementById(botMsgId)
 
@@ -870,69 +878,44 @@ async function initChatbot() {
       3. Jangan menjawab hal di luar portofolio jika tidak relevan.
       4. Jawablah dengan singkat dan padat.`
 
-      // NVIDIA / Google Gemma 3N API via Local Proxy
-      const response = await fetch("/api/ai/chat/completions", {
+      const response = await fetch(GEMINI_API_URL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "google/gemma-3n-e2b-it",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: text }
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: systemPrompt + "\n\nUser Question: " + text }]
+            }
           ],
-          max_tokens: 512,
-          temperature: 0.20,
-          top_p: 0.70,
-          frequency_penalty: 0.00,
-          presence_penalty: 0.00,
-          stream: true
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1024,
+          }
         })
       })
 
       if (!response.ok) {
-        const errData = await response.json().catch(() => ({}))
-        throw new Error(errData.message || 'API Error')
+        throw new Error('API Error')
       }
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let fullContent = ""
-      botMsgEl.innerHTML = "" // Clear typing dots
+      const data = await response.json()
+      const botResponse = data.candidates[0].content.parts[0].text
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      botMsgEl.innerHTML = escapeHTML(botResponse).replace(/\n/g, '<br>')
+      messages.scrollTop = messages.scrollHeight
 
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6).trim()
-            if (dataStr === '[DONE]') break
-            try {
-              const data = JSON.parse(dataStr)
-              const delta = data.choices[0].delta
-              const content = delta.content || ""
-
-              if (content) {
-                fullContent += content
-                botMsgEl.textContent = fullContent
-                messages.scrollTop = messages.scrollHeight
-              }
-            } catch (e) { }
-          }
-        }
-      }
     } catch (err) {
       console.error('Chat error:', err)
-      botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya (CORS/API Error). Silakan coba lagi nanti.'
+      botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya. Silakan coba lagi nanti.'
     }
   })
 }
+
 
 // ===== CONTACT FORM =====
 function initContact() {
@@ -1081,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initI18n()
   initLightbox()
   initPdfPreview()
+  initScrambleEffects()
   loadProfile()
   trackEvent('page_view', { path: window.location.pathname })
 })
@@ -1149,11 +1133,102 @@ function initI18n() {
   applyTranslations()
 }
 
+// ===== TEXT SCRAMBLE EFFECT =====
+class TextScramble {
+  constructor(el, options = {}) {
+    this.el = el;
+    this.options = {
+      duration: options.duration || 0.8,
+      speed: options.speed || 0.04,
+      characterSet: options.characterSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+      ...options
+    };
+    this.isAnimating = false;
+  }
+
+  async scramble() {
+    if (this.isAnimating) return;
+    this.isAnimating = true;
+
+    // Simpan teks asli dari atribut data-text (untuk i18n) atau textContent
+    const originalText = this.el.getAttribute('data-scramble-text') || this.el.innerText;
+    const steps = this.options.duration / this.options.speed;
+    let step = 0;
+
+    const interval = setInterval(() => {
+      let scrambled = '';
+      const progress = step / steps;
+
+      for (let i = 0; i < originalText.length; i++) {
+        if (originalText[i] === ' ' || originalText[i] === '\n') {
+          scrambled += originalText[i];
+          continue;
+        }
+
+        if (progress * originalText.length > i) {
+          scrambled += originalText[i];
+        } else {
+          scrambled += this.options.characterSet[Math.floor(Math.random() * this.options.characterSet.length)];
+        }
+      }
+
+      this.el.innerText = scrambled;
+      step++;
+
+      if (step > steps) {
+        clearInterval(interval);
+        this.el.innerText = originalText;
+        this.isAnimating = false;
+        if (this.options.onScrambleComplete) this.options.onScrambleComplete();
+      }
+    }, this.options.speed * 1000);
+  }
+}
+
+function initScrambleEffects() {
+  // 1. Hero Name Effect
+  const nameEl = document.getElementById('heroNameText');
+  if (nameEl) {
+    const ts = new TextScramble(nameEl);
+    nameEl.style.cursor = 'pointer';
+    nameEl.addEventListener('mouseenter', () => ts.scramble());
+    setTimeout(() => ts.scramble(), 1500); // Auto start
+  }
+
+  // 2. Section Titles Effect on Scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const title = entry.target;
+        if (!title.hasAttribute('data-scrambled')) {
+          const ts = new TextScramble(title);
+          ts.scramble();
+          title.setAttribute('data-scrambled', 'true');
+        }
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.section-title').forEach(title => {
+    // Simpan teks asli agar aman saat ganti bahasa
+    title.setAttribute('data-scramble-text', title.innerText);
+    observer.observe(title);
+
+    // Juga tambahkan hover effect
+    const ts = new TextScramble(title);
+    title.addEventListener('mouseenter', () => ts.scramble());
+  });
+}
+
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n')
     if (translations[currentLang][key]) {
-      el.textContent = translations[currentLang][key]
+      el.innerText = translations[currentLang][key]
+      // Update data-scramble-text if it exists
+      if (el.hasAttribute('data-scramble-text')) {
+        el.setAttribute('data-scramble-text', el.innerText)
+      }
     }
   })
 }
