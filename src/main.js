@@ -16,6 +16,7 @@ const translations = {
     about_title: "Tentang Saya",
     cv_download: "Unduh CV",
     cv_preview: "Preview CV",
+    tech_skills_title: "Kemahiran Teknis",
     skill_design_title: "Desain",
     skill_design_desc: "UI/UX, Desain Grafis",
     skill_dev_title: "Development",
@@ -68,6 +69,7 @@ const translations = {
     about_title: "About Me",
     cv_download: "Download CV",
     cv_preview: "Preview CV",
+    tech_skills_title: "Technical Proficiency",
     skill_design_title: "Design",
     skill_design_desc: "UI/UX, Graphic Design",
     skill_dev_title: "Development",
@@ -1085,9 +1087,29 @@ document.addEventListener('DOMContentLoaded', () => {
   initI18n()
   initLightbox()
   initPdfPreview()
+  initSkillAnimations()
   loadProfile()
   trackEvent('page_view', { path: window.location.pathname })
 })
+
+function initSkillAnimations() {
+  const section = document.getElementById('skillsProgress')
+  if (!section) return
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bars = entry.target.querySelectorAll('.skill-bar-fill')
+        bars.forEach(bar => {
+          bar.style.width = bar.getAttribute('data-percent') + '%'
+        })
+        observer.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.2 })
+
+  observer.observe(section)
+}
 
 async function loadProfile() {
   try {

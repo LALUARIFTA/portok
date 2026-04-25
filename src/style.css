@@ -2879,3 +2879,94 @@ body.no-scroll {
   .pdf-content { height: 95vh; }
   .pdf-header { padding: 12px 16px; }
 }
+
+/* ===== SKILL PROGRESS BARS ===== */
+.skills-progress-container {
+  margin-top: 50px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+}
+
+.skills-subtitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skills-subtitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px 40px;
+}
+
+@media (max-width: 768px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.skill-bar-wrapper {
+  margin-bottom: 5px;
+}
+
+.skill-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.skill-percent {
+  color: var(--accent-light);
+}
+
+.skill-bar-bg {
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 100px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.skill-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: 100px;
+  width: 0;
+  transition: width 1.5s cubic-bezier(0.1, 0.42, 0.41, 1);
+  box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.skill-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
