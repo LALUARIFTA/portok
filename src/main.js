@@ -423,15 +423,7 @@ function initTerminal() {
       } else if (cmd) {
         let response = commands[cmd] ? commands[cmd]() : null
 
-        // If not a system command, check chatbot keywords
-        if (!response) {
-          for (const [key, value] of Object.entries(chatbotResponses)) {
-            if (cmd.includes(key)) {
-              response = value
-              break
-            }
-          }
-        }
+
 
         if (!response) {
           response = `Command not found: ${escapeHTML(cmd)}. Type <span style="color:var(--accent-light)">"help"</span> for list.`
