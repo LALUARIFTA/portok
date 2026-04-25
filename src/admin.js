@@ -1,5 +1,7 @@
 import { supabase } from './supabase.js'
 
+let analyticsChart = null
+
 // ===== UTILS =====
 const showPage = (pageName) => {
   document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'))
@@ -171,7 +173,83 @@ async function loadStats() {
     document.getElementById('dashTotalMessages').textContent = mCount || 0
     document.getElementById('dashTotalViews').textContent = vCount
     document.getElementById('dashCvClicks').textContent = cCount
+
+    initAnalyticsChart()
   } catch (err) { console.error('Stats error:', err) }
+}
+
+async function initAnalyticsChart() {
+  const ctx = document.getElementById('analyticsChart')?.getContext('2d')
+  if (!ctx) return
+
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setHours(0,0,0,0)
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+  try {
+    const { data: views } = await supabase
+      .from('analytics')
+      .select('created_at')
+      .eq('event_name', 'page_view')
+      .gte('created_at', sevenDaysAgo.toISOString())
+
+    const labels = []
+    const counts = []
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const dateStr = d.toISOString().split('T')[0]
+      const label = d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' })
+      
+      const count = views ? views.filter(v => v.created_at.startsWith(dateStr)).length : 0
+      
+      labels.push(label)
+      counts.push(count)
+    }
+
+    if (analyticsChart) analyticsChart.destroy()
+
+    analyticsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Kunjungan Halaman',
+          data: counts,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true, 
+            grid: { color: 'rgba(255,255,255,0.05)' }, 
+            ticks: { stepSize: 1, color: '#94a3b8' } 
+          },
+          x: { 
+            grid: { display: false }, 
+            ticks: { color: '#94a3b8' } 
+          }
+        }
+      }
+    })
+  } catch (err) {
+    console.warn('Analytics table not ready or empty')
+  }
 }
 
 // ===== PROJECTS =====
@@ -532,6 +610,8 @@ window.editCertificate = async id => {
   document.getElementById('certCredential').value = c.credential_url || ''
   document.getElementById('certificateModal').classList.add('active')
 }
+
+
 
 // ===== PROFILE =====
 async function loadProfile() {

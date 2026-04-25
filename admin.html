@@ -12,8 +12,9 @@
     rel="stylesheet">
   <link rel="stylesheet" href="/src/admin.css">
   <meta name="robots" content="noindex, nofollow" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
 </head>
 
 <body>
@@ -105,6 +106,13 @@
           </div>
 
 
+
+          <div class="analytics-chart-container" style="margin-top: 40px; background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <h3 style="margin-bottom: 20px;">Tren Kunjungan (7 Hari Terakhir)</h3>
+            <div style="height: 300px; width: 100%;">
+              <canvas id="analyticsChart"></canvas>
+            </div>
+          </div>
 
           <div class="activity-log" style="margin-top: 40px;">
             <h3 style="margin-bottom: 20px;">Aktivitas Terbaru</h3>
