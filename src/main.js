@@ -837,9 +837,7 @@ async function initChatbot() {
   toggle?.addEventListener('click', () => windowEl.classList.toggle('active'))
   close?.addEventListener('click', () => windowEl.classList.remove('active'))
 
-  // Menggunakan Environment Variable dari Vite (simpan di .env sebagai VITE_NVIDIA_API_KEY)
-  const NVIDIA_API_KEY = import.meta.env.VITE_NVIDIA_API_KEY;
-  // Gunakan proxy lokal yang sudah terkonfigurasi di vite.config.js untuk menghindari CORS
+  // Proxy lokal (Vite) atau Proxy Produksi (Cloudflare Pages Functions)
   const NVIDIA_API_URL = "/api/ai/chat/completions";
 
   form?.addEventListener('submit', async (e) => {
@@ -884,7 +882,7 @@ async function initChatbot() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${NVIDIA_API_KEY}`,
+          // Authorization dihandle secara aman oleh Server/Proxy (Vite/Cloudflare)
           "Accept": "text/event-stream"
         },
         body: JSON.stringify({
