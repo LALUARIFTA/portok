@@ -1,10 +1,82 @@
 import { supabase } from './supabase.js'
 
+// ===== PAGE LOADER =====
+window.addEventListener('load', () => {
+  const loader = document.getElementById('page-loader');
+  if (loader) {
+    // Add a small delay to ensure smooth transition and show the animation
+    setTimeout(() => {
+      loader.classList.add('hidden');
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 500);
+    }, 800);
+  }
+});
 // ===== UTILS =====
 const escapeHTML = str => {
   const div = document.createElement('div')
   div.textContent = str
   return div.innerHTML
+}
+
+// ===== CUSTOM ALERTS =====
+window.showCustomAlert = function (type, message) {
+  const container = document.getElementById('alertContainer');
+  if (!container) return;
+
+  const alertDiv = document.createElement('div');
+  // Initial state: translated to right and invisible
+  alertDiv.className = 'transform translate-x-full opacity-0 transition-all duration-300 ease-out';
+
+  let html = '';
+  switch (type) {
+    case 'success':
+      html = `
+      <div role="alert" class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-700 text-green-900 dark:text-green-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-green-200 dark:hover:bg-green-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-green-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+    case 'error':
+      html = `
+      <div role="alert" class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-700 text-red-900 dark:text-red-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-red-200 dark:hover:bg-red-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-red-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+    case 'info':
+      html = `
+      <div role="alert" class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-700 text-blue-900 dark:text-blue-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-blue-200 dark:hover:bg-blue-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+    case 'warning':
+      html = `
+      <div role="alert" class="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-yellow-200 dark:hover:bg-yellow-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-yellow-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+  }
+
+  alertDiv.innerHTML = html;
+  container.appendChild(alertDiv);
+
+  // Trigger reflow
+  alertDiv.offsetHeight;
+
+  // Slide in
+  alertDiv.classList.remove('translate-x-full', 'opacity-0');
+
+  // Slide out and remove
+  setTimeout(() => {
+    alertDiv.classList.add('translate-x-full', 'opacity-0');
+    setTimeout(() => {
+      alertDiv.remove();
+    }, 300);
+  }, 4000);
 }
 
 // ===== THEME TOGGLE =====
@@ -224,6 +296,8 @@ function initTerminal() {
 
 // ===== PROJECTS & MODAL =====
 let allProjects = []
+let currentProjectFilter = 'all'
+let displayedProjectsCount = 6
 
 async function loadProjects() {
   const grid = document.getElementById('projectsGrid')
@@ -246,19 +320,23 @@ async function loadProjects() {
     allProjects = [...(projData || []), ...formattedCerts]
 
     if (grid) {
-      renderProjects(allProjects)
+      renderProjects()
       updateStats()
     }
   } catch (err) { console.error(err) }
 }
 
-function renderProjects(projects) {
+function renderProjects() {
   const grid = document.getElementById('projectsGrid')
   if (!grid) return
-  grid.innerHTML = projects.map((p, i) => `
-    <div class="project-card reveal" style="animation-delay:${i * 0.1}s" onclick="window.openProjectDetail('${p.id}')">
+
+  const filtered = currentProjectFilter === 'all' ? allProjects : allProjects.filter(p => p.category === currentProjectFilter)
+  const toDisplay = filtered.slice(0, displayedProjectsCount)
+
+  grid.innerHTML = toDisplay.map((p, i) => `
+    <div class="project-card reveal" style="animation-delay:${(i % 6) * 0.1}s" onclick="window.openProjectDetail('${p.id}')">
       <div class="project-thumb">
-        <img src="${p.thumbnail || 'https://via.placeholder.com/400x300'}" alt="Thumbnail for ${p.title}" loading="lazy">
+        ${p.thumbnail && p.thumbnail.toLowerCase().endsWith('.pdf') ? `<div style="height:100%; display:flex; align-items:center; justify-content:center; background:var(--bg-secondary); color:var(--text-muted);"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>` : `<img src="${p.thumbnail || 'https://via.placeholder.com/400x300'}" alt="Thumbnail for ${p.title}" loading="lazy">`}
         <div class="project-overlay"></div>
         <span class="project-category-badge">${p.category === 'certificate' ? 'Sertifikat' : p.category}</span>
       </div>
@@ -270,6 +348,16 @@ function renderProjects(projects) {
       </div>
     </div>
   `).join('')
+
+  const loadMoreContainer = document.getElementById('loadMoreContainer')
+  if (loadMoreContainer) {
+    if (filtered.length > displayedProjectsCount) {
+      loadMoreContainer.style.display = 'flex'
+    } else {
+      loadMoreContainer.style.display = 'none'
+    }
+  }
+
   initReveal() // Re-init for dynamic content
 }
 
@@ -283,7 +371,10 @@ window.openProjectDetail = async (id) => {
   document.getElementById('pmYear').textContent = p.year || '-'
   document.getElementById('pmStack').textContent = p.tech_stack || '-'
   document.getElementById('pmDescription').textContent = p.case_study || p.description || 'No detailed case study yet.'
-  document.getElementById('pmHero').innerHTML = `<img src="${p.thumbnail}" alt="Hero image for ${p.title}" loading="lazy">`
+  const isPdf = p.thumbnail && p.thumbnail.toLowerCase().endsWith('.pdf');
+  document.getElementById('pmHero').innerHTML = isPdf 
+    ? `<iframe src="${p.thumbnail}" width="100%" height="400px" style="border:none; border-radius: 12px 12px 0 0;"></iframe>` 
+    : `<img src="${p.thumbnail}" alt="Hero image for ${p.title}" loading="lazy">`;
 
   // Gallery
   const gallery = document.getElementById('pmGallery')
@@ -314,30 +405,7 @@ if (pmCloseBtn) {
   })
 }
 
-// ===== BLOG =====
-async function loadArticles() {
-  const grid = document.getElementById('blogGrid')
-  if (!grid) return
 
-  try {
-    const { data } = await supabase.from('articles').select('*').eq('published', true).order('created_at', { ascending: false })
-    if (!data || data.length === 0) {
-      grid.innerHTML = '<p style="color:var(--text-muted); text-align:center; grid-column: 1/-1;">Belum ada artikel.</p>'
-      return
-    }
-    grid.innerHTML = data.map(a => `
-      <div class="article-card reveal">
-        <div class="article-thumb"><img src="${a.thumbnail || 'https://via.placeholder.com/400x250'}" alt="Thumbnail for ${a.title}" loading="lazy"></div>
-        <div class="article-info">
-          <span class="article-date">${new Date(a.created_at).toLocaleDateString('id-ID')}</span>
-          <h4>${a.title}</h4>
-          <a href="#" class="project-link" aria-label="Baca selengkapnya tentang ${a.title}">Baca Selengkapnya →</a>
-        </div>
-      </div>
-    `).join('')
-    if (typeof initReveal === 'function') initReveal()
-  } catch (err) { console.error(err) }
-}
 
 // ===== PROFILE & CONTENT =====
 async function loadDynamicContent() {
@@ -356,6 +424,8 @@ async function loadDynamicContent() {
       const elLoc = document.getElementById('contactLocation')
       const elCVBtn = document.getElementById('cvDownloadBtn')
       const elCVCont = document.getElementById('cvDownloadContainer')
+      const elLinkedInBtn = document.getElementById('resumeLinkedInBtn')
+      const elLinkedInCont = document.getElementById('resumeLinkedInContainer')
 
       if (elNavName) elNavName.textContent = p.name
       if (elHeroName) elHeroName.textContent = p.name
@@ -373,13 +443,26 @@ async function loadDynamicContent() {
         elCVCont.style.display = 'block'
       }
 
-      // Socials
+      if (p.linkedin && elLinkedInBtn && elLinkedInCont) {
+        elLinkedInBtn.href = p.linkedin
+        elLinkedInCont.style.display = 'flex'
+      }
+
+      // Socials — styled icon buttons
       const socials = document.getElementById('footerSocials')
       if (socials) {
+        const linkStyle = 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--border);color:var(--text-muted);text-decoration:none;transition:all 0.2s;'
+        const hoverIn = "this.style.borderColor='var(--accent)';this.style.color='var(--accent)';this.style.transform='translateY(-2px)'"
+        const hoverOut = "this.style.borderColor='var(--border)';this.style.color='var(--text-muted)';this.style.transform='translateY(0)'"
         let html = ''
-        if (p.github) html += `<a href="${p.github}" target="_blank">GitHub</a>`
-        if (p.linkedin) html += `<a href="${p.linkedin}" target="_blank">LinkedIn</a>`
-        if (p.instagram) html += `<a href="${p.instagram}" target="_blank">Instagram</a>`
+        if (p.email) html += `<a href="mailto:${p.email}" style="${linkStyle}" onmouseover="${hoverIn}" onmouseout="${hoverOut}" aria-label="Email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>`
+        if (p.github) html += `<a href="${p.github}" target="_blank" style="${linkStyle}" onmouseover="${hoverIn}" onmouseout="${hoverOut}" aria-label="GitHub"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></a>`
+        if (p.linkedin) html += `<a href="${p.linkedin}" target="_blank" style="${linkStyle}" onmouseover="${hoverIn}" onmouseout="${hoverOut}" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>`
+        if (p.instagram) html += `<a href="${p.instagram}" target="_blank" style="${linkStyle}" onmouseover="${hoverIn}" onmouseout="${hoverOut}" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>`
+        if (p.whatsapp) {
+          const waNum = p.whatsapp.replace(/\D/g, '')
+          html += `<a href="https://wa.me/${waNum}" target="_blank" style="${linkStyle}" onmouseover="${hoverIn}" onmouseout="${hoverOut}" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></a>`
+        }
         socials.innerHTML = html
       }
     }
@@ -458,9 +541,127 @@ function initFilters() {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     const filter = btn.dataset.filter
-    const filtered = filter === 'all' ? allProjects : allProjects.filter(p => p.category === filter)
-    renderProjects(filtered)
+    currentProjectFilter = filter
+    displayedProjectsCount = 6
+    renderProjects()
   })
+
+  document.getElementById('loadMoreProjectsBtn')?.addEventListener('click', () => {
+    displayedProjectsCount += 6
+    renderProjects()
+  })
+}
+
+// ===== BLOG ARTICLES =====
+async function loadArticles() {
+  const grid = document.getElementById('blogGrid')
+  if (!grid) return
+
+  const loader = document.getElementById('blogLoader')
+  const empty = document.getElementById('blogEmpty')
+
+  try {
+    const { data: articles, error } = await supabase
+      .from('articles')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    // Hide loader
+    if (loader) loader.style.display = 'none'
+
+    if (error) throw error
+
+    if (!articles || articles.length === 0) {
+      if (empty) empty.style.display = 'block'
+      return
+    }
+
+    grid.innerHTML = articles.map(a => `
+      <div class="blog-card-item">
+        ${a.image_url || a.thumbnail ? `<div style="overflow:hidden;"><img src="${a.image_url || a.thumbnail}" alt="${escapeHTML(a.title)}" loading="lazy"></div>` : `<div style="height:200px;background:linear-gradient(135deg,var(--bg-secondary),var(--accent-glow));display:flex;align-items:center;justify-content:center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-light)" stroke-width="1.5" opacity="0.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>`}
+        <div class="blog-card-body">
+          <div class="blog-card-meta">
+            ${a.category ? `<span class="blog-card-tag">${escapeHTML(a.category)}</span>` : ''}
+            <span class="blog-card-date">${new Date(a.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          </div>
+          <h3 class="blog-card-title">${escapeHTML(a.title)}</h3>
+          <p class="blog-card-excerpt">${escapeHTML(a.excerpt || a.content?.substring(0, 150) || '')}</p>
+          <a href="/article.html?id=${a.id}" class="blog-card-read">Baca Selengkapnya <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></a>
+        </div>
+      </div>
+    `).join('')
+  } catch (err) {
+    console.error('Error loading articles:', err)
+    if (loader) loader.style.display = 'none'
+    if (empty) empty.style.display = 'block'
+  }
+}
+
+// ===== SINGLE ARTICLE =====
+async function loadSingleArticle() {
+  const wrapper = document.getElementById('articleContentWrapper')
+  const loader = document.getElementById('articleLoader')
+  const errorEl = document.getElementById('articleError')
+
+  if (!wrapper || !loader || !errorEl) return // Not on the article page
+
+  const params = new URLSearchParams(window.location.search)
+  const id = params.get('id')
+
+  if (!id) {
+    loader.style.display = 'none'
+    errorEl.style.display = 'block'
+    return
+  }
+
+  try {
+    const { data: article, error } = await supabase
+      .from('articles')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    loader.style.display = 'none'
+
+    if (error || !article) {
+      errorEl.style.display = 'block'
+      return
+    }
+
+    // Render Content
+    document.title = `${escapeHTML(article.title)} — Ayek Portfolio`
+    document.getElementById('articleTitle').textContent = article.title
+    document.getElementById('articleDate').textContent = new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+
+    if (article.category) {
+      const catEl = document.getElementById('articleCategory')
+      catEl.textContent = article.category
+      catEl.style.display = 'inline-block'
+    }
+
+    const imgUrl = article.image_url || article.thumbnail
+    if (imgUrl) {
+      const imgEl = document.getElementById('articleImage')
+      imgEl.src = imgUrl
+      imgEl.alt = article.title
+      imgEl.style.display = 'block'
+    }
+
+    // Convert markdown to HTML if marked is available, else use basic formatting
+    const bodyEl = document.getElementById('articleBody')
+    if (typeof marked !== 'undefined') {
+      bodyEl.innerHTML = marked.parse(article.content)
+    } else {
+      bodyEl.innerHTML = article.content.split('\n').map(p => `<p>${escapeHTML(p)}</p>`).join('')
+    }
+
+    wrapper.style.display = 'block'
+
+  } catch (err) {
+    console.error('Error loading article:', err)
+    loader.style.display = 'none'
+    errorEl.style.display = 'block'
+  }
 }
 
 // ===== CHATBOT =====
@@ -560,16 +761,77 @@ function initContact() {
 
       if (error) throw error
 
-      alert('Pesan berhasil dikirim! Terima kasih.')
+      showCustomAlert('success', 'Success - Pesan berhasil dikirim! Terima kasih.')
       form.reset()
     } catch (err) {
       console.error(err)
-      alert('Gagal mengirim pesan. Silakan coba lagi nanti.')
+      showCustomAlert('error', 'Error - Gagal mengirim pesan. Silakan coba lagi.')
     } finally {
       btn.disabled = false
       btn.innerHTML = originalBtnText
     }
   })
+}
+
+// ===== SCROLL PROGRESS & BACK TO TOP =====
+function initScrollFeatures() {
+  const progressBar = document.getElementById('scrollProgress')
+
+  window.addEventListener('scroll', () => {
+    // Progress bar
+    if (progressBar) {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+      progressBar.style.width = scrollPercent + '%'
+    }
+  })
+}
+
+// ===== HERO TYPING ANIMATION =====
+function initHeroTyping() {
+  const roleEl = document.getElementById('heroRole')
+  if (!roleEl) return
+
+  const roles = ['Web Developer', 'UI/UX Designer', 'Network Engineer', 'IT Professional']
+  let roleIndex = 0
+  let charIndex = 0
+  let isDeleting = false
+  let typingSpeed = 100
+
+  function type() {
+    const current = roles[roleIndex]
+
+    if (isDeleting) {
+      roleEl.textContent = current.substring(0, charIndex - 1)
+      charIndex--
+      typingSpeed = 50
+    } else {
+      roleEl.textContent = current.substring(0, charIndex + 1)
+      charIndex++
+      typingSpeed = 100
+    }
+
+    if (!isDeleting && charIndex === current.length) {
+      typingSpeed = 2000 // Pause at end
+      isDeleting = true
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false
+      roleIndex = (roleIndex + 1) % roles.length
+      typingSpeed = 400 // Pause before next word
+    }
+
+    setTimeout(type, typingSpeed)
+  }
+
+  // Start after a short delay
+  setTimeout(type, 1500)
+}
+
+// ===== DYNAMIC YEAR =====
+function initYear() {
+  const el = document.getElementById('currentYear')
+  if (el) el.textContent = new Date().getFullYear()
 }
 
 // ===== INIT =====
@@ -581,8 +843,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initFilters()
   loadProjects()
   loadArticles()
+  loadSingleArticle()
   loadDynamicContent()
   initChatbot()
   initContact()
   initTerminal()
+  initScrollFeatures()
+  initHeroTyping()
+  initYear()
 })

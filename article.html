@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- SEO & Security Tags -->
-  <meta name="description" content="Kumpulan artikel dan edukasi seputar Web Development, Design, dan IT oleh Ayek." />
+  <meta name="description" content="Baca artikel lengkap di Ayek Portfolio." />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
   <meta name="robots" content="index, follow" />
 
-  <title>Blog — Ayek Portfolio</title>
+  <title>Artikel — Ayek Portfolio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,104 +24,160 @@
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 font-family=%22monospace%22 fill=%22%237c4dff%22>&lt;/&gt;</text></svg>">
 
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <style>
-    .blog-card-item {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      transition: var(--transition);
-      cursor: pointer;
+    .article-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
 
-    .blog-card-item:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(124, 77, 255, 0.15);
-      border-color: var(--accent);
+    .article-header {
+      margin-bottom: 40px;
+      text-align: center;
     }
 
-    .blog-card-item img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-
-    .blog-card-item:hover img {
-      transform: scale(1.05);
-    }
-
-    .blog-card-body {
-      padding: 24px;
-    }
-
-    .blog-card-meta {
+    .article-meta {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
       align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .blog-card-tag {
-      font-size: 0.7rem;
-      padding: 3px 12px;
+    .article-tag {
+      font-size: 0.8rem;
+      padding: 4px 14px;
       border-radius: 20px;
       background: var(--accent-glow);
       color: var(--accent-light);
       font-weight: 600;
     }
 
-    .blog-card-date {
-      font-size: 0.72rem;
+    .article-date {
+      font-size: 0.9rem;
       color: var(--text-muted);
     }
 
-    .blog-card-title {
-      font-size: 1.05rem;
-      margin-bottom: 10px;
+    .article-title {
+      font-size: 2.5rem;
       color: var(--text-primary);
-      line-height: 1.5;
+      line-height: 1.3;
+      margin-bottom: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    @media (max-width: 768px) {
+      .article-title {
+        font-size: 2rem;
+      }
+    }
+
+    .article-hero-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      border-radius: var(--radius-lg);
+      margin-bottom: 40px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 768px) {
+      .article-hero-image {
+        height: 250px;
+      }
+    }
+
+    .article-body {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    .article-body h2 {
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      margin: 40px 0 20px;
+      font-weight: 700;
+    }
+
+    .article-body h3 {
+      font-size: 1.4rem;
+      color: var(--text-primary);
+      margin: 30px 0 16px;
       font-weight: 600;
     }
 
-    .blog-card-excerpt {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+    .article-body p {
+      margin-bottom: 24px;
     }
 
-    .blog-card-read {
+    .article-body img {
+      max-width: 100%;
+      border-radius: var(--radius-md);
+      margin: 32px 0;
+    }
+
+    .article-body ul,
+    .article-body ol {
+      margin-bottom: 24px;
+      padding-left: 24px;
+    }
+
+    .article-body li {
+      margin-bottom: 10px;
+    }
+
+    .article-body pre {
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      margin: 32px 0;
+      border: 1px solid var(--border);
+    }
+
+    .article-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--accent-light);
+    }
+
+    .article-body blockquote {
+      border-left: 4px solid var(--accent);
+      padding-left: 20px;
+      margin: 32px 0;
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    .article-body a {
+      color: var(--accent-light);
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      transition: text-decoration-color 0.2s;
+    }
+
+    .article-body a:hover {
+      text-decoration-color: var(--accent-light);
+    }
+
+    .back-to-blog {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 16px;
-      font-size: 0.8rem;
-      color: var(--accent);
-      font-weight: 600;
+      gap: 8px;
+      color: var(--text-muted);
       text-decoration: none;
-      transition: gap 0.2s;
+      font-size: 0.95rem;
+      margin-bottom: 40px;
+      transition: color 0.2s;
     }
 
-    .blog-card-read:hover {
-      gap: 10px;
-    }
-
-    .blog-grid-layout {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 28px;
-      margin-top: 32px;
-    }
-
-    @media (max-width: 640px) {
-      .blog-grid-layout {
-        grid-template-columns: 1fr;
-      }
+    .back-to-blog:hover {
+      color: var(--accent);
     }
   </style>
 </head>
@@ -173,32 +229,48 @@
       </div>
     </nav>
 
-    <main style="padding-top: 100px; min-height: 60vh;">
-      <!-- BLOG SECTION -->
-      <section class="section blog" id="blog">
-        <div class="section-container">
-          <div class="section-header" style="text-align:center;max-width:600px;margin:0 auto 20px;">
-            <span class="section-tag">&lt;blog&gt;</span>
-            <h2 class="section-title">Artikel <span class="gradient-text">& Edukasi</span></h2>
-            <p style="color:var(--text-muted);margin-top:12px;font-size:0.92rem;line-height:1.7;">Berbagi wawasan
-              seputar teknologi, desain, dan pengembangan perangkat lunak.</p>
-          </div>
-          <div class="blog-grid-layout" id="blogGrid">
-            <div id="blogLoader" class="loader" style="grid-column:1/-1;"></div>
-            <div id="blogEmpty" style="display:none;text-align:center;padding:60px 20px;grid-column:1/-1;">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1"
-                style="margin:0 auto 20px;opacity:0.4;">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <line x1="10" y1="9" x2="8" y2="9" />
-              </svg>
-              <h3 style="color:var(--text-secondary);font-size:1.2rem;margin-bottom:10px;font-weight:600;">Belum Ada
-                Artikel</h3>
-              <p style="color:var(--text-muted);font-size:0.88rem;max-width:400px;margin:0 auto;line-height:1.6;">
-                Artikel dan edukasi seputar teknologi akan segera hadir. Stay tuned!</p>
+    <main style="padding-top: 120px; min-height: 70vh;">
+      <!-- ARTICLE SECTION -->
+      <section class="section" id="singleArticle">
+        <div class="article-container">
+          <a href="/blog.html" class="back-to-blog">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Kembali ke Blog
+          </a>
+
+          <div id="articleLoader" class="loader" style="margin: 60px auto;"></div>
+
+          <div id="articleContentWrapper" style="display: none; animation: fade-in 0.5s ease;">
+            <div class="article-header">
+              <div class="article-meta">
+                <span id="articleCategory" class="article-tag" style="display:none;"></span>
+                <span id="articleDate" class="article-date"></span>
+              </div>
+              <h1 id="articleTitle" class="article-title"></h1>
             </div>
+
+            <img id="articleImage" src="" alt="" class="article-hero-image" style="display:none;">
+
+            <div id="articleBody" class="article-body"></div>
+          </div>
+
+          <div id="articleError" style="display: none; text-align: center; padding: 60px 20px;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"
+              style="margin: 0 auto 20px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h3 style="color:var(--text-secondary);font-size:1.5rem;margin-bottom:10px;">Artikel Tidak Ditemukan</h3>
+            <p style="color:var(--text-muted);margin-bottom:30px;">Artikel yang Anda cari mungkin telah dihapus atau URL
+              tidak valid.</p>
+            <a href="/blog.html"
+              style="display:inline-block;padding:12px 24px;background:var(--accent);color:#fff;border-radius:var(--radius-md);text-decoration:none;font-weight:600;">Lihat
+              Semua Artikel</a>
           </div>
         </div>
       </section>
@@ -211,11 +283,10 @@
 
 
 
-    <!-- FOOTER (matching index.html) -->
+    <!-- FOOTER -->
     <footer class="footer reveal"
       style="background:linear-gradient(180deg,var(--bg-primary) 0%,var(--bg-secondary) 100%);border-top:1px solid var(--border);margin-top:60px;">
       <div style="max-width:1200px;margin:0 auto;padding:48px 24px 0;">
-        <!-- Top: Logo + Bio -->
         <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;margin-bottom:40px;">
           <div style="flex:1;min-width:280px;">
             <a href="/" style="text-decoration:none;">
@@ -230,8 +301,6 @@
             </p>
             <div id="footerSocials" style="display:flex;gap:10px;margin-top:16px;"></div>
           </div>
-
-          <!-- Navigation Columns -->
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1;min-width:300px;">
             <div>
               <h4
@@ -296,8 +365,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Bottom Bar -->
         <div
           style="border-top:1px solid var(--border);padding:20px 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;">
           <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">

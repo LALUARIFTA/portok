@@ -32,3 +32,4 @@ dist-ssr
 *.sw?
 
 #http://localhost:5174/
+.wrangler/

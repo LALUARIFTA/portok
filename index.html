@@ -40,9 +40,49 @@
 
   <link rel="icon"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22 font-family=%22monospace%22 fill=%22%237c4dff%22>&lt;/&gt;</text></svg>">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Ayek",
+    "jobTitle": "IT Professional",
+    "url": "https://ayek.dev",
+    "sameAs": [],
+    "knowsAbout": ["Web Development", "UI/UX Design", "Network Engineering"]
+  }
+  </script>
 </head>
 
 <body data-theme="dark">
+  <!-- Theme Flash Prevention -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('portfolio-theme') || 'dark';
+      document.body.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <!-- Alert Container -->
+  <div id="alertContainer" class="fixed top-4 right-4 z-[9999] space-y-2 flex flex-col items-end pointer-events-none">
+  </div>
+
+  <!-- Preloader -->
+  <div id="page-loader" class="loader-wrapper">
+    <div class="terminal-loader">
+      <div class="terminal-header">
+        <div class="terminal-title">Status</div>
+        <div class="terminal-controls">
+          <div class="control close"></div>
+          <div class="control minimize"></div>
+          <div class="control maximize"></div>
+        </div>
+      </div>
+      <div class="text">Loading...</div>
+    </div>
+  </div>
+
   <div id="app">
     <!-- Mobile Nav Overlay -->
     <div class="nav-overlay" id="navOverlay"></div>
@@ -100,7 +140,7 @@
             <h1 class="hero-title">
               <span class="hero-line">Hi, Saya</span>
               <span class="hero-line hero-name"><span class="gradient-text" id="heroNameText">Ayek</span></span>
-              <span class="hero-line hero-role" id="heroRole">IT Professional</span>
+              <span class="hero-line hero-role"><span id="heroRole" style="border-right:2px solid var(--accent);padding-right:4px;animation:blink-cursor 0.8s step-end infinite;">IT Professional</span></span>
             </h1>
             <p class="hero-description" id="heroBioText">
               Seorang IT Enthusiast yang passionate di bidang <strong>Web Development</strong>, <strong>UI/UX
@@ -145,10 +185,23 @@
       </section>
 
       <section class="section about reveal" id="about">
-        <div class="section-container">
-          <div class="section-header" style="margin-top: 20px; margin-bottom: 20px;">
-            <span class="section-tag">&lt;about&gt;</span>
-            <h2 class="section-title">Tentang <span class="gradient-text">Saya</span></h2>
+        <div class="grid-background" aria-hidden="true"></div>
+        <div class="section-container" style="position: relative; z-index: 1;">
+          <div class="section-header" style="margin-top: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <span class="section-tag">&lt;about&gt;</span>
+              <h2 class="section-title" style="margin-bottom: 0;">Tentang <span class="gradient-text">Saya</span></h2>
+            </div>
+            <div id="cvDownloadContainer">
+              <a href="https://xgsuoivedppftgmewlcx.supabase.co/storage/v1/object/public/portfolio/cv/0.572751462094714.pdf" id="cvDownloadBtn" target="_blank" class="btn btn-primary btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Download CV</span>
+              </a>
+            </div>
           </div>
           <div class="about-grid">
             <div class="about-card">
@@ -173,16 +226,7 @@
               </div>
             </div>
             <div class="about-text">
-              <div id="cvDownloadContainer" style="margin-top: 24px; display: none;">
-                <a href="#" id="cvDownloadBtn" target="_blank" class="btn btn-primary">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  <span>Download CV</span>
-                </a>
-              </div>
+
 
               <div class="about-highlights">
                 <div class="highlight-item">
@@ -308,6 +352,19 @@
               <div class="timeline-list" id="educationList"></div>
             </div>
           </div>
+
+          <div id="resumeLinkedInContainer" style="display: none; justify-content: center; margin-top: 50px;">
+            <a id="resumeLinkedInBtn" href="#" target="_blank" class="btn btn-outline"
+              style="min-width: 240px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect width="4" height="12" x="2" y="9" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+              Lihat Selengkapnya di LinkedIn
+            </a>
+          </div>
         </div>
       </section>
 
@@ -325,32 +382,38 @@
             <button class="filter-btn" data-filter="certificate">Sertifikat</button>
           </div>
           <div class="projects-grid" id="projectsGrid"></div>
+          <div id="loadMoreContainer" style="display: none; justify-content: center; margin-top: 40px;">
+            <button id="loadMoreProjectsBtn" class="btn btn-outline" style="min-width: 200px;">Lihat Lebih Banyak</button>
+          </div>
         </div>
       </section>
 
-    <section class="section testimonials reveal" id="testimonials" style="background: var(--bg-secondary); overflow: hidden;">
-      <div class="section-container">
-        <div class="section-header text-center" style="max-width: 600px; margin: 0 auto 40px;">
-          <span class="section-tag">&lt;testimonials&gt;</span>
-          <h2 class="section-title">Apa Kata <span class="gradient-text">Mereka</span></h2>
-          <p class="opacity-75 mt-4">Lihat bagaimana pengalaman mereka bekerja bersama saya dalam membangun solusi digital.</p>
-        </div>
+      <section class="section testimonials reveal" id="testimonials"
+        style="background: var(--bg-secondary); overflow: hidden;">
+        <div class="section-container">
+          <div class="section-header text-center" style="max-width: 600px; margin: 0 auto 40px;">
+            <span class="section-tag">&lt;testimonials&gt;</span>
+            <h2 class="section-title">Apa Kata <span class="gradient-text">Mereka</span></h2>
+            <p class="opacity-75 mt-4">Lihat bagaimana pengalaman mereka bekerja bersama saya dalam membangun solusi
+              digital.</p>
+          </div>
 
-        <!-- Horizontal Slider Container -->
-        <div class="testimonial-slider-container mt-6 relative overflow-hidden" style="padding: 20px 0; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
-          <div class="testi-track" id="testiTrack"></div>
+          <!-- Horizontal Slider Container -->
+          <div class="testimonial-slider-container mt-6 relative overflow-hidden"
+            style="padding: 20px 0; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);">
+            <div class="testi-track" id="testiTrack"></div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
       <section class="section contact reveal" id="contact">
         <div class="section-container">
           <div class="section-header text-center" style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
             <span class="section-tag">&lt;contact&gt;</span>
-            <h2 class="section-title">Hubungi <span class="gradient-text">Saya</span></h2>
           </div>
-          <div class="contact-flex" style="display: flex; justify-content: center;">
-            <form class="contact-form" id="contactForm" style="width: 100%; max-width: 800px;">
+          <div class="contact-flex"
+            style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; justify-content: center;">
+            <form class="contact-form" id="contactForm" style="flex: 1; min-width: 300px; max-width: 600px;">
               <div class="form-group"><label for="contactName">Nama</label><input type="text" id="contactName" required
                   placeholder="Masukkan nama Anda">
               </div>
@@ -362,57 +425,175 @@
                   required placeholder="Tuliskan pesan Anda di sini..."></textarea></div>
               <button type="submit" class="btn btn-primary btn-full"><span>Kirim Pesan</span></button>
             </form>
+
+            <div class="wallet-wrapper"
+              style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
+              <h2 class="section-title" style="margin-bottom: 10px;">Hubungi <span class="gradient-text">Saya</span>
+              </h2>
+              <p
+                style="color: var(--text-muted); font-size: 0.95rem; text-align: center; max-width: 320px; margin-bottom: 30px; line-height: 1.5;">
+                Ingin membuat website? Pembayaran kini lebih mudah dan fleksibel melalui berbagai platform pilihan.</p>
+              <div class="app-container">
+                <div class="wallet">
+                  <div class="wallet-back"></div>
+
+                  <div class="card stripe">
+                    <div class="card-inner">
+                      <div class="card-top">
+                        <span>Stripe</span>
+                        <div class="chip"></div>
+                      </div>
+                      <div class="card-bottom">
+                        <div class="card-info">
+                          <span class="label">Holder</span><span class="value">ALEX SMITH</span>
+                        </div>
+                        <div class="card-number-wrapper">
+                          <span class="hidden-stars">**** 4242</span>
+                          <span class="card-number">5524 9910 4242</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card wise">
+                    <div class="card-inner">
+                      <div class="card-top">
+                        <span>Wise</span>
+                        <div class="chip"></div>
+                      </div>
+                      <div class="card-bottom">
+                        <div class="card-info">
+                          <span class="label">Business</span><span class="value">STUDIO LLC</span>
+                        </div>
+                        <div class="card-number-wrapper">
+                          <span class="hidden-stars">**** 8810</span>
+                          <span class="card-number">9012 4432 8810</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card paypal">
+                    <div class="card-inner">
+                      <div class="card-top">
+                        <span>Pay<b style="color:#0079C1">Pal</b></span>
+                        <div class="chip"></div>
+                      </div>
+                      <div class="card-bottom">
+                        <div class="card-info">
+                          <span class="label">Email</span><span class="value">hello@work.com</span>
+                        </div>
+                        <div class="card-number-wrapper">
+                          <span class="hidden-stars">**** 0094</span>
+                          <span class="card-number">3312 0045 0094</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pocket">
+                    <svg class="pocket-svg" viewBox="0 0 280 160" fill="none">
+                      <path
+                        d="M 0 20 C 0 10, 5 10, 10 10 C 20 10, 25 25, 40 25 L 240 25 C 255 25, 260 10, 270 10 C 275 10, 280 10, 280 20 L 280 120 C 280 155, 260 160, 240 160 L 40 160 C 20 160, 0 155, 0 120 Z"
+                        fill="#1e341e"></path>
+                      <path
+                        d="M 8 22 C 8 16, 12 16, 15 16 C 23 16, 27 29, 40 29 L 240 29 C 253 29, 257 16, 265 16 C 268 16, 272 16, 272 22 L 272 120 C 272 150, 255 152, 240 152 L 40 152 C 25 152, 8 152, 8 120 Z"
+                        stroke="#3d5635" stroke-width="1.5" stroke-dasharray="6 4"></path>
+                    </svg>
+                    <div class="pocket-content">
+                      <div style="position: relative; height: 24px; width: 100%;">
+                        <div class="balance-stars">******</div>
+                        <div class="balance-real">$12,450.00</div>
+                      </div>
+                      <div style="color: #698263; font-size: 12px; font-weight: 500;">
+                        Total Balance
+                      </div>
+                      <div class="eye-icon-wrapper">
+                        <svg class="eye-icon eye-slash" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                          <line x1="3" y1="3" x2="21" y2="21"></line>
+                        </svg>
+                        <svg class="eye-icon eye-open" style="opacity: 0;" width="20" height="20" viewBox="0 0 24 24"
+                          fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
       </section>
     </main>
 
-    <footer class="footer reveal">
-      <div class="footer-container">
-        <div class="footer-content-grid">
-          <div class="footer-info">
-            <h3 class="footer-logo">
-              <span class="logo-bracket">&lt;</span><span id="footerName">Ayek</span><span class="logo-bracket">/&gt;</span>
-            </h3>
-            <p class="footer-bio">IT Professional specializing in Web Development, UI/UX Design, and Network Engineering. Building digital solutions with precision and passion.</p>
-            <div class="footer-socials-icons" id="footerSocialsIcons">
-              <!-- Social icons will be injected by JS or hardcoded -->
-            </div>
-          </div>
-          
-          <div class="footer-links">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><a href="#home">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#projects">Projects</a></li>
-              <li><a href="#resume">Resume</a></li>
-              <li><a href="#contact">Contact</a></li>
-            </ul>
+    <!-- Scroll Progress Indicator -->
+    <div id="scrollProgress" style="position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),#a855f7);width:0%;z-index:9999;transition:width 0.1s linear;"></div>
+
+
+
+    <!-- FOOTER -->
+    <footer class="footer reveal" style="background:linear-gradient(180deg,var(--bg-primary) 0%,var(--bg-secondary) 100%);border-top:1px solid var(--border);margin-top:60px;">
+      <div style="max-width:1200px;margin:0 auto;padding:48px 24px 0;">
+        <!-- Top: Logo + Bio -->
+        <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;margin-bottom:40px;">
+          <div style="flex:1;min-width:280px;">
+            <a href="#hero" style="text-decoration:none;">
+              <h3 class="footer-logo" style="font-size:1.8rem;margin-bottom:12px;">
+                <span class="logo-bracket">&lt;</span><span id="footerName">Ayek</span><span class="logo-bracket">/&gt;</span>
+              </h3>
+            </a>
+            <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.7;max-width:380px;" id="footerBio">
+              IT Professional specializing in Web Development, UI/UX Design, and Network Engineering. Building digital solutions with precision and passion.
+            </p>
+            <div id="footerSocials" style="display:flex;gap:10px;margin-top:16px;"></div>
           </div>
 
-          <div class="footer-contact">
-            <h4>Get In Touch</h4>
-            <ul>
-              <li>
-                <span>📍</span>
-                <span id="contactLocation">Indonesia</span>
-              </li>
-              <li>
-                <span>📧</span>
-                <span id="contactEmail">ayek@example.com</span>
-              </li>
-              <li>
-                <span>📱</span>
-                <span id="contactWhatsapp">+62 ...</span>
-              </li>
-            </ul>
+          <!-- Navigation Columns -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1;min-width:300px;">
+            <div>
+              <h4 style="font-size:0.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Navigasi</h4>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+                <li><a href="#hero" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Home</a></li>
+                <li><a href="#about" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">About</a></li>
+                <li><a href="#resume" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Resume</a></li>
+                <li><a href="#projects" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Projects</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 style="font-size:0.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Layanan</h4>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+                <li><a href="#" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Web Development</a></li>
+                <li><a href="#" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">UI/UX Design</a></li>
+                <li><a href="#" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Networking</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 style="font-size:0.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Lainnya</h4>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+                <li><a href="#contact" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Contact</a></li>
+                <li><a href="/blog.html" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Blog</a></li>
+                <li><a href="/admin.html" style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Dashboard</a></li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div class="footer-bottom">
-          <p>&copy; 2026 Ayek Portfolio. All rights reserved.</p>
-          <p>Built with <span style="color: var(--accent);">Love</span> & <span style="color: var(--accent);">Code</span></p>
+        <!-- Bottom Bar -->
+        <div style="border-top:1px solid var(--border);padding:20px 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;">
+          <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">
+            &copy; <span id="currentYear">2026</span> Ayek Portfolio. Built with
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" stroke="none" style="display:inline;vertical-align:text-bottom;margin:0 2px;">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg> & Code
+          </p>
+          <div style="display:flex;gap:16px;align-items:center;">
+            <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:0.75rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
+            <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:0.75rem;transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Terms</a>
+          </div>
         </div>
       </div>
     </footer>

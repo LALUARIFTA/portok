@@ -6,7 +6,7 @@ const showPage = (pageName) => {
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'))
   document.getElementById(`page${capitalize(pageName)}`).classList.add('active')
   const link = document.querySelector(`[data-page="${pageName}"]`)
-  if(link) link.classList.add('active')
+  if (link) link.classList.add('active')
   document.getElementById('pageTitle').textContent = capitalize(pageName)
 }
 
@@ -18,6 +18,58 @@ const escapeHTML = str => {
   const div = document.createElement('div')
   div.textContent = str
   return div.innerHTML
+}
+
+// ===== CUSTOM ALERTS =====
+window.showCustomAlert = function (type, message) {
+  const container = document.getElementById('alertContainer');
+  if (!container) return;
+
+  const alertDiv = document.createElement('div');
+  alertDiv.className = 'transform translate-x-full opacity-0 transition-all duration-300 ease-out';
+
+  let html = '';
+  switch (type) {
+    case 'success':
+      html = `
+      <div role="alert" class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-700 text-green-900 dark:text-green-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-green-200 dark:hover:bg-green-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-green-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+    case 'error':
+      html = `
+      <div role="alert" class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-700 text-red-900 dark:text-red-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-red-200 dark:hover:bg-red-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-red-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+    case 'info':
+      html = `
+      <div role="alert" class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-700 text-blue-900 dark:text-blue-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-blue-200 dark:hover:bg-blue-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+    case 'warning':
+      html = `
+      <div role="alert" class="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-yellow-200 dark:hover:bg-yellow-800 transform hover:scale-105 pointer-events-auto">
+        <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-yellow-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
+        <p class="text-xs font-semibold">${message}</p>
+      </div>`;
+      break;
+  }
+
+  alertDiv.innerHTML = html;
+  container.appendChild(alertDiv);
+
+  alertDiv.offsetHeight; // Reflow
+  alertDiv.classList.remove('translate-x-full', 'opacity-0');
+
+  setTimeout(() => {
+    alertDiv.classList.add('translate-x-full', 'opacity-0');
+    setTimeout(() => alertDiv.remove(), 300);
+  }, 4000);
 }
 
 // ===== AUTH =====
@@ -40,7 +92,7 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
   const email = e.target[0].value
   const password = e.target[1].value
   const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) alert(error.message)
+  if (error) showCustomAlert('error', error.message)
 })
 
 document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -108,7 +160,7 @@ document.getElementById('projectForm').addEventListener('submit', async e => {
   e.preventDefault()
   const btn = e.target.querySelector('button[type="submit"]')
   const originalBtnText = btn.innerHTML
-  
+
   const id = document.getElementById('projectId').value
   const file = document.getElementById('projectThumbFile').files[0]
   let thumbUrl = document.getElementById('projectThumbnail').value
@@ -125,17 +177,21 @@ document.getElementById('projectForm').addEventListener('submit', async e => {
 
       const { error: uploadError } = await supabase.storage
         .from('portfolio')
-        .upload(filePath, file)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type
+        })
 
       if (uploadError) {
-        alert('Gagal upload thumbnail: ' + uploadError.message)
+        showCustomAlert('error', 'Gagal upload thumbnail: ' + uploadError.message)
         return
       }
 
       const { data: urlData } = supabase.storage
         .from('portfolio')
         .getPublicUrl(filePath)
-      
+
       thumbUrl = urlData.publicUrl
     }
 
@@ -149,17 +205,17 @@ document.getElementById('projectForm').addEventListener('submit', async e => {
       tech_stack: document.getElementById('projectTech').value,
       url: document.getElementById('projectUrl').value,
     }
-    
+
     if (id) await supabase.from('projects').update(payload).eq('id', id)
     else await supabase.from('projects').insert(payload)
-    
+
     document.getElementById('projectThumbFile').value = '' // Clear file input
     closeModal('projectModal')
     loadProjects()
-    alert('Project berhasil disimpan!')
+    showCustomAlert('success', 'Project berhasil disimpan!')
   } catch (err) {
     console.error(err)
-    alert('Terjadi kesalahan saat menyimpan project.')
+    showCustomAlert('error', 'Terjadi kesalahan saat menyimpan project.')
   } finally {
     btn.disabled = false
     btn.innerHTML = originalBtnText
@@ -207,20 +263,56 @@ document.getElementById('addArticleBtn').addEventListener('click', () => {
 document.getElementById('articleForm').addEventListener('submit', async e => {
   e.preventDefault()
   const id = document.getElementById('articleId').value
-  const payload = {
-    title: document.getElementById('articleTitle').value,
-    slug: document.getElementById('articleSlug').value,
-    thumbnail: document.getElementById('articleThumb').value,
-    content: document.getElementById('articleContent').value,
-    category: document.getElementById('articleCategory').value,
-    published: document.getElementById('articlePublished').checked,
+  const btn = e.target.querySelector('button[type="submit"]')
+  const originalBtnText = btn.innerHTML
+
+  try {
+    btn.disabled = true
+    btn.innerHTML = '<span>Menyimpan...</span>'
+
+    let thumbUrl = document.getElementById('articleThumb').value
+    const fileInput = document.getElementById('articleThumbFile')
+
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `articles/${fileName}`
+
+      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      })
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
+      thumbUrl = urlData.publicUrl
+    }
+
+    const payload = {
+      title: document.getElementById('articleTitle').value,
+      slug: document.getElementById('articleSlug').value,
+      thumbnail: thumbUrl,
+      content: document.getElementById('articleContent').value,
+      category: document.getElementById('articleCategory').value,
+      published: document.getElementById('articlePublished').checked,
+    }
+
+    if (id) await supabase.from('articles').update(payload).eq('id', id)
+    else await supabase.from('articles').insert(payload)
+
+    document.getElementById('articleThumbFile').value = '' // Clear file input
+    closeModal('articleModal')
+    loadArticles()
+    showCustomAlert('success', 'Artikel berhasil disimpan!')
+  } catch (err) {
+    console.error(err)
+    showCustomAlert('error', 'Terjadi kesalahan saat menyimpan artikel.')
+  } finally {
+    btn.disabled = false
+    btn.innerHTML = originalBtnText
   }
-
-  if (id) await supabase.from('articles').update(payload).eq('id', id)
-  else await supabase.from('articles').insert(payload)
-
-  closeModal('articleModal')
-  loadArticles()
 })
 
 window.editArticle = async id => {
@@ -239,13 +331,13 @@ window.editArticle = async id => {
 window.deleteItem = async (table, id) => {
   if (confirm('Hapus item ini?')) {
     await supabase.from(table).delete().eq('id', id)
-    if(table === 'projects') loadProjects()
-    else if(table === 'articles') loadArticles()
-    else if(table === 'chatbot_keywords') loadChatbot()
-    else if(table === 'certificates') loadCertificates()
-    else if(table === 'experience' || table === 'education') loadResume()
-    else if(table === 'testimonials') loadTestimonials()
-    else if(table === 'messages') loadMessages()
+    if (table === 'projects') loadProjects()
+    else if (table === 'articles') loadArticles()
+    else if (table === 'chatbot_keywords') loadChatbot()
+    else if (table === 'certificates') loadCertificates()
+    else if (table === 'experience' || table === 'education') loadResume()
+    else if (table === 'testimonials') loadTestimonials()
+    else if (table === 'messages') loadMessages()
   }
 }
 
@@ -327,7 +419,7 @@ document.getElementById('certificateForm')?.addEventListener('submit', async e =
   e.preventDefault()
   const btn = e.target.querySelector('button[type="submit"]')
   const originalBtnText = btn.innerHTML
-  
+
   const id = document.getElementById('certificateId').value
   const file = document.getElementById('certFile').files[0]
   let imageUrl = document.getElementById('certImage').value
@@ -344,17 +436,21 @@ document.getElementById('certificateForm')?.addEventListener('submit', async e =
 
       const { error: uploadError } = await supabase.storage
         .from('portfolio')
-        .upload(filePath, file)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type
+        })
 
       if (uploadError) {
-        alert('Gagal upload gambar: ' + uploadError.message)
+        showCustomAlert('error', 'Gagal upload file: ' + uploadError.message)
         return
       }
 
       const { data: urlData } = supabase.storage
         .from('portfolio')
         .getPublicUrl(filePath)
-      
+
       imageUrl = urlData.publicUrl
     }
 
@@ -372,10 +468,10 @@ document.getElementById('certificateForm')?.addEventListener('submit', async e =
     document.getElementById('certFile').value = '' // Clear file input
     closeModal('certificateModal')
     loadCertificates()
-    alert('Sertifikat berhasil disimpan!')
+    showCustomAlert('success', 'Sertifikat berhasil disimpan!')
   } catch (err) {
     console.error(err)
-    alert('Terjadi kesalahan.')
+    showCustomAlert('error', 'Terjadi kesalahan.')
   } finally {
     btn.disabled = false
     btn.innerHTML = originalBtnText
@@ -410,20 +506,57 @@ async function loadProfile() {
 
 document.getElementById('profileForm').addEventListener('submit', async e => {
   e.preventDefault()
-  const payload = {
-    name: document.getElementById('profileName').value,
-    title: document.getElementById('profileTitle').value,
-    bio: document.getElementById('profileBio').value,
-    email: document.getElementById('profileEmail').value,
-    whatsapp: document.getElementById('profileWhatsapp').value,
-    github: document.getElementById('profileGithub').value,
-    linkedin: document.getElementById('profileLinkedin').value,
-    cv_url: document.getElementById('profileCvUrl').value,
+  const btn = e.target.querySelector('button[type="submit"]')
+  const originalBtnText = btn.innerHTML
+
+  try {
+    btn.disabled = true
+    btn.innerHTML = '<span>Menyimpan...</span>'
+
+    let cvUrl = document.getElementById('profileCvUrl').value
+    const fileInput = document.getElementById('profileCvFile')
+
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `cv/${fileName}`
+
+      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      })
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
+      cvUrl = urlData.publicUrl
+    }
+
+    const payload = {
+      name: document.getElementById('profileName').value,
+      title: document.getElementById('profileTitle').value,
+      bio: document.getElementById('profileBio').value,
+      email: document.getElementById('profileEmail').value,
+      whatsapp: document.getElementById('profileWhatsapp').value,
+      github: document.getElementById('profileGithub').value,
+      linkedin: document.getElementById('profileLinkedin').value,
+      cv_url: cvUrl,
+    }
+    const { data: existing } = await supabase.from('profile').select('id').maybeSingle()
+    if (existing) await supabase.from('profile').update(payload).eq('id', existing.id)
+    else await supabase.from('profile').insert(payload)
+
+    document.getElementById('profileCvFile').value = ''
+    document.getElementById('profileCvUrl').value = cvUrl
+    showCustomAlert('success', 'Profile disimpan!')
+  } catch (err) {
+    console.error(err)
+    showCustomAlert('error', 'Terjadi kesalahan saat menyimpan profile.')
+  } finally {
+    btn.disabled = false
+    btn.innerHTML = originalBtnText
   }
-  const { data: existing } = await supabase.from('profile').select('id').single()
-  if (existing) await supabase.from('profile').update(payload).eq('id', existing.id)
-  else await supabase.from('profile').insert(payload)
-  alert('Profile disimpan!')
 })
 
 // ===== MESSAGES =====
@@ -431,12 +564,12 @@ async function loadMessages() {
   const { data } = await supabase.from('messages').select('*').order('created_at', { ascending: false })
   const tbody = document.getElementById('messagesTableBody')
   if (!tbody) return
-  
+
   if (!data || data.length === 0) {
     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">Belum ada pesan masuk.</td></tr>'
     return
   }
-  
+
   tbody.innerHTML = data.map(m => `
     <tr>
       <td style="font-weight:600;">${m.name}</td>
@@ -457,14 +590,14 @@ async function loadMessages() {
 async function loadResume() {
   const { data: exp } = await supabase.from('experience').select('*').order('created_at', { ascending: true })
   const { data: edu } = await supabase.from('education').select('*').order('created_at', { ascending: true })
-  
+
   const expTbody = document.getElementById('experienceTableBody')
   if (expTbody) {
     expTbody.innerHTML = (exp || []).map(e => `
       <tr>
-        <td>${e.title}</td>
+        <td>${e.role}</td>
         <td>${e.company}</td>
-        <td>${e.year || '-'}</td>
+        <td>${e.duration || '-'}</td>
         <td>
           <div class="table-actions">
             <button class="btn btn-outline btn-sm" onclick="editExperience('${e.id}')">Edit</button>
@@ -503,9 +636,9 @@ document.getElementById('experienceForm')?.addEventListener('submit', async e =>
   e.preventDefault()
   const id = document.getElementById('expId').value
   const payload = {
-    title: document.getElementById('expTitle').value,
+    role: document.getElementById('expTitle').value,
     company: document.getElementById('expCompany').value,
-    year: document.getElementById('expYear').value,
+    duration: document.getElementById('expYear').value,
     description: document.getElementById('expDesc').value,
   }
   if (id) await supabase.from('experience').update(payload).eq('id', id)
@@ -517,9 +650,9 @@ document.getElementById('experienceForm')?.addEventListener('submit', async e =>
 window.editExperience = async id => {
   const { data: e } = await supabase.from('experience').select('*').eq('id', id).single()
   document.getElementById('expId').value = e.id
-  document.getElementById('expTitle').value = e.title
+  document.getElementById('expTitle').value = e.role
   document.getElementById('expCompany').value = e.company
-  document.getElementById('expYear').value = e.year || ''
+  document.getElementById('expYear').value = e.duration || ''
   document.getElementById('expDesc').value = e.description || ''
   document.getElementById('experienceModal').classList.add('active')
 }

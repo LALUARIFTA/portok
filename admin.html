@@ -12,10 +12,15 @@
     rel="stylesheet">
   <link rel="stylesheet" href="/src/admin.css">
   <meta name="robots" content="noindex, nofollow" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
 </head>
 
 <body>
+  <!-- Alert Container -->
+  <div id="alertContainer" class="fixed top-4 right-4 z-[9999] space-y-2 flex flex-col items-end pointer-events-none">
+  </div>
+
   <div id="adminApp">
     <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
@@ -62,7 +67,12 @@
       <main class="admin-main">
         <header class="admin-header">
           <button class="sidebar-toggle" id="sidebarToggle">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" x2="20" y1="12" y2="12" />
+              <line x1="4" x2="20" y1="6" y2="6" />
+              <line x1="4" x2="20" y1="18" y2="18" />
+            </svg>
           </button>
           <h2 id="pageTitle">Dashboard</h2>
           <div class="admin-user" id="adminUserInfo">Admin</div>
@@ -71,7 +81,8 @@
         <!-- DASHBOARD -->
         <div class="admin-page active" id="pageDashboard">
           <div class="welcome-section" style="margin-bottom: 40px;">
-            <h1 style="font-size: 2rem; margin-bottom: 10px;">Selamat Datang, <span class="gradient-text">Admin</span> 👋</h1>
+            <h1 style="font-size: 2rem; margin-bottom: 10px;">Selamat Datang, <span class="gradient-text">Admin</span>
+              👋</h1>
             <p style="color: var(--text-secondary);">Kelola portofolio Anda dengan mudah di sini.</p>
           </div>
 
@@ -90,21 +101,24 @@
           <div class="quick-actions" style="margin-top: 40px;">
             <h3 style="margin-bottom: 20px;">Aksi Cepat</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-              <button class="btn btn-outline" onclick="showPage('projects')" style="justify-content: flex-start; padding: 20px;">
+              <button class="btn btn-outline" onclick="showPage('projects')"
+                style="justify-content: flex-start; padding: 20px;">
                 <span style="font-size: 1.2rem;">📁</span>
                 <div style="text-align: left;">
                   <div style="font-weight: 700;">Tambah Project</div>
                   <div style="font-size: 0.75rem; color: var(--text-muted);">Publikasikan karya baru</div>
                 </div>
               </button>
-              <button class="btn btn-outline" onclick="showPage('articles')" style="justify-content: flex-start; padding: 20px;">
+              <button class="btn btn-outline" onclick="showPage('articles')"
+                style="justify-content: flex-start; padding: 20px;">
                 <span style="font-size: 1.2rem;">✍️</span>
                 <div style="text-align: left;">
                   <div style="font-weight: 700;">Tulis Artikel</div>
                   <div style="font-size: 0.75rem; color: var(--text-muted);">Bagikan insight terbaru</div>
                 </div>
               </button>
-              <button class="btn btn-outline" onclick="showPage('messages')" style="justify-content: flex-start; padding: 20px;">
+              <button class="btn btn-outline" onclick="showPage('messages')"
+                style="justify-content: flex-start; padding: 20px;">
                 <span style="font-size: 1.2rem;">📧</span>
                 <div style="text-align: left;">
                   <div style="font-weight: 700;">Cek Pesan</div>
@@ -167,7 +181,8 @@
               <div class="form-group"><label>GitHub</label><input type="text" id="profileGithub"></div>
               <div class="form-group"><label>LinkedIn</label><input type="text" id="profileLinkedin"></div>
             </div>
-            <div class="form-group"><label>URL CV (PDF)</label><input type="text" id="profileCvUrl"></div>
+            <div class="form-group"><label>URL CV (PDF, Opsional)</label><input type="text" id="profileCvUrl"></div>
+            <div class="form-group"><label>Atau Upload CV (PDF)</label><input type="file" id="profileCvFile" accept="application/pdf"></div>
             <button type="submit" class="btn btn-primary"><span>Simpan Profile</span></button>
           </form>
         </div>
@@ -303,8 +318,10 @@
               </div>
               <div class="form-group"><label>Tahun</label><input type="text" id="projectYear"></div>
             </div>
-            <div class="form-group"><label>Thumbnail URL (Opsional)</label><input type="text" id="projectThumbnail"></div>
-            <div class="form-group"><label>Atau Upload Thumbnail</label><input type="file" id="projectThumbFile" accept="image/*"></div>
+            <div class="form-group"><label>Thumbnail URL (Opsional)</label><input type="text" id="projectThumbnail">
+            </div>
+            <div class="form-group"><label>Atau Upload Thumbnail</label><input type="file" id="projectThumbFile"
+                accept="image/*"></div>
             <div class="form-group"><label>Deskripsi Singkat</label><textarea id="projectDesc" rows="2"></textarea>
             </div>
             <div class="form-group"><label>Case Study (Detail)</label><textarea id="projectCaseStudy" rows="5"
@@ -328,7 +345,9 @@
             <input type="hidden" id="articleId">
             <div class="form-group"><label>Judul Artikel</label><input type="text" id="articleTitle" required></div>
             <div class="form-group"><label>Slug (URL)</label><input type="text" id="articleSlug" required></div>
-            <div class="form-group"><label>Thumbnail URL</label><input type="text" id="articleThumb"></div>
+            <div class="form-group"><label>Thumbnail URL (Opsional)</label><input type="text" id="articleThumb"></div>
+            <div class="form-group"><label>Atau Upload Thumbnail</label><input type="file" id="articleThumbFile"
+                accept="image/*"></div>
             <div class="form-group"><label>Konten (HTML/Markdown)</label><textarea id="articleContent" rows="10"
                 required></textarea></div>
             <div class="form-row">
@@ -435,8 +454,10 @@
             <div class="form-group"><label>Penerbit (Issuer)</label><input type="text" id="certIssuer" required></div>
             <div class="form-group"><label>Tahun</label><input type="text" id="certYear"></div>
           </div>
-          <div class="form-group"><label>URL Gambar Sertifikat (Opsional)</label><input type="text" id="certImage"></div>
-          <div class="form-group"><label>Atau Upload Gambar</label><input type="file" id="certFile" accept="image/*"></div>
+          <div class="form-group"><label>URL File Sertifikat (Gambar/PDF, Opsional)</label><input type="text" id="certImage">
+          </div>
+          <div class="form-group"><label>Atau Upload File (Gambar/PDF)</label><input type="file" id="certFile" accept="image/*,application/pdf">
+          </div>
           <div class="form-group"><label>URL Kredensial (Link Validasi)</label><input type="text" id="certCredential">
           </div>
           <div class="modal-actions">
