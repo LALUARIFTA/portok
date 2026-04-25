@@ -332,8 +332,13 @@ function initTerminal() {
   input.focus()
 }
 
-// ===== PROJECTS & MODAL =====
+// ===== GLOBALS =====
 let allProjects = []
+let portfolioContext = {
+  profile: null,
+  projects: [],
+  resume: { experience: [], education: [] }
+}
 let currentProjectFilter = 'all'
 let displayedProjectsCount = 6
 
@@ -341,6 +346,12 @@ async function loadProjects() {
   const grid = document.getElementById('projectsGrid')
   if (grid) showSkeletons('projectsGrid', 6)
   try {
+    const { data: exp } = await supabase.from('experience').select('*').order('duration', { ascending: false })
+    const { data: edu } = await supabase.from('education').select('*').order('year', { ascending: false })
+
+    portfolioContext.resume.experience = exp || []
+    portfolioContext.resume.education = edu || []
+
     const { data: projData } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
     const { data: certData } = await supabase.from('certificates').select('*').order('created_at', { ascending: false })
 
@@ -357,11 +368,9 @@ async function loadProjects() {
     }))
 
     allProjects = [...(projData || []), ...formattedCerts]
-
-    if (grid) {
-      renderProjects()
-      updateStats()
-    }
+    portfolioContext.projects = allProjects
+    renderProjects()
+    updateStats()
   } catch (err) { console.error(err) }
 }
 
@@ -452,6 +461,7 @@ async function loadDynamicContent() {
   try {
     const { data: p } = await supabase.from('profile').select('*').single()
     if (p) {
+      portfolioContext.profile = p
       const elNavName = document.getElementById('navName')
       const elHeroName = document.getElementById('heroNameText')
       const elFooterName = document.getElementById('footerName')
@@ -706,9 +716,7 @@ async function loadSingleArticle() {
   }
 }
 
-// ===== CHATBOT =====
-let chatbotResponses = {}
-
+// ===== CHATBOT (DeepSeek AI) =====
 async function initChatbot() {
   const toggle = document.getElementById('chatbotToggle')
   const windowEl = document.getElementById('chatbotWindow')
@@ -717,31 +725,10 @@ async function initChatbot() {
   const input = document.getElementById('chatbotInput')
   const messages = document.getElementById('chatbotMessages')
 
-  toggle?.addEventListener('click', () => {
-    windowEl.classList.toggle('active')
-  })
+  toggle?.addEventListener('click', () => windowEl.classList.toggle('active'))
+  close?.addEventListener('click', () => windowEl.classList.remove('active'))
 
-  close?.addEventListener('click', () => {
-    windowEl.classList.remove('active')
-  })
-
-  // Fetch keywords from database
-  try {
-    const { data } = await supabase.from('chatbot_keywords').select('keyword, response')
-    if (data) {
-      data.forEach(item => {
-        // Handle multiple keywords separated by commas
-        const keywords = item.keyword.split(',').map(k => k.trim().toLowerCase())
-        keywords.forEach(k => {
-          if (k) chatbotResponses[k] = item.response
-        })
-      })
-    }
-  } catch (err) {
-    console.error('Failed to load chatbot keywords:', err)
-  }
-
-  form?.addEventListener('submit', (e) => {
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const text = input.value.trim()
     if (!text) return
@@ -751,21 +738,83 @@ async function initChatbot() {
     input.value = ''
     messages.scrollTop = messages.scrollHeight
 
-    // Add typing indicator simulation
-    setTimeout(() => {
-      let reply = 'Maaf, saya belum mengerti. Silakan coba kata kunci lain atau hubungi saya langsung.'
+    // Add typing container
+    const botMsgId = 'bot-' + Date.now()
+    messages.innerHTML += `<div class="msg-bot" id="${botMsgId}"><span class="typing-dots"><span>.</span><span>.</span><span>.</span></span></div>`
+    messages.scrollTop = messages.scrollHeight
+    const botMsgEl = document.getElementById(botMsgId)
 
-      const lowerText = text.toLowerCase()
-      for (const [key, value] of Object.entries(chatbotResponses)) {
-        if (lowerText.includes(key)) {
-          reply = value
-          break
+    try {
+      const systemPrompt = `Kamu adalah asisten AI profesional untuk portofolio Lalu Arif (Ayek). 
+      Gunakan data berikut untuk menjawab pertanyaan:
+      - Nama: ${portfolioContext.profile?.name || 'Ayek'}
+      - Title: ${portfolioContext.profile?.title || ''}
+      - Bio: ${portfolioContext.profile?.bio || ''}
+      - Lokasi: ${portfolioContext.profile?.location || ''}
+      - Project: ${portfolioContext.projects.map(p => p.title).join(', ')}
+      - Pengalaman: ${portfolioContext.resume.experience.map(e => e.role + ' di ' + e.company).join(', ')}
+      - Pendidikan: ${portfolioContext.resume.education.map(e => e.degree + ' - ' + e.institution).join(', ')}
+      
+      Aturan:
+      1. Jawab dengan ramah, profesional, dan gunakan Bahasa Indonesia.
+      2. Jika ditanya tentang kontak, berikan email: ${portfolioContext.profile?.email || ''} atau WhatsApp: ${portfolioContext.profile?.whatsapp || ''}.
+      3. Jangan menjawab hal di luar portofolio jika tidak relevan.
+      4. Jawablah dengan singkat dan padat.`
+
+      // NVIDIA / DeepSeek API Implementation
+      // WARNING: Client-side API key is insecure. For production, use a backend proxy.
+      const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer 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"
+        },
+        body: JSON.stringify({
+          model: "deepseek-ai/deepseek-v4-pro",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: text }
+          ],
+          temperature: 0.7,
+          max_tokens: 1024,
+          stream: true
+        })
+      })
+
+      if (!response.ok) throw new Error('API Error')
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let fullContent = ""
+      botMsgEl.innerHTML = "" // Clear typing dots
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.slice(6).trim()
+            if (dataStr === '[DONE]') break
+            try {
+              const data = JSON.parse(dataStr)
+              const content = data.choices[0].delta.content
+              if (content) {
+                fullContent += content
+                botMsgEl.textContent = fullContent
+                messages.scrollTop = messages.scrollHeight
+              }
+            } catch (e) {}
+          }
         }
       }
-
-      messages.innerHTML += `<div class="msg-bot">${reply}</div>`
-      messages.scrollTop = messages.scrollHeight
-    }, 600)
+    } catch (err) {
+      console.error('Chat error:', err)
+      botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya. Silakan coba lagi nanti.'
+    }
   })
 }
 
