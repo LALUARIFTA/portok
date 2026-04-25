@@ -761,28 +761,25 @@ async function initChatbot() {
       3. Jangan menjawab hal di luar portofolio jika tidak relevan.
       4. Jawablah dengan singkat dan padat.`
 
-      // NVIDIA / DeepSeek API via Local Proxy (Fixes CORS)
+      // NVIDIA / Google Gemma 3N API via Local Proxy
       const response = await fetch("/api/ai/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
+          "Authorization": "Bearer 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"
         },
         body: JSON.stringify({
-          model: "deepseek-ai/deepseek-v4-pro",
+          model: "google/gemma-3n-e2b-it",
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: text }
           ],
-          temperature: 0.6,
-          max_tokens: 16384,
-          stream: true,
-          extra_body: {
-            chat_template_kwargs: {
-              thinking: true,
-              reasoning_effort: "high"
-            }
-          }
+          max_tokens: 512,
+          temperature: 0.20,
+          top_p: 0.70,
+          frequency_penalty: 0.00,
+          presence_penalty: 0.00,
+          stream: true
         })
       })
 
@@ -811,10 +808,9 @@ async function initChatbot() {
               const data = JSON.parse(dataStr)
               const delta = data.choices[0].delta
               const content = delta.content || ""
-              const reasoning = delta.reasoning || delta.reasoning_content || ""
               
-              if (reasoning || content) {
-                fullContent += (reasoning + content)
+              if (content) {
+                fullContent += content
                 botMsgEl.textContent = fullContent
                 messages.scrollTop = messages.scrollHeight
               }
