@@ -88,6 +88,16 @@ export class PixelatedCanvas {
         window.addEventListener('resize', () => this.compute(img));
     }
 
+    this.isVisible = true;
+    if (window.IntersectionObserver) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          this.isVisible = entry.isIntersecting;
+        });
+      }, { threshold: 0 });
+      io.observe(this.container);
+    }
+
     this.animate();
   }
 
@@ -225,6 +235,11 @@ export class PixelatedCanvas {
       return;
     }
     this.lastFrameTime = now;
+
+    if (!this.isVisible) {
+      this.rafId = requestAnimationFrame(() => this.animate());
+      return;
+    }
 
     if (this.interactive) {
       this.animMouse.x += (this.targetMouse.x - this.animMouse.x) * this.followSpeed;

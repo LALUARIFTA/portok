@@ -1,13 +1,5 @@
 import { supabase } from './supabase.js'
-import { initThreeJSBackground } from './three-bg.js'
-
-import gsap from 'gsap'
-import emailjs from '@emailjs/browser'
-import { PixelatedCanvas } from './pixel-art.js'
 import myPhoto from './assets/me.webp'
-
-// Initialize EmailJS
-emailjs.init("YOUR_PUBLIC_KEY")
 
 // ===== I18N (Translations) =====
 const translations = {
@@ -123,19 +115,7 @@ let currentLang = localStorage.getItem('portfolio-lang') || 'id'
 let currentImages = []
 let currentImageIndex = 0
 
-// ===== PAGE LOADER =====
-window.addEventListener('load', () => {
-  const loader = document.getElementById('page-loader');
-  if (loader) {
-    // Add a small delay to ensure smooth transition and show the animation
-    setTimeout(() => {
-      loader.classList.add('hidden');
-      setTimeout(() => {
-        loader.style.display = 'none';
-      }, 500);
-    }, 800);
-  }
-});
+
 // ===== UTILS =====
 const escapeHTML = str => {
   const div = document.createElement('div')
@@ -145,7 +125,17 @@ const escapeHTML = str => {
 
 async function trackEvent(eventName, eventData = {}) {
   try {
-    await supabase.from('analytics').insert([{ event_name: eventName, event_data: eventData }])
+    const doTrack = async () => {
+      try {
+        await supabase.from('analytics').insert([{ event_name: eventName, event_data: eventData }]);
+      } catch (err) { /* silent fail */ }
+    };
+    
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(doTrack, { timeout: 2000 });
+    } else {
+      setTimeout(doTrack, 1000);
+    }
   } catch (err) { /* silent fail for analytics */ }
 }
 
@@ -295,27 +285,34 @@ function initNav() {
 
   if (!navbar) return
 
+  let ticking = false;
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50)
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50)
 
-    // Active link highlight
-    let current = ''
-    const sections = document.querySelectorAll('section[id]')
-    sections.forEach(sec => {
-      const top = sec.offsetTop
-      const h = sec.offsetHeight
-      if (window.scrollY >= top - 200 && window.scrollY < top + h - 200) {
-        current = sec.id
-      }
-    })
+        // Active link highlight
+        let current = ''
+        const sections = document.querySelectorAll('section[id]')
+        sections.forEach(sec => {
+          const top = sec.offsetTop
+          const h = sec.offsetHeight
+          if (window.scrollY >= top - 200 && window.scrollY < top + h - 200) {
+            current = sec.id
+          }
+        })
 
-    links.forEach(link => {
-      link.classList.remove('active')
-      if (link.getAttribute('href').includes(current) && current !== '') {
-        link.classList.add('active')
-      }
-    })
-  })
+        links.forEach(link => {
+          link.classList.remove('active')
+          if (link.getAttribute('href').includes(current) && current !== '') {
+            link.classList.add('active')
+          }
+        })
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true })
 
   const toggleMenu = () => {
     navToggle?.classList.toggle('active')
@@ -430,12 +427,6 @@ async function loadProjects() {
   const grid = document.getElementById('projectsGrid')
   if (grid) showSkeletons('projectsGrid', 6)
   try {
-    const { data: exp } = await supabase.from('experience').select('*').order('duration', { ascending: false })
-    const { data: edu } = await supabase.from('education').select('*').order('year', { ascending: false })
-
-    portfolioContext.resume.experience = exp || []
-    portfolioContext.resume.education = edu || []
-
     const { data: projData } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
     const { data: certData } = await supabase.from('certificates').select('*').order('created_at', { ascending: false })
 
@@ -600,6 +591,7 @@ async function loadDynamicContent() {
 
     // Experience/Education
     const { data: exp } = await supabase.from('experience').select('*').order('created_at', { ascending: false })
+    portfolioContext.resume.experience = exp || []
     const elExp = document.getElementById('experienceList')
     if (elExp && exp) {
       elExp.innerHTML = exp.map(e => `
@@ -613,6 +605,7 @@ async function loadDynamicContent() {
     }
 
     const { data: edu } = await supabase.from('education').select('*').order('created_at', { ascending: false })
+    portfolioContext.resume.education = edu || []
     const elEdu = document.getElementById('educationList')
     if (elEdu && edu) {
       elEdu.innerHTML = edu.map(e => `
@@ -952,13 +945,19 @@ function initContact() {
 
       showCustomAlert('success', 'Success - Pesan berhasil dikirim! Terima kasih.')
 
-      // EmailJS Notification
-      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        from_name: name,
-        from_email: email,
-        message: message,
-        to_name: "Ayek",
-      }).catch(err => console.error('EmailJS error:', err));
+      // EmailJS Notification (Dynamically loaded to save performance)
+      try {
+        const emailjs = (await import('@emailjs/browser')).default;
+        emailjs.init("YOUR_PUBLIC_KEY");
+        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+          from_name: name,
+          from_email: email,
+          message: message,
+          to_name: "Ayek",
+        }).catch(err => console.error('EmailJS error:', err));
+      } catch (err) {
+        console.error('Failed to load EmailJS:', err);
+      }
 
       form.reset()
     } catch (err) {
@@ -975,15 +974,20 @@ function initContact() {
 function initScrollFeatures() {
   const progressBar = document.getElementById('scrollProgress')
 
+  let ticking = false;
   window.addEventListener('scroll', () => {
     // Progress bar
-    if (progressBar) {
-      const scrollTop = window.scrollY
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
-      progressBar.style.width = scrollPercent + '%'
+    if (progressBar && !ticking) {
+      window.requestAnimationFrame(() => {
+        const scrollTop = window.scrollY
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight
+        const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) : 0
+        progressBar.style.transform = `scaleX(${scrollPercent})`;
+        ticking = false;
+      });
+      ticking = true;
     }
-  })
+  }, { passive: true })
 }
 
 // ===== HERO TYPING ANIMATION =====
@@ -1034,11 +1038,10 @@ function initYear() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-  initThreeJSBackground('#hero, .section')
-
-  // Page Transition (GSAP)
-  gsap.from("main", { opacity: 0, duration: 1.2, ease: "power2.out" })
-  gsap.from(".hero-container", { y: 40, opacity: 0, duration: 1, delay: 0.3, ease: "back.out(1.5)" })
+  // Load ThreeJS dynamically
+  import('./three-bg.js').then(({ initThreeJSBackground }) => {
+    initThreeJSBackground('#hero, .section');
+  }).catch(err => console.error("Failed to load ThreeJS:", err));
 
   initTheme()
   initNav()
@@ -1058,7 +1061,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initLightbox()
 
   initScrambleEffects()
-  loadProfile()
   initPerspectiveMarquee()
   trackEvent('page_view', { path: window.location.pathname })
 
@@ -1074,47 +1076,35 @@ function initPixelArt() {
   container.style.opacity = '0';
   container.style.transition = 'opacity 1.5s ease-in-out';
 
-  new PixelatedCanvas({
-    src: myPhoto,
-    container: container,
-    width: 1600,
-    height: 2000,
-    cellSize: 5,
-    dotScale: 0.9,
-    shape: "square",
-    backgroundColor: "transparent",
-    dropoutStrength: 0.3,
-    interactive: true,
-    distortionStrength: 5,
-    distortionRadius: 120,
-    distortionMode: "swirl",
-    followSpeed: 0.15,
-    jitterStrength: 2,
-    jitterSpeed: 2,
-    sampleAverage: true,
-    tintStrength: 0
-  });
+  import('./pixel-art.js').then(({ PixelatedCanvas }) => {
+    new PixelatedCanvas({
+      src: myPhoto,
+      container: container,
+      width: 1600,
+      height: 2000,
+      cellSize: 5,
+      dotScale: 0.9,
+      shape: "square",
+      backgroundColor: "transparent",
+      dropoutStrength: 0.3,
+      interactive: true,
+      distortionStrength: 5,
+      distortionRadius: 120,
+      distortionMode: "swirl",
+      followSpeed: 0.15,
+      jitterStrength: 2,
+      jitterSpeed: 2,
+      sampleAverage: true,
+      tintStrength: 0
+    });
 
-  // Fade in after a short delay to allow sampling to start
-  setTimeout(() => {
-    container.style.opacity = '1';
-  }, 500);
+    // Fade in after a short delay to allow sampling to start
+    setTimeout(() => {
+      container.style.opacity = '1';
+    }, 500);
+  }).catch(err => console.error("Failed to load PixelArt:", err));
 }
 
-
-async function loadProfile() {
-  try {
-    const { data: p } = await supabase.from('profile').select('*').single()
-    if (p) {
-      window.portfolioProfile = p
-      const bioEl = document.getElementById('heroBioText')
-      if (bioEl) bioEl.textContent = p.bio
-
-      const cvBtn = document.getElementById('cvDownloadBtn')
-      if (cvBtn && p.cv_url) cvBtn.href = p.cv_url
-    }
-  } catch (err) { console.error('Profile error:', err) }
-}
 
 
 

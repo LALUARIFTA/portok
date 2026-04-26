@@ -30,6 +30,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://xgsuoivedppftgmewlcx.supabase.co" crossorigin>
 
 
 
@@ -83,20 +84,7 @@
   <div id="alertContainer" class="fixed top-4 right-4 z-[9999] space-y-2 flex flex-col items-end pointer-events-none">
   </div>
 
-  <!-- Preloader -->
-  <div id="page-loader" class="loader-wrapper">
-    <div class="terminal-loader">
-      <div class="terminal-header">
-        <div class="terminal-title">Status</div>
-        <div class="terminal-controls">
-          <div class="control close"></div>
-          <div class="control minimize"></div>
-          <div class="control maximize"></div>
-        </div>
-      </div>
-      <div class="text">Loading...</div>
-    </div>
-  </div>
+
 
   <div id="app">
     <!-- Mobile Nav Overlay -->
@@ -480,7 +468,7 @@
 
     <!-- Scroll Progress Indicator -->
     <div id="scrollProgress"
-      style="position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),#a855f7);width:0%;z-index:9999;transition:width 0.1s linear;">
+      style="position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),#a855f7);width:100%;transform-origin:left;transform:scaleX(0);z-index:9999;transition:transform 0.1s linear;">
     </div>
 
 
