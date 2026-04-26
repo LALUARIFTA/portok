@@ -14,7 +14,7 @@
   <meta name="robots" content="noindex, nofollow" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co;" />
+    content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co https://challenges.cloudflare.com; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co https://static.cloudflareinsights.com;" />
 </head>
 
 <body>
@@ -107,7 +107,8 @@
 
 
 
-          <div class="analytics-chart-container" style="margin-top: 40px; background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+          <div class="analytics-chart-container"
+            style="margin-top: 40px; background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
             <h3 style="margin-bottom: 20px;">Tren Kunjungan (7 Hari Terakhir)</h3>
             <div style="height: 300px; width: 100%;">
               <canvas id="analyticsChart"></canvas>
@@ -117,7 +118,8 @@
           <div class="recent-messages-container" style="margin-top: 40px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
               <h3 style="margin:0;">Pesan Terbaru</h3>
-              <a href="#" onclick="showPage('pageMessages')" style="color:var(--accent); text-decoration:none; font-size:0.9rem; font-weight:600;">Lihat Semua</a>
+              <a href="#" onclick="showPage('pageMessages')"
+                style="color:var(--accent); text-decoration:none; font-size:0.9rem; font-weight:600;">Lihat Semua</a>
             </div>
             <div class="projects-table-wrap">
               <table class="projects-table">
@@ -129,7 +131,10 @@
                   </tr>
                 </thead>
                 <tbody id="dashRecentMessagesBody">
-                  <tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Memuat pesan...</td></tr>
+                  <tr>
+                    <td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Memuat pesan...
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -146,7 +151,10 @@
                   </tr>
                 </thead>
                 <tbody id="activityLogBody">
-                  <tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">Memuat aktivitas...</td></tr>
+                  <tr>
+                    <td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">Memuat
+                      aktivitas...</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -206,7 +214,8 @@
               <div class="form-group"><label>LinkedIn</label><input type="text" id="profileLinkedin"></div>
             </div>
             <div class="form-group"><label>URL CV (PDF, Opsional)</label><input type="text" id="profileCvUrl"></div>
-            <div class="form-group"><label>Atau Upload CV (PDF)</label><input type="file" id="profileCvFile" accept="application/pdf"></div>
+            <div class="form-group"><label>Atau Upload CV (PDF)</label><input type="file" id="profileCvFile"
+                accept="application/pdf"></div>
             <button type="submit" class="btn btn-primary"><span>Simpan Profile</span></button>
           </form>
         </div>
@@ -478,9 +487,11 @@
             <div class="form-group"><label>Penerbit (Issuer)</label><input type="text" id="certIssuer" required></div>
             <div class="form-group"><label>Tahun</label><input type="text" id="certYear"></div>
           </div>
-          <div class="form-group"><label>URL File Sertifikat (Gambar/PDF, Opsional)</label><input type="text" id="certImage">
+          <div class="form-group"><label>URL File Sertifikat (Gambar/PDF, Opsional)</label><input type="text"
+              id="certImage">
           </div>
-          <div class="form-group"><label>Atau Upload File (Gambar/PDF)</label><input type="file" id="certFile" accept="image/*,application/pdf">
+          <div class="form-group"><label>Atau Upload File (Gambar/PDF)</label><input type="file" id="certFile"
+              accept="image/*,application/pdf">
           </div>
           <div class="form-group"><label>URL Kredensial (Link Validasi)</label><input type="text" id="certCredential">
           </div>
