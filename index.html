@@ -70,6 +70,7 @@
     ]
   }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body data-theme="dark">
@@ -631,6 +632,9 @@
       </div>
       <div class="chatbot-messages" id="chatbotMessages">
         <div class="msg-bot">Halo! Ada yang bisa saya bantu?</div>
+        <div class="chatbot-suggestions" id="chatbotSuggestions">
+          <!-- Suggestions will be injected here -->
+        </div>
       </div>
       <form class="chatbot-input" id="chatbotForm">
         <input type="text" id="chatbotInput" placeholder="Ketik pesan..." autocomplete="off">

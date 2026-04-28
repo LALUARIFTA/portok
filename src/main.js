@@ -54,7 +54,18 @@ const translations = {
     form_btn: "Kirim Pesan",
     footer_nav: "Navigasi",
     footer_services: "Layanan",
-    footer_others: "Lainnya"
+    footer_others: "Lainnya",
+    chat_suggestions: [
+      "Apa keahlian utamanya?",
+      "Tunjukkan proyek terbaiknya",
+      "Bagaimana cara menghubunginya?",
+      "Apa pengalaman kerjanya?"
+    ],
+    chat_welcome: "Halo! Ada yang bisa saya bantu?",
+    chat_input_placeholder: "Ketik pesan...",
+    chat_typing: "Ayek Bot sedang mengetik...",
+    chat_bot_name: "Ayek Bot",
+    chat_status: "Online"
   },
   en: {
     nav_home: "Home",
@@ -107,7 +118,18 @@ const translations = {
     form_btn: "Send Message",
     footer_nav: "Navigation",
     footer_services: "Services",
-    footer_others: "Others"
+    footer_others: "Others",
+    chat_suggestions: [
+      "What are his main skills?",
+      "Show his best projects",
+      "How to contact him?",
+      "What is his work experience?"
+    ],
+    chat_welcome: "Hi! How can I help you today?",
+    chat_input_placeholder: "Type a message...",
+    chat_typing: "Ayek Bot is typing...",
+    chat_bot_name: "Ayek Bot",
+    chat_status: "Online"
   }
 }
 
@@ -784,7 +806,7 @@ async function loadSingleArticle() {
   }
 }
 
-// ===== CHATBOT (DeepSeek AI) =====
+// ===== CHATBOT (AI Assistant) =====
 async function initChatbot() {
   const toggle = document.getElementById('chatbotToggle')
   const windowEl = document.getElementById('chatbotWindow')
@@ -792,64 +814,119 @@ async function initChatbot() {
   const form = document.getElementById('chatbotForm')
   const input = document.getElementById('chatbotInput')
   const messages = document.getElementById('chatbotMessages')
+  const suggestionsContainer = document.getElementById('chatbotSuggestions')
+
+  // Chat History Memory
+  let chatHistory = [];
 
   toggle?.addEventListener('click', () => windowEl.classList.toggle('active'))
   close?.addEventListener('click', () => windowEl.classList.remove('active'))
 
-  // Proxy lokal (Vite) atau Proxy Produksi (Cloudflare Pages Functions)
   const NVIDIA_API_URL = "/api/ai/chat/completions";
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const text = input.value.trim()
-    if (!text) return
+  function renderSuggestions() {
+    if (!suggestionsContainer) return;
+    const currentSuggestions = translations[currentLang].chat_suggestions || [];
+    suggestionsContainer.innerHTML = currentSuggestions.map(s => `
+      <button class="suggestion-btn" type="button">${s}</button>
+    `).join('');
 
-    // Add user message
+    suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        handleChat(btn.textContent);
+      });
+    });
+  }
+
+  renderSuggestions();
+  window.renderChatbotSuggestions = renderSuggestions; // Expose for applyTranslations
+
+  async function handleChat(text) {
+    if (!text) return;
+
+    // Hide suggestions once chat starts
+    if (suggestionsContainer) suggestionsContainer.style.display = 'none';
+
+    // Add user message to UI
     messages.innerHTML += `<div class="msg-user">${text}</div>`
-    input.value = ''
+    if (input) input.value = ''
     messages.scrollTop = messages.scrollHeight
+
+    // Add user message to history
+    chatHistory.push({ role: "user", content: text });
 
     // Add typing container
     const botMsgId = 'bot-' + Date.now()
+    const typingText = translations[currentLang].chat_typing || "Typing..."
     messages.innerHTML += `
-      <div class="msg-bot" id="${botMsgId}">
-        <div class="typing-dots">
-          <span></span><span></span><span></span>
+      <div class="msg-bot typing-container" id="${botMsgId}">
+        <div class="typing-indicator">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="typing-label">${typingText}</span>
         </div>
       </div>`
     messages.scrollTop = messages.scrollHeight
     const botMsgEl = document.getElementById(botMsgId)
 
     try {
-      const systemPrompt = `Kamu adalah asisten AI profesional untuk portofolio Lalu Arif (Ayek). 
-      Gunakan data berikut untuk menjawab pertanyaan:
-      - Nama: ${portfolioContext.profile?.name || 'Ayek'}
-      - Title: ${portfolioContext.profile?.title || ''}
-      - Bio: ${portfolioContext.profile?.bio || ''}
-      - Lokasi: ${portfolioContext.profile?.location || ''}
-      - Project: ${portfolioContext.projects.map(p => p.title).join(', ')}
-      - Pengalaman: ${portfolioContext.resume.experience.map(e => e.role + ' di ' + e.company).join(', ')}
-      - Pendidikan: ${portfolioContext.resume.education.map(e => e.degree + ' - ' + e.institution).join(', ')}
-      - Pasangan: sudah punya ia bernama astrid.
-      - Menikah: sudah menikah dengan astrid.
-      Aturan:
-      1. Jawab dengan ramah, profesional, dan gunakan Bahasa Indonesia.
-      2. Jika ditanya tentang kontak, berikan email: ${portfolioContext.profile?.email || ''} atau WhatsApp: ${portfolioContext.profile?.whatsapp || ''}.
-      3. Jangan menjawab hal di luar portofolio jika tidak relevan.
-      4. Jawablah dengan singkat dan padat.`
+      // Build context
+      const profileData = portfolioContext.profile || {};
+      const projectsData = portfolioContext.projects || [];
+      const expData = portfolioContext.resume.experience || [];
+      const eduData = portfolioContext.resume.education || [];
+
+      const langName = currentLang === 'en' ? 'English' : 'Bahasa Indonesia';
+      const systemPrompt = `Kamu adalah asisten AI profesional (Ayek Bot) untuk portofolio Lalu Arif Trasna Ashari (Ayek).
+      Berikut adalah data lengkap tentang Ayek untuk referensimu:
+      
+      PROFIL:
+      - Nama Lengkap: Lalu Arif Trasna Ashari (Panggilan: Ayek)
+      - Peran: ${profileData.title || 'IT Professional & Web Developer'}
+      - Bio: ${profileData.bio || ''}
+      - Lokasi: ${profileData.location || ''}
+      - Email: ${profileData.email || ''}
+      - WhatsApp: ${profileData.whatsapp || ''}
+      
+      KEAHLIAN:
+      - Web Development: Full-Stack (HTML, CSS, JS, React, Node.js, Supabase)
+      - Desain: UI/UX Design, Graphic Design
+      - Networking: Network Engineering, Infrastruktur Jaringan, MikroTik, Cisco
+      - IT Support: Troubleshooting, Administrasi Data
+      
+      PROYEK TERBARU:
+      ${projectsData.slice(0, 5).map(p => `- ${p.title} (${p.category}): ${p.description || ''}`).join('\n')}
+      
+      PENGALAMAN KERJA:
+      ${expData.map(e => `- ${e.role} di ${e.company} (${e.duration})`).join('\n')}
+      
+      PENDIDIKAN:
+      ${eduData.map(e => `- ${e.degree} di ${e.institution} (${e.year})`).join('\n')}
+      
+      DATA PRIBADI:
+      - Ayek sudah menikah dengan Astrid Ekaningsih.
+      - Istri tercinta: Astrid Ekaningsih.
+      
+      ATURAN MERESPON:
+      1. Jawab dalam ${langName} yang ramah, santun, dan profesional.
+      2. Gunakan gaya bicara asisten pribadi yang cerdas.
+      3. Jika ditanya hal di luar data di atas, jawablah bahwa kamu hanya fokus pada portofolio Ayek, namun tetap sopan.
+      4. Berikan jawaban yang ringkas namun informatif.
+      5. Jika ditanya kontak, arahkan ke email atau WhatsApp yang tertera di atas.
+      6. Manfaatkan riwayat percakapan yang ada untuk memberikan jawaban yang berkesinambungan.`
 
       const response = await fetch(NVIDIA_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization dihandle secara aman oleh Server/Proxy (Vite/Cloudflare)
           "Accept": "text/event-stream"
         },
         body: JSON.stringify({
           model: "google/gemma-3n-e2b-it",
           messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: text }
+            ...chatHistory.slice(-8) // Include last 8 messages for context
           ],
           max_tokens: 1024,
           temperature: 0.20,
@@ -866,7 +943,7 @@ async function initChatbot() {
       const reader = response.body.getReader()
       const decoder = new TextDecoder()
       let fullContent = ""
-      botMsgEl.innerHTML = "" // Clear typing dots
+      botMsgEl.innerHTML = "" 
 
       while (true) {
         const { done, value } = await reader.read()
@@ -884,17 +961,106 @@ async function initChatbot() {
               const content = data.choices[0].delta.content || ""
               if (content) {
                 fullContent += content
-                botMsgEl.innerHTML = escapeHTML(fullContent).replace(/\n/g, '<br>')
+                botMsgEl.innerHTML = typeof marked !== 'undefined' ? marked.parse(fullContent) : escapeHTML(fullContent).replace(/\n/g, '<br>')
                 messages.scrollTop = messages.scrollHeight
               }
             } catch (e) { }
           }
         }
       }
+
+      // Add assistant response to history
+      chatHistory.push({ role: "assistant", content: fullContent });
+      
+      // Limit history size
+      if (chatHistory.length > 20) chatHistory = chatHistory.slice(-15);
+
+      // Smart CTA Detection
+      detectCTA(text, fullContent);
+
     } catch (err) {
       console.error('Chat error:', err)
-      botMsgEl.textContent = 'Maaf, terjadi gangguan pada koneksi AI saya. Silakan coba lagi nanti.'
+      botMsgEl.textContent = 'Maaf, sepertinya saya sedang offline. Silakan coba lagi nanti atau hubungi Ayek langsung melalui email.'
     }
+  }
+
+  function detectCTA(userText, botReply) {
+    const combined = (userText + " " + botReply).toLowerCase();
+    const ctaContainer = document.createElement('div');
+    ctaContainer.className = 'chatbot-cta-container';
+    
+    let hasCTA = false;
+
+    // 1. CV/Resume
+    if (combined.includes('cv') || combined.includes('resume') || combined.includes('riwayat hidup')) {
+      appendCTAButton(ctaContainer, {
+        text: currentLang === 'en' ? 'Download CV' : 'Unduh CV',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`,
+        action: () => {
+          const cvBtn = document.getElementById('cvDownloadBtn');
+          if (cvBtn) {
+            // Scroll to the button section first
+            cvBtn.scrollIntoView({ behavior: 'smooth' });
+            // Small delay for smooth scrolling then trigger click
+            setTimeout(() => {
+              cvBtn.click();
+              windowEl.classList.remove('active');
+            }, 500);
+          } else {
+            // Fallback if button not found
+            window.open('/assets/cv.pdf', '_blank');
+          }
+          trackEvent('chatbot_cta_click', { type: 'cv' });
+        }
+      });
+      hasCTA = true;
+    }
+
+    // 2. Contact/Hire
+    if (combined.includes('kontak') || combined.includes('contact') || combined.includes('hubung') || combined.includes('hire') || combined.includes('email') || combined.includes('whatsapp')) {
+      appendCTAButton(ctaContainer, {
+        text: currentLang === 'en' ? 'Contact Me' : 'Hubungi Saya',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+        action: () => {
+          document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+          windowEl.classList.remove('active');
+          trackEvent('chatbot_cta_click', { type: 'contact' });
+        }
+      });
+      hasCTA = true;
+    }
+
+    // 3. Projects/Portfolio
+    if (combined.includes('proyek') || combined.includes('project') || combined.includes('portfolio') || combined.includes('karya')) {
+      appendCTAButton(ctaContainer, {
+        text: currentLang === 'en' ? 'View Portfolio' : 'Lihat Portofolio',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`,
+        action: () => {
+          document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+          windowEl.classList.remove('active');
+          trackEvent('chatbot_cta_click', { type: 'portfolio' });
+        }
+      });
+      hasCTA = true;
+    }
+
+    if (hasCTA) {
+      messages.appendChild(ctaContainer);
+      messages.scrollTop = messages.scrollHeight;
+    }
+  }
+
+  function appendCTAButton(container, data) {
+    const btn = document.createElement('button');
+    btn.className = 'cta-btn';
+    btn.innerHTML = `${data.icon} <span>${data.text}</span>`;
+    btn.onclick = data.action;
+    container.appendChild(btn);
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    handleChat(input.value.trim())
   })
 }
 
@@ -1224,6 +1390,26 @@ function applyTranslations() {
       }
     }
   })
+
+  // Update Chatbot specific elements
+  const chatWelcome = document.querySelector('.msg-bot:first-child')
+  if (chatWelcome) {
+    chatWelcome.innerText = translations[currentLang].chat_welcome
+  }
+  const chatInput = document.getElementById('chatbotInput')
+  if (chatInput) {
+    chatInput.placeholder = translations[currentLang].chat_input_placeholder
+  }
+  const botName = document.querySelector('.chatbot-header-info strong')
+  if (botName) botName.innerText = translations[currentLang].chat_bot_name
+  
+  const botStatus = document.querySelector('.chatbot-header-info span')
+  if (botStatus) botStatus.innerText = translations[currentLang].chat_status
+
+  // Re-render suggestions if they are still visible
+  if (typeof window.renderChatbotSuggestions === 'function') {
+    window.renderChatbotSuggestions()
+  }
 }
 
 function initLightbox() {
