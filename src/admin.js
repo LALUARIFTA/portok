@@ -580,38 +580,44 @@ document.getElementById('articleForm').addEventListener('submit', async e => {
   const btn = e.target.querySelector('button[type="submit"]')
   const originalBtnText = btn.innerHTML
 
-  try {
-    btn.disabled = true
-    btn.innerHTML = '<span>Menyimpan...</span>'
-
-    let thumbUrl = document.getElementById('articleThumb').value
-    const fileInput = document.getElementById('articleThumbFile')
-
-    if (fileInput.files.length > 0) {
-      const file = fileInput.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `articles/${fileName}`
-
-      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type
-      })
-      if (uploadError) throw uploadError
-
-      const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
-      thumbUrl = urlData.publicUrl
+    const content = articleEditor ? articleEditor.value() : document.getElementById('articleContent').value;
+    if (!content.trim()) {
+      showCustomAlert('error', 'Konten artikel tidak boleh kosong!');
+      return;
     }
 
-    const payload = {
-      title: document.getElementById('articleTitle').value,
-      slug: document.getElementById('articleSlug').value,
-      thumbnail: thumbUrl,
-      content: articleEditor ? articleEditor.value() : document.getElementById('articleContent').value,
-      category: document.getElementById('articleCategory').value,
-      published: document.getElementById('articlePublished').checked,
-    }
+    try {
+      btn.disabled = true
+      btn.innerHTML = '<span>Menyimpan...</span>'
+
+      let thumbUrl = document.getElementById('articleThumb').value
+      const fileInput = document.getElementById('articleThumbFile')
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0]
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Math.random()}.${fileExt}`
+        const filePath = `articles/${fileName}`
+
+        const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type
+        })
+        if (uploadError) throw uploadError
+
+        const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
+        thumbUrl = urlData.publicUrl
+      }
+
+      const payload = {
+        title: document.getElementById('articleTitle').value,
+        slug: document.getElementById('articleSlug').value,
+        thumbnail: thumbUrl,
+        content: content,
+        category: document.getElementById('articleCategory').value,
+        published: document.getElementById('articlePublished').checked,
+      }
 
     if (id) await supabase.from('articles').update(payload).eq('id', id)
     else await supabase.from('articles').insert(payload)
