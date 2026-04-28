@@ -1095,7 +1095,9 @@ async function loadMedia() {
     }
 
     grid.innerHTML = allFiles.map(f => `
-      <div class="media-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; position: relative; transition: var(--transition); group">
+      <div class="media-card" 
+           onclick="openMediaPreview('${f.url}', '${f.name}', '${f.path}', '${f.metadata?.mimetype}')"
+           style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; position: relative; transition: var(--transition); cursor: pointer;">
         <div style="height: 140px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
           ${f.metadata?.mimetype?.startsWith('image/') 
             ? `<img src="${f.url}" style="width: 100%; height: 100%; object-fit: cover;">`
@@ -1105,8 +1107,8 @@ async function loadMedia() {
         <div style="padding: 10px;">
           <div style="font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px;" title="${f.name}">${f.name}</div>
           <div style="display: flex; gap: 5px;">
-            <button class="btn btn-outline btn-sm" style="flex: 1; padding: 4px;" onclick="copyToClipboard('${f.url}')">Link</button>
-            <button class="btn btn-danger btn-sm" style="flex: 0 0 32px; padding: 4px;" onclick="deleteMedia('${f.path}')">🗑️</button>
+            <button class="btn btn-outline btn-sm" style="flex: 1; padding: 4px;" onclick="event.stopPropagation(); copyToClipboard('${f.url}')">Link</button>
+            <button class="btn btn-danger btn-sm" style="flex: 0 0 32px; padding: 4px;" onclick="event.stopPropagation(); deleteMedia('${f.path}')">🗑️</button>
           </div>
         </div>
         <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); font-size: 10px; padding: 2px 5px; border-radius: 4px; color: #fff;">${f.folder || 'root'}</div>
@@ -1130,9 +1132,33 @@ window.deleteMedia = async (path) => {
     if (error) showCustomAlert('error', 'Gagal menghapus: ' + error.message);
     else {
       showCustomAlert('success', 'Media dihapus!');
+      closeModal('mediaPreviewModal');
       loadMedia();
     }
   }
+}
+
+window.openMediaPreview = (url, name, path, mimeType) => {
+  const modal = document.getElementById('mediaPreviewModal');
+  const title = document.getElementById('previewTitle');
+  const content = document.getElementById('previewContent');
+  const copyBtn = document.getElementById('previewCopyBtn');
+  const deleteBtn = document.getElementById('previewDeleteBtn');
+
+  title.textContent = name;
+  
+  if (mimeType && mimeType.startsWith('image/')) {
+    content.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; border-radius: var(--radius-sm);">`;
+  } else if (mimeType === 'application/pdf') {
+    content.innerHTML = `<iframe src="${url}" style="width: 100%; height: 60vh; border: none;"></iframe>`;
+  } else {
+    content.innerHTML = `<div style="padding: 40px; background: var(--bg-secondary); border-radius: var(--radius-sm);">Pratinjau tidak tersedia untuk jenis file ini.<br><a href="${url}" target="_blank" style="color: var(--accent);">Buka di tab baru</a></div>`;
+  }
+
+  copyBtn.onclick = () => copyToClipboard(url);
+  deleteBtn.onclick = () => deleteMedia(path);
+
+  modal.classList.add('active');
 }
 
 document.getElementById('mediaUploadInput')?.addEventListener('change', async (e) => {
