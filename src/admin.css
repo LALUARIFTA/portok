@@ -276,6 +276,17 @@ input, textarea, select { font-family: inherit; }
 .CodeMirror-selected {
   background: rgba(124, 77, 255, 0.3) !important;
 }
+/* Markdown Syntax Highlighting in Editor */
+.cm-header { color: var(--accent-light) !important; font-weight: 700 !important; }
+.cm-bold { color: #fff !important; font-weight: 700 !important; }
+.cm-italic { color: #fff !important; font-style: italic !important; }
+.cm-quote { color: var(--text-muted) !important; font-style: italic !important; }
+.cm-link { color: var(--accent-light) !important; }
+.cm-url { color: var(--text-muted) !important; }
+.cm-variable-2 { color: var(--accent-light) !important; } /* Lists */
+.cm-comment { color: var(--green) !important; } /* Code blocks */
+.cm-string { color: var(--yellow) !important; }
+
 /* Ensure icons are visible */
 .editor-toolbar button:before {
   color: inherit;
