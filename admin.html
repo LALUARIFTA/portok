@@ -107,11 +107,21 @@
 
 
 
-          <div class="analytics-chart-container"
-            style="margin-top: 40px; background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
-            <h3 style="margin-bottom: 20px;">Tren Kunjungan (7 Hari Terakhir)</h3>
-            <div style="height: 300px; width: 100%;">
-              <canvas id="analyticsChart"></canvas>
+          <div class="analytics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-top: 40px;">
+            <div class="analytics-chart-container"
+              style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <h3 style="margin-bottom: 20px;">Tren Kunjungan (7 Hari Terakhir)</h3>
+              <div style="height: 300px; width: 100%;">
+                <canvas id="analyticsChart"></canvas>
+              </div>
+            </div>
+
+            <div class="analytics-chart-container"
+              style="background: var(--bg-card); padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <h3 style="margin-bottom: 20px;">Proyek Paling Diminati</h3>
+              <div style="height: 300px; width: 100%;">
+                <canvas id="projectsChart"></canvas>
+              </div>
             </div>
           </div>
 

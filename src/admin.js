@@ -1,6 +1,7 @@
 import { supabase } from './supabase.js'
 
 let analyticsChart = null
+let projectsChart = null
 
 // ===== UTILS =====
 const showPage = (pageName) => {
@@ -218,22 +219,25 @@ async function loadRecentMessages() {
 }
 
 async function initAnalyticsChart() {
-  const ctx = document.getElementById('analyticsChart')?.getContext('2d')
-  if (!ctx) return
+  const visitorCtx = document.getElementById('analyticsChart')?.getContext('2d')
+  const projectCtx = document.getElementById('projectsChart')?.getContext('2d')
+  
+  if (!visitorCtx || !projectCtx) return
 
   const sevenDaysAgo = new Date()
   sevenDaysAgo.setHours(0,0,0,0)
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
   try {
+    // 1. Visitor Chart Logic
     const { data: views } = await supabase
       .from('analytics')
       .select('created_at')
       .eq('event_name', 'page_view')
       .gte('created_at', sevenDaysAgo.toISOString())
 
-    const labels = []
-    const counts = []
+    const visitorLabels = []
+    const visitorCounts = []
     for (let i = 6; i >= 0; i--) {
       const d = new Date()
       d.setDate(d.getDate() - i)
@@ -242,19 +246,18 @@ async function initAnalyticsChart() {
       
       const count = views ? views.filter(v => v.created_at.startsWith(dateStr)).length : 0
       
-      labels.push(label)
-      counts.push(count)
+      visitorLabels.push(label)
+      visitorCounts.push(count)
     }
 
     if (analyticsChart) analyticsChart.destroy()
-
-    analyticsChart = new Chart(ctx, {
+    analyticsChart = new Chart(visitorCtx, {
       type: 'line',
       data: {
-        labels: labels,
+        labels: visitorLabels,
         datasets: [{
           label: 'Kunjungan Halaman',
-          data: counts,
+          data: visitorCounts,
           borderColor: '#3b82f6',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           fill: true,
@@ -268,10 +271,7 @@ async function initAnalyticsChart() {
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: {
-            mode: 'index',
-            intersect: false,
-          }
+          tooltip: { mode: 'index', intersect: false }
         },
         scales: {
           y: { 
@@ -286,8 +286,73 @@ async function initAnalyticsChart() {
         }
       }
     })
+
+    // 2. Projects Popularity Chart Logic
+    const { data: projectViews } = await supabase
+      .from('analytics')
+      .select('event_data')
+      .eq('event_name', 'project_view')
+
+    const { data: allProjects } = await supabase.from('projects').select('id, title')
+    const projectMap = {}
+    if (allProjects) {
+      allProjects.forEach(p => projectMap[p.id] = p.title)
+    }
+
+    const projectCounts = {}
+    if (projectViews) {
+      projectViews.forEach(v => {
+        const id = v.event_data?.id
+        if (id) {
+          const name = projectMap[id] || `Project ${id.substring(0, 5)}...`
+          projectCounts[name] = (projectCounts[name] || 0) + 1
+        }
+      })
+    }
+
+    const sortedProjects = Object.entries(projectCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+
+    const projectLabels = sortedProjects.map(p => p[0])
+    const projectData = sortedProjects.map(p => p[1])
+
+    if (projectsChart) projectsChart.destroy()
+    projectsChart = new Chart(projectCtx, {
+      type: 'bar',
+      data: {
+        labels: projectLabels,
+        datasets: [{
+          label: 'Jumlah Klik',
+          data: projectData,
+          backgroundColor: '#a855f7',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y', // Horizontal bar
+        plugins: {
+          legend: { display: false },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: { 
+            beginAtZero: true, 
+            grid: { color: 'rgba(255,255,255,0.05)' }, 
+            ticks: { stepSize: 1, color: '#94a3b8' } 
+          },
+          y: { 
+            grid: { display: false }, 
+            ticks: { color: '#94a3b8' } 
+          }
+        }
+      }
+    })
+
   } catch (err) {
-    console.warn('Analytics table not ready or empty')
+    console.warn('Analytics logic error:', err)
   }
 }
 
