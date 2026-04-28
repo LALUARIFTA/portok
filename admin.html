@@ -65,6 +65,7 @@
           <button class="sidebar-link" data-page="messages"><span>📧</span> Messages</button>
           <button class="sidebar-link" data-page="chatbot"><span>🤖</span> Chatbot</button>
           <button class="sidebar-link" data-page="certificates"><span>🎓</span> Sertifikat</button>
+          <button class="sidebar-link" data-page="media"><span>🖼️</span> Media Library</button>
         </nav>
         <button class="sidebar-logout" id="logoutBtn"><span>🚪</span> Logout</button>
       </aside>
@@ -173,6 +174,22 @@
               </table>
             </div>
           </div>
+        </div>
+
+        <!-- MEDIA LIBRARY -->
+        <div class="admin-page" id="pageMedia">
+          <div class="page-actions" style="justify-content: space-between; align-items: center;">
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Kelola semua aset gambar dan dokumen Anda di sini.</p>
+            <div style="display: flex; gap: 10px;">
+               <input type="file" id="mediaUploadInput" style="display: none;" multiple accept="image/*,application/pdf">
+               <button class="btn btn-primary" onclick="document.getElementById('mediaUploadInput').click()"><span>+ Upload Media</span></button>
+            </div>
+          </div>
+          
+          <div class="media-grid" id="mediaGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;">
+            <!-- Media items will be injected here -->
+          </div>
+          <div id="mediaLoader" style="text-align: center; padding: 40px; color: var(--text-muted);">Memuat media...</div>
         </div>
 
         <!-- PROJECTS -->

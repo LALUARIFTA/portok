@@ -287,6 +287,18 @@ input, textarea, select { font-family: inherit; }
 .cm-comment { color: var(--green) !important; } /* Code blocks */
 .cm-string { color: var(--yellow) !important; }
 
+.media-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-sm);
+}
+.media-card img {
+  transition: transform 0.5s ease;
+}
+.media-card:hover img {
+  transform: scale(1.1);
+}
+
 /* Ensure icons are visible */
 .editor-toolbar button:before {
   color: inherit;

@@ -147,6 +147,7 @@ function initDashboard() {
   loadResume()
   loadTestimonials()
   initSortable()
+  loadMedia()
 }
 
 function initEditors() {
@@ -1055,6 +1056,106 @@ window.editTestimonial = async id => {
   document.getElementById('testiContent').value = t.content
   document.getElementById('testimonialModal').classList.add('active')
 }
+
+// ===== MEDIA LIBRARY =====
+async function loadMedia() {
+  const grid = document.getElementById('mediaGrid');
+  const loader = document.getElementById('mediaLoader');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  loader.style.display = 'block';
+
+  try {
+    const folders = ['', 'projects', 'articles', 'certificates', 'cv'];
+    let allFiles = [];
+
+    for (const folder of folders) {
+      const { data, error } = await supabase.storage.from('portfolio').list(folder, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'name', order: 'desc' }
+      });
+
+      if (error) throw error;
+      
+      if (data) {
+        data.filter(f => f.name !== '.emptyFolderPlaceholder').forEach(f => {
+          const path = folder ? `${folder}/${f.name}` : f.name;
+          const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(path);
+          allFiles.push({ ...f, path, url: urlData.publicUrl, folder });
+        });
+      }
+    }
+
+    loader.style.display = 'none';
+    if (allFiles.length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">Belum ada media diunggah.</div>';
+      return;
+    }
+
+    grid.innerHTML = allFiles.map(f => `
+      <div class="media-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; position: relative; transition: var(--transition); group">
+        <div style="height: 140px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+          ${f.metadata?.mimetype?.startsWith('image/') 
+            ? `<img src="${f.url}" style="width: 100%; height: 100%; object-fit: cover;">`
+            : `<div style="font-size: 2rem;">📄</div>`
+          }
+        </div>
+        <div style="padding: 10px;">
+          <div style="font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px;" title="${f.name}">${f.name}</div>
+          <div style="display: flex; gap: 5px;">
+            <button class="btn btn-outline btn-sm" style="flex: 1; padding: 4px;" onclick="copyToClipboard('${f.url}')">Link</button>
+            <button class="btn btn-danger btn-sm" style="flex: 0 0 32px; padding: 4px;" onclick="deleteMedia('${f.path}')">🗑️</button>
+          </div>
+        </div>
+        <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); font-size: 10px; padding: 2px 5px; border-radius: 4px; color: #fff;">${f.folder || 'root'}</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('Load media error:', err);
+    loader.textContent = 'Gagal memuat media.';
+  }
+}
+
+window.copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text).then(() => {
+    showCustomAlert('success', 'URL disalin ke clipboard!');
+  });
+}
+
+window.deleteMedia = async (path) => {
+  if (confirm('Hapus media ini secara permanen?')) {
+    const { error } = await supabase.storage.from('portfolio').remove([path]);
+    if (error) showCustomAlert('error', 'Gagal menghapus: ' + error.message);
+    else {
+      showCustomAlert('success', 'Media dihapus!');
+      loadMedia();
+    }
+  }
+}
+
+document.getElementById('mediaUploadInput')?.addEventListener('change', async (e) => {
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
+
+  showCustomAlert('info', `Mengunggah ${files.length} file...`);
+  
+  for (const file of files) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+    const filePath = `uploads/${fileName}`; // Put all admin uploads in an 'uploads' folder
+
+    const { error } = await supabase.storage.from('portfolio').upload(filePath, file);
+    if (error) {
+      showCustomAlert('error', `Gagal upload ${file.name}: ${error.message}`);
+    }
+  }
+
+  showCustomAlert('success', 'Semua file berhasil diunggah!');
+  loadMedia();
+  e.target.value = ''; // Reset input
+});
 
 // ===== INIT =====
 initAuth()
