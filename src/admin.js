@@ -1181,11 +1181,8 @@ async function initSettings() {
     document.getElementById('themePrimary').value = p.theme_primary || '#9333ea';
     document.getElementById('themePrimaryHex').value = p.theme_primary || '#9333ea';
     document.getElementById('themeFont').value = p.theme_font || "'Inter', sans-serif";
-
-    // Profile
-    document.getElementById('profName').value = p.name || '';
-    document.getElementById('profTitle').value = p.title || '';
-    document.getElementById('profBio').value = p.bio || '';
+    document.getElementById('themeRadius').value = p.theme_radius || "8px";
+    document.getElementById('themeGlass').checked = p.theme_glass || false;
 
     updateThemePreview();
   }
@@ -1214,7 +1211,9 @@ async function initSettings() {
     try {
       const { error } = await supabase.from('profile').update({
         theme_primary: document.getElementById('themePrimary').value,
-        theme_font: document.getElementById('themeFont').value
+        theme_font: document.getElementById('themeFont').value,
+        theme_radius: document.getElementById('themeRadius').value,
+        theme_glass: document.getElementById('themeGlass').checked
       }).eq('id', p.id);
 
       if (error) throw error;
