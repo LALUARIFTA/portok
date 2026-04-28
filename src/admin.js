@@ -187,7 +187,7 @@ function initSidebar() {
 function initSortable() {
   const expBody = document.getElementById('experienceTableBody');
   const eduBody = document.getElementById('educationTableBody');
-  
+
   if (expBody) {
     new Sortable(expBody, {
       animation: 150,
@@ -216,7 +216,7 @@ async function saveOrder(table) {
   const tbody = document.getElementById(`${table}TableBody`);
   const rows = Array.from(tbody.querySelectorAll('tr'));
   const btn = document.getElementById(`save${table === 'experience' ? 'Exp' : 'Edu'}OrderBtn`);
-  
+
   const originalBtnText = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = 'Saving...';
@@ -249,7 +249,7 @@ async function loadStats() {
     const { count: pCount } = await supabase.from('projects').select('*', { count: 'exact', head: true })
     const { count: aCount } = await supabase.from('articles').select('*', { count: 'exact', head: true })
     const { count: mCount } = await supabase.from('messages').select('*', { count: 'exact', head: true })
-    
+
     // Analytics (Try catch because table might not exist yet)
     let vCount = 0, cCount = 0
     try {
@@ -310,11 +310,11 @@ async function loadRecentMessages() {
 async function initAnalyticsChart() {
   const visitorCtx = document.getElementById('analyticsChart')?.getContext('2d')
   const projectCtx = document.getElementById('projectsChart')?.getContext('2d')
-  
+
   if (!visitorCtx || !projectCtx) return
 
   const sevenDaysAgo = new Date()
-  sevenDaysAgo.setHours(0,0,0,0)
+  sevenDaysAgo.setHours(0, 0, 0, 0)
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
 
   try {
@@ -332,9 +332,9 @@ async function initAnalyticsChart() {
       d.setDate(d.getDate() - i)
       const dateStr = d.toISOString().split('T')[0]
       const label = d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' })
-      
+
       const count = views ? views.filter(v => v.created_at.startsWith(dateStr)).length : 0
-      
+
       visitorLabels.push(label)
       visitorCounts.push(count)
     }
@@ -363,14 +363,14 @@ async function initAnalyticsChart() {
           tooltip: { mode: 'index', intersect: false }
         },
         scales: {
-          y: { 
-            beginAtZero: true, 
-            grid: { color: 'rgba(255,255,255,0.05)' }, 
-            ticks: { stepSize: 1, color: '#94a3b8' } 
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { stepSize: 1, color: '#94a3b8' }
           },
-          x: { 
-            grid: { display: false }, 
-            ticks: { color: '#94a3b8' } 
+          x: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8' }
           }
         }
       }
@@ -427,14 +427,14 @@ async function initAnalyticsChart() {
           tooltip: { mode: 'index', intersect: false }
         },
         scales: {
-          x: { 
-            beginAtZero: true, 
-            grid: { color: 'rgba(255,255,255,0.05)' }, 
-            ticks: { stepSize: 1, color: '#94a3b8' } 
+          x: {
+            beginAtZero: true,
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { stepSize: 1, color: '#94a3b8' }
           },
-          y: { 
-            grid: { display: false }, 
-            ticks: { color: '#94a3b8' } 
+          y: {
+            grid: { display: false },
+            ticks: { color: '#94a3b8' }
           }
         }
       }
@@ -581,44 +581,44 @@ document.getElementById('articleForm').addEventListener('submit', async e => {
   const btn = e.target.querySelector('button[type="submit"]')
   const originalBtnText = btn.innerHTML
 
-    const content = articleEditor ? articleEditor.value() : document.getElementById('articleContent').value;
-    if (!content.trim()) {
-      showCustomAlert('error', 'Konten artikel tidak boleh kosong!');
-      return;
+  const content = articleEditor ? articleEditor.value() : document.getElementById('articleContent').value;
+  if (!content.trim()) {
+    showCustomAlert('error', 'Konten artikel tidak boleh kosong!');
+    return;
+  }
+
+  try {
+    btn.disabled = true
+    btn.innerHTML = '<span>Menyimpan...</span>'
+
+    let thumbUrl = document.getElementById('articleThumb').value
+    const fileInput = document.getElementById('articleThumbFile')
+
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0]
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `articles/${fileName}`
+
+      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      })
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
+      thumbUrl = urlData.publicUrl
     }
 
-    try {
-      btn.disabled = true
-      btn.innerHTML = '<span>Menyimpan...</span>'
-
-      let thumbUrl = document.getElementById('articleThumb').value
-      const fileInput = document.getElementById('articleThumbFile')
-
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0]
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${Math.random()}.${fileExt}`
-        const filePath = `articles/${fileName}`
-
-        const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
-        })
-        if (uploadError) throw uploadError
-
-        const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
-        thumbUrl = urlData.publicUrl
-      }
-
-      const payload = {
-        title: document.getElementById('articleTitle').value,
-        slug: document.getElementById('articleSlug').value,
-        thumbnail: thumbUrl,
-        content: content,
-        category: document.getElementById('articleCategory').value,
-        published: document.getElementById('articlePublished').checked,
-      }
+    const payload = {
+      title: document.getElementById('articleTitle').value,
+      slug: document.getElementById('articleSlug').value,
+      thumbnail: thumbUrl,
+      content: content,
+      category: document.getElementById('articleCategory').value,
+      published: document.getElementById('articlePublished').checked,
+    }
 
     if (id) await supabase.from('articles').update(payload).eq('id', id)
     else await supabase.from('articles').insert(payload)
@@ -1086,7 +1086,7 @@ async function loadMedia() {
       });
 
       if (error) throw error;
-      
+
       if (data) {
         data.filter(f => f.name !== '.emptyFolderPlaceholder').forEach(f => {
           const path = folder ? `${folder}/${f.name}` : f.name;
@@ -1107,10 +1107,10 @@ async function loadMedia() {
            onclick="openMediaPreview('${f.url}', '${f.name}', '${f.path}', '${f.metadata?.mimetype}')"
            style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; position: relative; transition: var(--transition); cursor: pointer;">
         <div style="height: 140px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
-          ${f.metadata?.mimetype?.startsWith('image/') 
-            ? `<img src="${f.url}" style="width: 100%; height: 100%; object-fit: cover;">`
-            : `<div style="font-size: 2rem;">📄</div>`
-          }
+          ${f.metadata?.mimetype?.startsWith('image/')
+        ? `<img src="${f.url}" style="width: 100%; height: 100%; object-fit: cover;">`
+        : `<div style="font-size: 2rem;">📄</div>`
+      }
         </div>
         <div style="padding: 10px;">
           <div style="font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px;" title="${f.name}">${f.name}</div>
@@ -1154,7 +1154,7 @@ window.openMediaPreview = (url, name, path, mimeType) => {
   const deleteBtn = document.getElementById('previewDeleteBtn');
 
   title.textContent = name;
-  
+
   if (mimeType && mimeType.startsWith('image/')) {
     content.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; border-radius: var(--radius-sm);">`;
   } else if (mimeType === 'application/pdf') {
@@ -1172,8 +1172,7 @@ window.openMediaPreview = (url, name, path, mimeType) => {
 // ===== SETTINGS & THEME =====
 async function initSettings() {
   const themeForm = document.getElementById('themeForm');
-  const profileForm = document.getElementById('profileSettingsForm');
-  if (!themeForm || !profileForm) return;
+  if (!themeForm) return;
 
   // Load existing data
   const { data: p } = await supabase.from('profile').select('*').single();
@@ -1182,7 +1181,7 @@ async function initSettings() {
     document.getElementById('themePrimary').value = p.theme_primary || '#9333ea';
     document.getElementById('themePrimaryHex').value = p.theme_primary || '#9333ea';
     document.getElementById('themeFont').value = p.theme_font || "'Inter', sans-serif";
-    
+
     // Profile
     document.getElementById('profName').value = p.name || '';
     document.getElementById('profTitle').value = p.title || '';
@@ -1211,7 +1210,7 @@ async function initSettings() {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
-    
+
     try {
       const { error } = await supabase.from('profile').update({
         theme_primary: document.getElementById('themePrimary').value,
@@ -1228,44 +1227,25 @@ async function initSettings() {
       btn.disabled = false;
     }
   });
-
-  // Save Profile
-  profileForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    btn.disabled = true;
-
-    try {
-      const { error } = await supabase.from('profile').update({
-        name: document.getElementById('profName').value,
-        title: document.getElementById('profTitle').value,
-        bio: document.getElementById('profBio').value
-      }).eq('id', p.id);
-
-      if (error) throw error;
-      showCustomAlert('success', 'Profil berhasil diupdate!');
-      logActivity('Update informasi profil');
-    } catch (err) {
-      console.error(err);
-      showCustomAlert('error', 'Gagal update profil: ' + err.message);
-    } finally {
-      btn.disabled = false;
-    }
-  });
 }
 
 function updateThemePreview() {
   const color = document.getElementById('themePrimary').value;
   const font = document.getElementById('themeFont').value;
+  const radius = document.getElementById('themeRadius').value;
+  const glass = document.getElementById('themeGlass').checked;
   const preview = document.getElementById('themePreview');
-  
+
   if (preview) {
     preview.style.backgroundColor = color;
     preview.style.fontFamily = font;
-    
+    preview.style.borderRadius = radius;
+    preview.style.backdropFilter = glass ? 'blur(10px)' : 'none';
+
     // Apply to admin panel temporarily for real "live" feel
     document.documentElement.style.setProperty('--accent', color);
     document.documentElement.style.setProperty('--accent-light', color + 'CC');
+    document.documentElement.style.setProperty('--radius-md', radius);
   }
 }
 
@@ -1274,7 +1254,7 @@ document.getElementById('mediaUploadInput')?.addEventListener('change', async (e
   if (!files || files.length === 0) return;
 
   showCustomAlert('info', `Mengunggah ${files.length} file...`);
-  
+
   for (const file of files) {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
@@ -1316,16 +1296,21 @@ function initAI() {
 
 async function handleAIAction(task) {
   if (!articleEditor) return;
+  
+  const selectedText = articleEditor.getSelection().trim();
   const originalText = articleEditor.value().trim();
-  if (!originalText) {
-    showCustomAlert('warning', 'Tuliskan sesuatu terlebih dahulu agar AI bisa membantu.');
+  const textToProcess = selectedText || originalText;
+
+  if (!textToProcess) {
+    showCustomAlert('warning', 'Tuliskan atau pilih teks terlebih dahulu agar AI bisa membantu.');
     return;
   }
 
-  showCustomAlert('info', 'AI sedang memproses teks Anda...');
-  
+  const alertMsg = selectedText ? 'AI sedang memproses teks yang dipilih...' : 'AI sedang memproses seluruh teks Anda...';
+  showCustomAlert('info', alertMsg);
+
   let prompt = "";
-  switch(task) {
+  switch (task) {
     case 'improve':
       prompt = "Perbaiki tata bahasa dan ejaan teks berikut tanpa mengubah maknanya. Pastikan hasilnya tetap dalam format Markdown.";
       break;
@@ -1348,7 +1333,7 @@ async function handleAIAction(task) {
         model: "google/gemma-3n-e2b-it",
         messages: [
           { role: "system", content: "Kamu adalah asisten penulis profesional. Bantu pengguna memperbaiki teks mereka untuk portofolio. Kembalikan HANYA teks hasilnya saja dalam format Markdown." },
-          { role: "user", content: `${prompt}\n\nTEKS:\n${originalText}` }
+          { role: "user", content: `${prompt}\n\nTEKS:\n${textToProcess}` }
         ],
         temperature: 0.3
       })
@@ -1359,7 +1344,11 @@ async function handleAIAction(task) {
     const result = data.choices[0].message.content;
 
     if (result) {
-      articleEditor.value(result);
+      if (selectedText) {
+        articleEditor.replaceSelection(result);
+      } else {
+        articleEditor.value(result);
+      }
       showCustomAlert('success', 'Teks berhasil diperbarui oleh AI!');
     }
   } catch (err) {
