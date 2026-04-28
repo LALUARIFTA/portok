@@ -224,3 +224,44 @@ input, textarea, select { font-family: inherit; }
 
 .sidebar-toggle { display: none; padding: 10px; margin-right: 15px; }
 .page-actions { margin-bottom: 24px; display: flex; justify-content: flex-end; }
+/* EasyMDE Dark Theme Overrides */
+.editor-toolbar {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  opacity: 1;
+}
+.editor-toolbar button {
+  color: var(--text-primary) !important;
+}
+.editor-toolbar button:hover, .editor-toolbar button.active {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--accent) !important;
+}
+.editor-toolbar i.separator {
+  border-left-color: var(--border) !important;
+  border-right-color: var(--border) !important;
+}
+.CodeMirror {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-family: var(--font-mono) !important;
+}
+.CodeMirror-cursor {
+  border-left-color: var(--accent) !important;
+}
+.editor-preview-active-side, .editor-preview {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+.editor-statusbar {
+  color: var(--text-muted) !important;
+}
+.editor-toolbar.fullscreen, .CodeMirror-fullscreen, .editor-preview-side.editor-preview-active-side {
+  z-index: 1100 !important;
+}
+.CodeMirror-selected {
+  background: rgba(124, 77, 255, 0.2) !important;
+}

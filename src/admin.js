@@ -2,6 +2,7 @@ import { supabase } from './supabase.js'
 
 let analyticsChart = null
 let projectsChart = null
+let articleEditor = null
 
 // ===== UTILS =====
 const showPage = (pageName) => {
@@ -133,6 +134,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // ===== DASHBOARD & NAV =====
 function initDashboard() {
   initSidebar()
+  initEditors()
   loadStats()
   loadRecentMessages()
   loadActivityLog()
@@ -144,6 +146,29 @@ function initDashboard() {
   loadCertificates()
   loadResume()
   loadTestimonials()
+}
+
+function initEditors() {
+  const el = document.getElementById('articleContent')
+  if (el && !articleEditor) {
+    articleEditor = new EasyMDE({
+      element: el,
+      spellChecker: false,
+      autosave: {
+        enabled: true,
+        uniqueId: "articleContentSave",
+        delay: 1000,
+      },
+      placeholder: "Tulis konten artikel Anda di sini (Markdown didukung)...",
+      status: ["lines", "words", "cursor"],
+      renderingConfig: {
+        singleLineBreaks: false,
+        codeSyntaxHighlighting: true,
+      },
+      maxHeight: "400px",
+      theme: "dark" // EasyMDE is light by default, but we can style it via CSS
+    });
+  }
 }
 
 function initSidebar() {
@@ -481,6 +506,7 @@ async function loadArticles() {
 
 document.getElementById('addArticleBtn').addEventListener('click', () => {
   document.getElementById('articleForm').reset()
+  if (articleEditor) articleEditor.value('')
   document.getElementById('articleId').value = ''
   document.getElementById('articleModal').classList.add('active')
 })
@@ -519,7 +545,7 @@ document.getElementById('articleForm').addEventListener('submit', async e => {
       title: document.getElementById('articleTitle').value,
       slug: document.getElementById('articleSlug').value,
       thumbnail: thumbUrl,
-      content: document.getElementById('articleContent').value,
+      content: articleEditor ? articleEditor.value() : document.getElementById('articleContent').value,
       category: document.getElementById('articleCategory').value,
       published: document.getElementById('articlePublished').checked,
     }
@@ -547,7 +573,8 @@ window.editArticle = async id => {
   document.getElementById('articleTitle').value = a.title
   document.getElementById('articleSlug').value = a.slug
   document.getElementById('articleThumb').value = a.thumbnail
-  document.getElementById('articleContent').value = a.content
+  if (articleEditor) articleEditor.value(a.content || '')
+  else document.getElementById('articleContent').value = a.content
   document.getElementById('articleCategory').value = a.category
   document.getElementById('articlePublished').checked = a.published
   document.getElementById('articleModal').classList.add('active')
