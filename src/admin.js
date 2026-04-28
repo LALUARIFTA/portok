@@ -149,6 +149,7 @@ function initDashboard() {
   initSortable()
   loadMedia()
   initAI()
+  initSettings()
 }
 
 function initEditors() {
@@ -1166,6 +1167,106 @@ window.openMediaPreview = (url, name, path, mimeType) => {
   deleteBtn.onclick = () => deleteMedia(path);
 
   modal.classList.add('active');
+}
+
+// ===== SETTINGS & THEME =====
+async function initSettings() {
+  const themeForm = document.getElementById('themeForm');
+  const profileForm = document.getElementById('profileSettingsForm');
+  if (!themeForm || !profileForm) return;
+
+  // Load existing data
+  const { data: p } = await supabase.from('profile').select('*').single();
+  if (p) {
+    // Theme
+    document.getElementById('themePrimary').value = p.theme_primary || '#9333ea';
+    document.getElementById('themePrimaryHex').value = p.theme_primary || '#9333ea';
+    document.getElementById('themeFont').value = p.theme_font || "'Inter', sans-serif";
+    
+    // Profile
+    document.getElementById('profName').value = p.name || '';
+    document.getElementById('profTitle').value = p.title || '';
+    document.getElementById('profBio').value = p.bio || '';
+
+    updateThemePreview();
+  }
+
+  // Live Preview Listeners
+  document.getElementById('themePrimary').addEventListener('input', (e) => {
+    document.getElementById('themePrimaryHex').value = e.target.value;
+    updateThemePreview();
+  });
+
+  document.getElementById('themePrimaryHex').addEventListener('input', (e) => {
+    if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+      document.getElementById('themePrimary').value = e.target.value;
+      updateThemePreview();
+    }
+  });
+
+  document.getElementById('themeFont').addEventListener('change', updateThemePreview);
+
+  // Save Theme
+  themeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    
+    try {
+      const { error } = await supabase.from('profile').update({
+        theme_primary: document.getElementById('themePrimary').value,
+        theme_font: document.getElementById('themeFont').value
+      }).eq('id', p.id);
+
+      if (error) throw error;
+      showCustomAlert('success', 'Tema berhasil disimpan! Website publik akan segera terupdate.');
+      logActivity('Mengubah tema portofolio');
+    } catch (err) {
+      console.error(err);
+      showCustomAlert('error', 'Gagal menyimpan tema. Pastikan kolom "theme_primary" sudah ada di database.');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // Save Profile
+  profileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    try {
+      const { error } = await supabase.from('profile').update({
+        name: document.getElementById('profName').value,
+        title: document.getElementById('profTitle').value,
+        bio: document.getElementById('profBio').value
+      }).eq('id', p.id);
+
+      if (error) throw error;
+      showCustomAlert('success', 'Profil berhasil diupdate!');
+      logActivity('Update informasi profil');
+    } catch (err) {
+      console.error(err);
+      showCustomAlert('error', 'Gagal update profil: ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
+function updateThemePreview() {
+  const color = document.getElementById('themePrimary').value;
+  const font = document.getElementById('themeFont').value;
+  const preview = document.getElementById('themePreview');
+  
+  if (preview) {
+    preview.style.backgroundColor = color;
+    preview.style.fontFamily = font;
+    
+    // Apply to admin panel temporarily for real "live" feel
+    document.documentElement.style.setProperty('--accent', color);
+    document.documentElement.style.setProperty('--accent-light', color + 'CC');
+  }
 }
 
 document.getElementById('mediaUploadInput')?.addEventListener('change', async (e) => {

@@ -581,6 +581,15 @@ async function loadDynamicContent() {
       if (elWA) elWA.textContent = p.whatsapp
       if (elLoc) elLoc.textContent = p.location
 
+      // Apply Theme Settings
+      if (p.theme_primary) {
+        document.documentElement.style.setProperty('--accent', p.theme_primary);
+        document.documentElement.style.setProperty('--accent-light', p.theme_primary + 'CC');
+      }
+      if (p.theme_font) {
+        document.body.style.fontFamily = p.theme_font;
+      }
+
       if (p.cv_url && elCVBtn && elCVCont) {
         elCVBtn.href = p.cv_url
         elCVCont.style.display = 'block'

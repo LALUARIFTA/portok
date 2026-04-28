@@ -66,6 +66,7 @@
           <button class="sidebar-link" data-page="chatbot"><span>🤖</span> Chatbot</button>
           <button class="sidebar-link" data-page="certificates"><span>🎓</span> Sertifikat</button>
           <button class="sidebar-link" data-page="media"><span>🖼️</span> Media Library</button>
+          <button class="sidebar-link" data-page="settings"><span>⚙️</span> Settings</button>
         </nav>
         <button class="sidebar-logout" id="logoutBtn"><span>🚪</span> Logout</button>
       </aside>
@@ -172,6 +173,61 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="admin-page" id="pageSettings">
+          <div class="settings-container" style="max-width: 800px;">
+            <div style="background: var(--bg-card); padding: 30px; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 24px;">
+              <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><span>🎨</span> Portfolio Theme Customizer</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Ubah warna dan font seluruh website portofolio Anda secara real-time.</p>
+              
+              <form id="themeForm" class="admin-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Warna Aksen (Primary Color)</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                      <input type="color" id="themePrimary" style="height: 45px; width: 60px; padding: 2px; background: transparent; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;">
+                      <input type="text" id="themePrimaryHex" placeholder="#9333ea" style="flex: 1;">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Jenis Font</label>
+                    <select id="themeFont" style="width: 100%; padding: 12px; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); border-radius: var(--radius-sm);">
+                      <option value="'Inter', sans-serif">Inter (Modern & Clean)</option>
+                      <option value="'Outfit', sans-serif">Outfit (Rounded & Friendly)</option>
+                      <option value="'Roboto Mono', monospace">Roboto Mono (Tech & Geeky)</option>
+                      <option value="'Playfair Display', serif">Playfair Display (Elegant & Classic)</option>
+                      <option value="'Space Grotesk', sans-serif">Space Grotesk (Bold & Futuristic)</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: var(--bg-secondary); border-radius: var(--radius-sm); border-left: 4px solid var(--accent);">
+                  <h4 style="margin-bottom: 10px;">Pratinjau Live</h4>
+                  <div id="themePreview" style="padding: 15px; border-radius: 8px; background: var(--accent); color: #fff; text-align: center; font-weight: 600;">
+                    Tombol Aksinya Akan Seperti Ini
+                  </div>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 30px; justify-content: flex-start;">
+                  <button type="submit" class="btn btn-primary">Simpan Perubahan Tema</button>
+                </div>
+              </form>
+            </div>
+
+            <div style="background: var(--bg-card); padding: 30px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+              <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><span>ℹ️</span> Informasi Profil Dasar</h3>
+              <form id="profileSettingsForm" class="admin-form">
+                <div class="form-group"><label>Nama Lengkap</label><input type="text" id="profName"></div>
+                <div class="form-group"><label>Title / Peran</label><input type="text" id="profTitle"></div>
+                <div class="form-group"><label>Bio Singkat</label><textarea id="profBio" rows="3"></textarea></div>
+                <div class="modal-actions" style="margin-top: 20px; justify-content: flex-start;">
+                  <button type="submit" class="btn btn-primary">Update Profil</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
