@@ -299,6 +299,15 @@ input, textarea, select { font-family: inherit; }
   transform: scale(1.1);
 }
 
+.ai-opt {
+  display: block; width: 100%; padding: 10px 15px; text-align: left;
+  font-size: 0.85rem; font-weight: 500; color: var(--text-primary);
+  background: transparent; transition: var(--transition);
+  border: none; border-bottom: 1px solid var(--border);
+}
+.ai-opt:last-child { border-bottom: none; }
+.ai-opt:hover { background: var(--accent); color: #fff; }
+
 /* Ensure icons are visible */
 .editor-toolbar button:before {
   color: inherit;

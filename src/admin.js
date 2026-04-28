@@ -148,6 +148,7 @@ function initDashboard() {
   loadTestimonials()
   initSortable()
   loadMedia()
+  initAI()
 }
 
 function initEditors() {
@@ -1182,6 +1183,83 @@ document.getElementById('mediaUploadInput')?.addEventListener('change', async (e
   loadMedia();
   e.target.value = ''; // Reset input
 });
+
+// ===== AI ASSISTANT =====
+function initAI() {
+  const btn = document.getElementById('aiAssistantBtn');
+  const menu = document.getElementById('aiOptionsMenu');
+  if (!btn || !menu) return;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.addEventListener('click', () => {
+    menu.style.display = 'none';
+  });
+
+  document.querySelectorAll('.ai-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const task = opt.dataset.task;
+      handleAIAction(task);
+    });
+  });
+}
+
+async function handleAIAction(task) {
+  if (!articleEditor) return;
+  const originalText = articleEditor.value().trim();
+  if (!originalText) {
+    showCustomAlert('warning', 'Tuliskan sesuatu terlebih dahulu agar AI bisa membantu.');
+    return;
+  }
+
+  showCustomAlert('info', 'AI sedang memproses teks Anda...');
+  
+  let prompt = "";
+  switch(task) {
+    case 'improve':
+      prompt = "Perbaiki tata bahasa dan ejaan teks berikut tanpa mengubah maknanya. Pastikan hasilnya tetap dalam format Markdown.";
+      break;
+    case 'professional':
+      prompt = "Ubah teks berikut agar terdengar lebih profesional, elegan, dan meyakinkan untuk audiens portofolio IT. Tetap gunakan format Markdown.";
+      break;
+    case 'shorten':
+      prompt = "Ringkas teks berikut agar lebih padat dan to-the-point namun tetap informatif. Gunakan format Markdown.";
+      break;
+    case 'translate':
+      prompt = "Jika teks berikut berbahasa Indonesia, terjemahkan ke Bahasa Inggris yang profesional. Jika berbahasa Inggris, terjemahkan ke Bahasa Indonesia yang baik dan benar. Tetap gunakan format Markdown.";
+      break;
+  }
+
+  try {
+    const response = await fetch("/api/ai/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemma-3n-e2b-it",
+        messages: [
+          { role: "system", content: "Kamu adalah asisten penulis profesional. Bantu pengguna memperbaiki teks mereka untuk portofolio. Kembalikan HANYA teks hasilnya saja dalam format Markdown." },
+          { role: "user", content: `${prompt}\n\nTEKS:\n${originalText}` }
+        ],
+        temperature: 0.3
+      })
+    });
+
+    if (!response.ok) throw new Error('AI API Error');
+    const data = await response.json();
+    const result = data.choices[0].message.content;
+
+    if (result) {
+      articleEditor.value(result);
+      showCustomAlert('success', 'Teks berhasil diperbarui oleh AI!');
+    }
+  } catch (err) {
+    console.error('AI Error:', err);
+    showCustomAlert('error', 'Gagal menghubungi AI. Pastikan koneksi internet stabil.');
+  }
+}
 
 // ===== INIT =====
 initAuth()
