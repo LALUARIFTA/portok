@@ -612,7 +612,7 @@ async function loadDynamicContent() {
     }
 
     // Experience/Education
-    const { data: exp } = await supabase.from('experience').select('*').order('created_at', { ascending: false })
+    const { data: exp } = await supabase.from('experience').select('*').order('sort_order', { ascending: true })
     portfolioContext.resume.experience = exp || []
     const elExp = document.getElementById('experienceList')
     if (elExp && exp) {
@@ -626,7 +626,7 @@ async function loadDynamicContent() {
       `).join('')
     }
 
-    const { data: edu } = await supabase.from('education').select('*').order('created_at', { ascending: false })
+    const { data: edu } = await supabase.from('education').select('*').order('sort_order', { ascending: true })
     portfolioContext.resume.education = edu || []
     const elEdu = document.getElementById('educationList')
     if (elEdu && edu) {

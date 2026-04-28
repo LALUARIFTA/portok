@@ -146,6 +146,7 @@ function initDashboard() {
   loadCertificates()
   loadResume()
   loadTestimonials()
+  initSortable()
 }
 
 function initEditors() {
@@ -178,6 +179,66 @@ function initSidebar() {
   document.getElementById('sidebarToggle').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open')
   })
+}
+
+function initSortable() {
+  const expBody = document.getElementById('experienceTableBody');
+  const eduBody = document.getElementById('educationTableBody');
+  
+  if (expBody) {
+    new Sortable(expBody, {
+      animation: 150,
+      handle: '.drag-handle',
+      onEnd: () => {
+        document.getElementById('saveExpOrderBtn').style.display = 'block';
+      }
+    });
+  }
+
+  if (eduBody) {
+    new Sortable(eduBody, {
+      animation: 150,
+      handle: '.drag-handle',
+      onEnd: () => {
+        document.getElementById('saveEduOrderBtn').style.display = 'block';
+      }
+    });
+  }
+
+  document.getElementById('saveExpOrderBtn')?.addEventListener('click', () => saveOrder('experience'));
+  document.getElementById('saveEduOrderBtn')?.addEventListener('click', () => saveOrder('education'));
+}
+
+async function saveOrder(table) {
+  const tbody = document.getElementById(`${table}TableBody`);
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const btn = document.getElementById(`save${table === 'experience' ? 'Exp' : 'Edu'}OrderBtn`);
+  
+  const originalBtnText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'Saving...';
+
+  try {
+    const updates = rows.map((row, index) => ({
+      id: row.dataset.id,
+      sort_order: index
+    }));
+
+    // Update each item (Supabase doesn't support bulk update with different values easily without a RPC)
+    for (const item of updates) {
+      await supabase.from(table).update({ sort_order: item.sort_order }).eq('id', item.id);
+    }
+
+    showCustomAlert('success', `Urutan ${table} berhasil disimpan!`);
+    btn.style.display = 'none';
+    logActivity(`Mengubah urutan ${table}`);
+  } catch (err) {
+    console.error(err);
+    showCustomAlert('error', 'Gagal menyimpan urutan. Pastikan kolom "sort_order" sudah ada di database.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalBtnText;
+  }
 }
 
 async function loadStats() {
@@ -844,13 +905,14 @@ async function loadMessages() {
 
 // ===== RESUME (EXP & EDU) =====
 async function loadResume() {
-  const { data: exp } = await supabase.from('experience').select('*').order('created_at', { ascending: true })
-  const { data: edu } = await supabase.from('education').select('*').order('created_at', { ascending: true })
+  const { data: exp } = await supabase.from('experience').select('*').order('sort_order', { ascending: true })
+  const { data: edu } = await supabase.from('education').select('*').order('sort_order', { ascending: true })
 
   const expTbody = document.getElementById('experienceTableBody')
   if (expTbody) {
     expTbody.innerHTML = (exp || []).map(e => `
-      <tr>
+      <tr data-id="${e.id}">
+        <td class="drag-handle" style="cursor:grab; color:var(--text-muted);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg></td>
         <td>${e.role}</td>
         <td>${e.company}</td>
         <td>${e.duration || '-'}</td>
@@ -867,7 +929,8 @@ async function loadResume() {
   const eduTbody = document.getElementById('educationTableBody')
   if (eduTbody) {
     eduTbody.innerHTML = (edu || []).map(e => `
-      <tr>
+      <tr data-id="${e.id}">
+        <td class="drag-handle" style="cursor:grab; color:var(--text-muted);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg></td>
         <td>${e.degree}</td>
         <td>${e.institution}</td>
         <td>${e.year || '-'}</td>

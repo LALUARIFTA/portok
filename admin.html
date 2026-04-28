@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <meta name="robots" content="noindex, nofollow" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
   <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
   <meta http-equiv="Content-Security-Policy"
@@ -237,12 +238,17 @@
         <div class="admin-page" id="pageResume">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
             <h3>Pengalaman Kerja (Experience)</h3>
-            <button class="btn btn-primary btn-sm" id="addExpBtn">+ Tambah</button>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline btn-sm" id="saveExpOrderBtn" style="display:none;">💾 Simpan Urutan</button>
+              <button class="btn btn-primary btn-sm" id="addExpBtn">+ Tambah</button>
+            </div>
           </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">💡 Klik dan tahan pada baris untuk mengatur urutan.</p>
           <div class="projects-table-wrap" style="margin-bottom: 40px;">
             <table class="projects-table">
               <thead>
                 <tr>
+                  <th style="width:40px;"></th>
                   <th>Posisi</th>
                   <th>Perusahaan</th>
                   <th>Tahun</th>
@@ -255,12 +261,17 @@
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
             <h3>Pendidikan (Education)</h3>
-            <button class="btn btn-primary btn-sm" id="addEduBtn">+ Tambah</button>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline btn-sm" id="saveEduOrderBtn" style="display:none;">💾 Simpan Urutan</button>
+              <button class="btn btn-primary btn-sm" id="addEduBtn">+ Tambah</button>
+            </div>
           </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">💡 Klik dan tahan pada baris untuk mengatur urutan.</p>
           <div class="projects-table-wrap">
             <table class="projects-table">
               <thead>
                 <tr>
+                  <th style="width:40px;"></th>
                   <th>Gelar / Jurusan</th>
                   <th>Institusi</th>
                   <th>Tahun</th>
