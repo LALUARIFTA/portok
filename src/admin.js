@@ -1,88 +1,139 @@
-import { supabase } from './supabase.js'
+import { supabase } from "./supabase.js";
 
-let analyticsChart = null
-let projectsChart = null
-let articleEditor = null
+let analyticsChart = null;
+let projectsChart = null;
+let articleEditor = null;
 
 // ===== UTILS =====
 const showPage = (pageName) => {
-  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'))
-  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'))
-  document.getElementById(`page${capitalize(pageName)}`).classList.add('active')
-  const link = document.querySelector(`[data-page="${pageName}"]`)
-  if (link) link.classList.add('active')
-  document.getElementById('pageTitle').textContent = capitalize(pageName)
+  document
+    .querySelectorAll(".admin-page")
+    .forEach((p) => p.classList.remove("active"));
+  document
+    .querySelectorAll(".sidebar-link")
+    .forEach((l) => l.classList.remove("active"));
+  document
+    .getElementById(`page${capitalize(pageName)}`)
+    .classList.add("active");
+  const link = document.querySelector(`[data-page="${pageName}"]`);
+  if (link) link.classList.add("active");
+  document.getElementById("pageTitle").textContent = capitalize(pageName);
+};
+
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+window.closeModal = (id) =>
+  document.getElementById(id).classList.remove("active");
+
+const escapeHTML = (str) => {
+  if (!str) return "";
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+};
+
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_PDF_TYPES = ["application/pdf"];
+
+function isAllowedFileType(file, allowedTypes) {
+  if (!file || !file.type) return false;
+  return allowedTypes.includes(file.type.toLowerCase());
 }
 
-const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
-window.closeModal = id => document.getElementById(id).classList.remove('active')
+function validateUploadFile(file, allowedTypes, label = "File") {
+  if (!file) return false;
 
-const escapeHTML = str => {
-  if (!str) return ''
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
+  if (!isAllowedFileType(file, allowedTypes)) {
+    showCustomAlert(
+      "error",
+      `${label} tidak valid. Gunakan format: ${allowedTypes.join(", ")}`,
+    );
+    return false;
+  }
+
+  if (file.size > MAX_UPLOAD_SIZE) {
+    showCustomAlert(
+      "error",
+      `${label} terlalu besar. Maksimal ${(MAX_UPLOAD_SIZE / (1024 * 1024)).toFixed(0)}MB.`,
+    );
+    return false;
+  }
+
+  return true;
 }
 
 async function logActivity(action) {
   try {
-    await supabase.from('activity_log').insert([{ action }])
-    if (document.getElementById('activityLogBody')) loadActivityLog()
-  } catch (err) { console.warn('Activity log failed - table might not exist') }
+    await supabase.from("activity_log").insert([{ action }]);
+    if (document.getElementById("activityLogBody")) loadActivityLog();
+  } catch (err) {
+    console.warn("Activity log failed - table might not exist");
+  }
 }
 
 async function loadActivityLog() {
-  const tbody = document.getElementById('activityLogBody')
-  if (!tbody) return
+  const tbody = document.getElementById("activityLogBody");
+  if (!tbody) return;
   try {
-    const { data } = await supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(8)
+    const { data } = await supabase
+      .from("activity_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(8);
     if (!data || data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">Belum ada aktivitas.</td></tr>'
-      return
+      tbody.innerHTML =
+        '<tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted);">Belum ada aktivitas.</td></tr>';
+      return;
     }
-    tbody.innerHTML = data.map(l => `
+    tbody.innerHTML = data
+      .map(
+        (l) => `
       <tr>
         <td style="font-size:0.85rem; font-weight:500;">${escapeHTML(l.action)}</td>
-        <td style="font-size:0.75rem; color:var(--text-muted);">${new Date(l.created_at).toLocaleTimeString('id-ID')} - ${new Date(l.created_at).toLocaleDateString('id-ID')}</td>
+        <td style="font-size:0.75rem; color:var(--text-muted);">${new Date(l.created_at).toLocaleTimeString("id-ID")} - ${new Date(l.created_at).toLocaleDateString("id-ID")}</td>
       </tr>
-    `).join('')
+    `,
+      )
+      .join("");
   } catch (err) {
-    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.75rem;">Gagal memuat log. Buat tabel "activity_log" di Supabase.</td></tr>'
+    tbody.innerHTML =
+      '<tr><td colspan="2" style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.75rem;">Gagal memuat log. Buat tabel "activity_log" di Supabase.</td></tr>';
   }
 }
 
 // ===== CUSTOM ALERTS =====
 window.showCustomAlert = function (type, message) {
-  const container = document.getElementById('alertContainer');
+  const container = document.getElementById("alertContainer");
   if (!container) return;
 
-  const alertDiv = document.createElement('div');
-  alertDiv.className = 'transform translate-x-full opacity-0 transition-all duration-300 ease-out';
+  const alertDiv = document.createElement("div");
+  alertDiv.className =
+    "transform translate-x-full opacity-0 transition-all duration-300 ease-out";
 
-  let html = '';
+  let html = "";
   switch (type) {
-    case 'success':
+    case "success":
       html = `
       <div role="alert" class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 dark:border-green-700 text-green-900 dark:text-green-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-green-200 dark:hover:bg-green-800 transform hover:scale-105 pointer-events-auto">
         <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-green-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
         <p class="text-xs font-semibold">${message}</p>
       </div>`;
       break;
-    case 'error':
+    case "error":
       html = `
       <div role="alert" class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-700 text-red-900 dark:text-red-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-red-200 dark:hover:bg-red-800 transform hover:scale-105 pointer-events-auto">
         <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-red-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
         <p class="text-xs font-semibold">${message}</p>
       </div>`;
       break;
-    case 'info':
+    case "info":
       html = `
       <div role="alert" class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 dark:border-blue-700 text-blue-900 dark:text-blue-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-blue-200 dark:hover:bg-blue-800 transform hover:scale-105 pointer-events-auto">
         <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-blue-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
         <p class="text-xs font-semibold">${message}</p>
       </div>`;
       break;
-    case 'warning':
+    case "warning":
       html = `
       <div role="alert" class="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100 p-2 rounded-lg flex items-center shadow-lg transition duration-300 ease-in-out hover:bg-yellow-200 dark:hover:bg-yellow-800 transform hover:scale-105 pointer-events-auto">
         <svg stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 flex-shrink-0 mr-2 text-yellow-600" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path></svg>
@@ -95,65 +146,65 @@ window.showCustomAlert = function (type, message) {
   container.appendChild(alertDiv);
 
   alertDiv.offsetHeight; // Reflow
-  alertDiv.classList.remove('translate-x-full', 'opacity-0');
+  alertDiv.classList.remove("translate-x-full", "opacity-0");
 
   setTimeout(() => {
-    alertDiv.classList.add('translate-x-full', 'opacity-0');
+    alertDiv.classList.add("translate-x-full", "opacity-0");
     setTimeout(() => alertDiv.remove(), 300);
   }, 4000);
-}
+};
 
 // ===== AUTH =====
 async function initAuth() {
   supabase.auth.onAuthStateChange((event, session) => {
     if (session) {
-      document.getElementById('loginScreen').style.display = 'none'
-      document.getElementById('adminDashboard').style.display = 'flex'
-      document.getElementById('adminUserInfo').textContent = session.user.email
-      initDashboard()
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("adminDashboard").style.display = "flex";
+      document.getElementById("adminUserInfo").textContent = session.user.email;
+      initDashboard();
     } else {
-      document.getElementById('loginScreen').style.display = 'flex'
-      document.getElementById('adminDashboard').style.display = 'none'
+      document.getElementById("loginScreen").style.display = "flex";
+      document.getElementById("adminDashboard").style.display = "none";
     }
-  })
+  });
 }
 
-document.getElementById('loginForm').addEventListener('submit', async e => {
-  e.preventDefault()
-  const email = e.target[0].value
-  const password = e.target[1].value
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) showCustomAlert('error', error.message)
-})
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = e.target[0].value;
+  const password = e.target[1].value;
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) showCustomAlert("error", error.message);
+});
 
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  await supabase.auth.signOut()
-  location.reload()
-})
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  location.reload();
+});
 
 // ===== DASHBOARD & NAV =====
 function initDashboard() {
-  initSidebar()
-  initEditors()
-  loadStats()
-  loadRecentMessages()
-  loadActivityLog()
-  loadProjects()
-  loadArticles()
-  loadProfile()
-  loadMessages()
-  loadChatbot()
-  loadCertificates()
-  loadResume()
-  loadTestimonials()
-  initSortable()
-  loadMedia()
-  initAI()
-  initSettings()
+  initSidebar();
+  initEditors();
+  loadStats();
+  loadRecentMessages();
+  loadActivityLog();
+  loadProjects();
+  loadArticles();
+  loadProfile();
+  loadMessages();
+  loadChatbot();
+  loadCertificates();
+  loadResume();
+  loadTestimonials();
+  initSortable();
+  loadMedia();
+  initAI();
+  initSettings();
 }
 
 function initEditors() {
-  const el = document.getElementById('articleContent')
+  const el = document.getElementById("articleContent");
   if (el && !articleEditor) {
     articleEditor = new EasyMDE({
       element: el,
@@ -170,74 +221,121 @@ function initEditors() {
         codeSyntaxHighlighting: true,
       },
       maxHeight: "400px",
-      theme: "dark" // EasyMDE is light by default, but we can style it via CSS
+      theme: "dark", // EasyMDE is light by default, but we can style it via CSS
     });
   }
 }
 
 function initSidebar() {
-  document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.addEventListener('click', () => showPage(link.dataset.page))
-  })
-  document.getElementById('sidebarToggle').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open')
-  })
+  const sidebar = document.getElementById("sidebar");
+  const sidebarToggle = document.getElementById("sidebarToggle");
+
+  if (!sidebar || !sidebarToggle) return;
+
+  let backdrop = document.querySelector(".sidebar-backdrop");
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.className = "sidebar-backdrop";
+    document.body.appendChild(backdrop);
+  }
+
+  const closeSidebar = () => {
+    sidebar.classList.remove("open");
+    backdrop.classList.remove("active");
+    document.body.classList.remove("sidebar-open");
+  };
+
+  const openSidebar = () => {
+    sidebar.classList.add("open");
+    backdrop.classList.add("active");
+    document.body.classList.add("sidebar-open");
+  };
+
+  document.querySelectorAll(".sidebar-link").forEach((link) => {
+    link.addEventListener("click", () => {
+      showPage(link.dataset.page);
+      if (window.innerWidth <= 1024) closeSidebar();
+    });
+  });
+
+  sidebarToggle.addEventListener("click", () => {
+    if (sidebar.classList.contains("open")) closeSidebar();
+    else openSidebar();
+  });
+
+  backdrop.addEventListener("click", closeSidebar);
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 1024) closeSidebar();
+  });
 }
 
 function initSortable() {
-  const expBody = document.getElementById('experienceTableBody');
-  const eduBody = document.getElementById('educationTableBody');
+  const expBody = document.getElementById("experienceTableBody");
+  const eduBody = document.getElementById("educationTableBody");
 
   if (expBody) {
     new Sortable(expBody, {
       animation: 150,
-      handle: '.drag-handle',
+      handle: ".drag-handle",
       onEnd: () => {
-        document.getElementById('saveExpOrderBtn').style.display = 'block';
-      }
+        document.getElementById("saveExpOrderBtn").style.display = "block";
+      },
     });
   }
 
   if (eduBody) {
     new Sortable(eduBody, {
       animation: 150,
-      handle: '.drag-handle',
+      handle: ".drag-handle",
       onEnd: () => {
-        document.getElementById('saveEduOrderBtn').style.display = 'block';
-      }
+        document.getElementById("saveEduOrderBtn").style.display = "block";
+      },
     });
   }
 
-  document.getElementById('saveExpOrderBtn')?.addEventListener('click', () => saveOrder('experience'));
-  document.getElementById('saveEduOrderBtn')?.addEventListener('click', () => saveOrder('education'));
+  document
+    .getElementById("saveExpOrderBtn")
+    ?.addEventListener("click", () => saveOrder("experience"));
+  document
+    .getElementById("saveEduOrderBtn")
+    ?.addEventListener("click", () => saveOrder("education"));
 }
 
 async function saveOrder(table) {
   const tbody = document.getElementById(`${table}TableBody`);
-  const rows = Array.from(tbody.querySelectorAll('tr'));
-  const btn = document.getElementById(`save${table === 'experience' ? 'Exp' : 'Edu'}OrderBtn`);
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+  const btn = document.getElementById(
+    `save${table === "experience" ? "Exp" : "Edu"}OrderBtn`,
+  );
 
   const originalBtnText = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = 'Saving...';
+  btn.innerHTML = "Saving...";
 
   try {
     const updates = rows.map((row, index) => ({
       id: row.dataset.id,
-      sort_order: index
+      sort_order: index,
     }));
 
     // Update each item (Supabase doesn't support bulk update with different values easily without a RPC)
     for (const item of updates) {
-      await supabase.from(table).update({ sort_order: item.sort_order }).eq('id', item.id);
+      await supabase
+        .from(table)
+        .update({ sort_order: item.sort_order })
+        .eq("id", item.id);
     }
 
-    showCustomAlert('success', `Urutan ${table} berhasil disimpan!`);
-    btn.style.display = 'none';
+    showCustomAlert("success", `Urutan ${table} berhasil disimpan!`);
+    btn.style.display = "none";
     logActivity(`Mengubah urutan ${table}`);
   } catch (err) {
     console.error(err);
-    showCustomAlert('error', 'Gagal menyimpan urutan. Pastikan kolom "sort_order" sudah ada di database.');
+    showCustomAlert(
+      "error",
+      'Gagal menyimpan urutan. Pastikan kolom "sort_order" sudah ada di database.',
+    );
   } finally {
     btn.disabled = false;
     btn.innerHTML = originalBtnText;
@@ -246,210 +344,250 @@ async function saveOrder(table) {
 
 async function loadStats() {
   try {
-    const { count: pCount } = await supabase.from('projects').select('*', { count: 'exact', head: true })
-    const { count: aCount } = await supabase.from('articles').select('*', { count: 'exact', head: true })
-    const { count: mCount } = await supabase.from('messages').select('*', { count: 'exact', head: true })
+    const { count: pCount } = await supabase
+      .from("projects")
+      .select("*", { count: "exact", head: true });
+    const { count: aCount } = await supabase
+      .from("articles")
+      .select("*", { count: "exact", head: true });
+    const { count: mCount } = await supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true });
 
     // Analytics (Try catch because table might not exist yet)
-    let vCount = 0, cCount = 0
+    let vCount = 0,
+      cCount = 0;
     try {
-      const { count: views } = await supabase.from('analytics').select('*', { count: 'exact', head: true }).eq('event_name', 'page_view')
-      const { count: clicks } = await supabase.from('analytics').select('*', { count: 'exact', head: true }).eq('event_name', 'cv_click')
-      vCount = views || 0
-      cCount = clicks || 0
-    } catch (e) { console.warn('Analytics table not found') }
+      const { count: views } = await supabase
+        .from("analytics")
+        .select("*", { count: "exact", head: true })
+        .eq("event_name", "page_view");
+      const { count: clicks } = await supabase
+        .from("analytics")
+        .select("*", { count: "exact", head: true })
+        .eq("event_name", "cv_click");
+      vCount = views || 0;
+      cCount = clicks || 0;
+    } catch (e) {
+      console.warn("Analytics table not found");
+    }
 
-    document.getElementById('dashTotalProjects').textContent = pCount || 0
-    document.getElementById('dashTotalArticles').textContent = aCount || 0
-    document.getElementById('dashTotalMessages').textContent = mCount || 0
-    document.getElementById('dashTotalViews').textContent = vCount
-    document.getElementById('dashCvClicks').textContent = cCount
+    document.getElementById("dashTotalProjects").textContent = pCount || 0;
+    document.getElementById("dashTotalArticles").textContent = aCount || 0;
+    document.getElementById("dashTotalMessages").textContent = mCount || 0;
+    document.getElementById("dashTotalViews").textContent = vCount;
+    document.getElementById("dashCvClicks").textContent = cCount;
 
-    initAnalyticsChart()
-  } catch (err) { console.error('Stats error:', err) }
+    initAnalyticsChart();
+  } catch (err) {
+    console.error("Stats error:", err);
+  }
 }
 
 async function loadRecentMessages() {
-  const body = document.getElementById('dashRecentMessagesBody')
-  if (!body) return
+  const body = document.getElementById("dashRecentMessagesBody");
+  if (!body) return;
 
   try {
     const { data: msgs, error } = await supabase
-      .from('messages')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(5)
+      .from("messages")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5);
 
-    if (error) throw error
+    if (error) throw error;
 
     if (!msgs || msgs.length === 0) {
-      body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Belum ada pesan.</td></tr>'
-      return
+      body.innerHTML =
+        '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--text-muted);">Belum ada pesan.</td></tr>';
+      return;
     }
 
-    body.innerHTML = msgs.map(m => `
+    body.innerHTML = msgs
+      .map(
+        (m) => `
       <tr>
         <td>
           <div style="font-weight:700;">${escapeHTML(m.name)}</div>
           <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHTML(m.email)}</div>
         </td>
         <td style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-          ${escapeHTML(m.message || '')}
+          ${escapeHTML(m.message || "")}
         </td>
         <td style="font-size:0.8rem; color:var(--text-muted);">
-          ${new Date(m.created_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+          ${new Date(m.created_at).toLocaleString("id-ID", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
         </td>
       </tr>
-    `).join('')
+    `,
+      )
+      .join("");
   } catch (err) {
-    console.error('Recent messages error:', err)
-    body.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--accent);">Gagal memuat pesan.</td></tr>'
+    console.error("Recent messages error:", err);
+    body.innerHTML =
+      '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--accent);">Gagal memuat pesan.</td></tr>';
   }
 }
 
 async function initAnalyticsChart() {
-  const visitorCtx = document.getElementById('analyticsChart')?.getContext('2d')
-  const projectCtx = document.getElementById('projectsChart')?.getContext('2d')
+  const visitorCtx = document
+    .getElementById("analyticsChart")
+    ?.getContext("2d");
+  const projectCtx = document.getElementById("projectsChart")?.getContext("2d");
 
-  if (!visitorCtx || !projectCtx) return
+  if (!visitorCtx || !projectCtx) return;
 
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setHours(0, 0, 0, 0)
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setHours(0, 0, 0, 0);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
   try {
     // 1. Visitor Chart Logic
     const { data: views } = await supabase
-      .from('analytics')
-      .select('created_at')
-      .eq('event_name', 'page_view')
-      .gte('created_at', sevenDaysAgo.toISOString())
+      .from("analytics")
+      .select("created_at")
+      .eq("event_name", "page_view")
+      .gte("created_at", sevenDaysAgo.toISOString());
 
-    const visitorLabels = []
-    const visitorCounts = []
+    const visitorLabels = [];
+    const visitorCounts = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date()
-      d.setDate(d.getDate() - i)
-      const dateStr = d.toISOString().split('T')[0]
-      const label = d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' })
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      const label = d.toLocaleDateString("id-ID", {
+        weekday: "short",
+        day: "numeric",
+      });
 
-      const count = views ? views.filter(v => v.created_at.startsWith(dateStr)).length : 0
+      const count = views
+        ? views.filter((v) => v.created_at.startsWith(dateStr)).length
+        : 0;
 
-      visitorLabels.push(label)
-      visitorCounts.push(count)
+      visitorLabels.push(label);
+      visitorCounts.push(count);
     }
 
-    if (analyticsChart) analyticsChart.destroy()
+    if (analyticsChart) analyticsChart.destroy();
     analyticsChart = new Chart(visitorCtx, {
-      type: 'line',
+      type: "line",
       data: {
         labels: visitorLabels,
-        datasets: [{
-          label: 'Kunjungan Halaman',
-          data: visitorCounts,
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          fill: true,
-          tension: 0.4,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
+        datasets: [
+          {
+            label: "Kunjungan Halaman",
+            data: visitorCounts,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: { mode: 'index', intersect: false }
+          tooltip: { mode: "index", intersect: false },
         },
         scales: {
           y: {
             beginAtZero: true,
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { stepSize: 1, color: '#94a3b8' }
+            grid: { color: "rgba(255,255,255,0.05)" },
+            ticks: { stepSize: 1, color: "#94a3b8" },
           },
           x: {
             grid: { display: false },
-            ticks: { color: '#94a3b8' }
-          }
-        }
-      }
-    })
+            ticks: { color: "#94a3b8" },
+          },
+        },
+      },
+    });
 
     // 2. Projects Popularity Chart Logic
     const { data: projectViews } = await supabase
-      .from('analytics')
-      .select('event_data')
-      .eq('event_name', 'project_view')
+      .from("analytics")
+      .select("event_data")
+      .eq("event_name", "project_view");
 
-    const { data: allProjects } = await supabase.from('projects').select('id, title')
-    const projectMap = {}
+    const { data: allProjects } = await supabase
+      .from("projects")
+      .select("id, title");
+    const projectMap = {};
     if (allProjects) {
-      allProjects.forEach(p => projectMap[p.id] = p.title)
+      allProjects.forEach((p) => (projectMap[p.id] = p.title));
     }
 
-    const projectCounts = {}
+    const projectCounts = {};
     if (projectViews) {
-      projectViews.forEach(v => {
-        const id = v.event_data?.id
+      projectViews.forEach((v) => {
+        const id = v.event_data?.id;
         if (id) {
-          const name = projectMap[id] || `Project ${id.substring(0, 5)}...`
-          projectCounts[name] = (projectCounts[name] || 0) + 1
+          const name = projectMap[id] || `Project ${id.substring(0, 5)}...`;
+          projectCounts[name] = (projectCounts[name] || 0) + 1;
         }
-      })
+      });
     }
 
     const sortedProjects = Object.entries(projectCounts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
+      .slice(0, 5);
 
-    const projectLabels = sortedProjects.map(p => p[0])
-    const projectData = sortedProjects.map(p => p[1])
+    const projectLabels = sortedProjects.map((p) => p[0]);
+    const projectData = sortedProjects.map((p) => p[1]);
 
-    if (projectsChart) projectsChart.destroy()
+    if (projectsChart) projectsChart.destroy();
     projectsChart = new Chart(projectCtx, {
-      type: 'bar',
+      type: "bar",
       data: {
         labels: projectLabels,
-        datasets: [{
-          label: 'Jumlah Klik',
-          data: projectData,
-          backgroundColor: '#a855f7',
-          borderRadius: 4
-        }]
+        datasets: [
+          {
+            label: "Jumlah Klik",
+            data: projectData,
+            backgroundColor: "#a855f7",
+            borderRadius: 4,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        indexAxis: 'y', // Horizontal bar
+        indexAxis: "y", // Horizontal bar
         plugins: {
           legend: { display: false },
-          tooltip: { mode: 'index', intersect: false }
+          tooltip: { mode: "index", intersect: false },
         },
         scales: {
           x: {
             beginAtZero: true,
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { stepSize: 1, color: '#94a3b8' }
+            grid: { color: "rgba(255,255,255,0.05)" },
+            ticks: { stepSize: 1, color: "#94a3b8" },
           },
           y: {
             grid: { display: false },
-            ticks: { color: '#94a3b8' }
-          }
-        }
-      }
-    })
-
+            ticks: { color: "#94a3b8" },
+          },
+        },
+      },
+    });
   } catch (err) {
-    console.warn('Analytics logic error:', err)
+    console.warn("Analytics logic error:", err);
   }
 }
 
 // ===== PROJECTS =====
 async function loadProjects() {
-  const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
-  const tbody = document.getElementById('projectsTableBody')
-  tbody.innerHTML = data.map(p => `
+  const { data } = await supabase
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const tbody = document.getElementById("projectsTableBody");
+  tbody.innerHTML = data
+    .map(
+      (p) => `
     <tr>
       <td>${escapeHTML(p.title)}</td>
       <td>${escapeHTML(p.category)}</td>
@@ -460,104 +598,121 @@ async function loadProjects() {
         </div>
       </td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 }
 
-document.getElementById('addProjectBtn').addEventListener('click', () => {
-  document.getElementById('projectForm').reset()
-  document.getElementById('projectId').value = ''
-  document.getElementById('projectModal').classList.add('active')
-})
+document.getElementById("addProjectBtn").addEventListener("click", () => {
+  document.getElementById("projectForm").reset();
+  document.getElementById("projectId").value = "";
+  document.getElementById("projectModal").classList.add("active");
+});
 
-document.getElementById('projectForm').addEventListener('submit', async e => {
-  e.preventDefault()
-  const btn = e.target.querySelector('button[type="submit"]')
-  const originalBtnText = btn.innerHTML
+document.getElementById("projectForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalBtnText = btn.innerHTML;
 
-  const id = document.getElementById('projectId').value
-  const file = document.getElementById('projectThumbFile').files[0]
-  let thumbUrl = document.getElementById('projectThumbnail').value
+  const id = document.getElementById("projectId").value;
+  const file = document.getElementById("projectThumbFile").files[0];
+  let thumbUrl = document.getElementById("projectThumbnail").value;
 
   try {
-    btn.disabled = true
-    btn.innerHTML = '<span>Menyimpan...</span>'
+    btn.disabled = true;
+    btn.innerHTML = "<span>Menyimpan...</span>";
 
     // Handle File Upload
     if (file) {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `projects/${fileName}`
+      if (!validateUploadFile(file, ALLOWED_IMAGE_TYPES, "Thumbnail project")) {
+        return;
+      }
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `projects/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('portfolio')
+        .from("portfolio")
         .upload(filePath, file, {
-          cacheControl: '3600',
+          cacheControl: "3600",
           upsert: false,
-          contentType: file.type
-        })
+          contentType: file.type,
+        });
 
       if (uploadError) {
-        showCustomAlert('error', 'Gagal upload thumbnail: ' + uploadError.message)
-        return
+        showCustomAlert(
+          "error",
+          "Gagal upload thumbnail: " + uploadError.message,
+        );
+        return;
       }
 
       const { data: urlData } = supabase.storage
-        .from('portfolio')
-        .getPublicUrl(filePath)
+        .from("portfolio")
+        .getPublicUrl(filePath);
 
-      thumbUrl = urlData.publicUrl
+      thumbUrl = urlData.publicUrl;
     }
 
     const payload = {
-      title: document.getElementById('projectTitle').value,
-      category: document.getElementById('projectCategory').value,
-      year: document.getElementById('projectYear').value,
+      title: document.getElementById("projectTitle").value,
+      category: document.getElementById("projectCategory").value,
+      year: document.getElementById("projectYear").value,
       thumbnail: thumbUrl,
-      description: document.getElementById('projectDesc').value,
-      case_study: document.getElementById('projectCaseStudy').value,
-      tech_stack: document.getElementById('projectTech').value,
-      url: document.getElementById('projectUrl').value,
-    }
+      description: document.getElementById("projectDesc").value,
+      case_study: document.getElementById("projectCaseStudy").value,
+      tech_stack: document.getElementById("projectTech").value,
+      url: document.getElementById("projectUrl").value,
+    };
 
-    if (id) await supabase.from('projects').update(payload).eq('id', id)
-    else await supabase.from('projects').insert(payload)
+    if (id) await supabase.from("projects").update(payload).eq("id", id);
+    else await supabase.from("projects").insert(payload);
 
-    document.getElementById('projectThumbFile').value = '' // Clear file input
-    logActivity(`Menyimpan project: ${payload.title}`)
-    closeModal('projectModal')
-    loadProjects()
-    showCustomAlert('success', 'Project berhasil disimpan!')
+    document.getElementById("projectThumbFile").value = ""; // Clear file input
+    logActivity(`Menyimpan project: ${payload.title}`);
+    closeModal("projectModal");
+    loadProjects();
+    showCustomAlert("success", "Project berhasil disimpan!");
   } catch (err) {
-    console.error(err)
-    showCustomAlert('error', 'Terjadi kesalahan saat menyimpan project.')
+    console.error(err);
+    showCustomAlert("error", "Terjadi kesalahan saat menyimpan project.");
   } finally {
-    btn.disabled = false
-    btn.innerHTML = originalBtnText
+    btn.disabled = false;
+    btn.innerHTML = originalBtnText;
   }
-})
+});
 
-window.editProject = async id => {
-  const { data: p } = await supabase.from('projects').select('*').eq('id', id).single()
-  document.getElementById('projectId').value = p.id
-  document.getElementById('projectTitle').value = p.title
-  document.getElementById('projectCategory').value = p.category
-  document.getElementById('projectYear').value = p.year
-  document.getElementById('projectThumbnail').value = p.thumbnail
-  document.getElementById('projectDesc').value = p.description
-  document.getElementById('projectCaseStudy').value = p.case_study || ''
-  document.getElementById('projectTech').value = p.tech_stack
-  document.getElementById('projectUrl').value = p.url
-  document.getElementById('projectModal').classList.add('active')
-}
+window.editProject = async (id) => {
+  const { data: p } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("projectId").value = p.id;
+  document.getElementById("projectTitle").value = p.title;
+  document.getElementById("projectCategory").value = p.category;
+  document.getElementById("projectYear").value = p.year;
+  document.getElementById("projectThumbnail").value = p.thumbnail;
+  document.getElementById("projectDesc").value = p.description;
+  document.getElementById("projectCaseStudy").value = p.case_study || "";
+  document.getElementById("projectTech").value = p.tech_stack;
+  document.getElementById("projectUrl").value = p.url;
+  document.getElementById("projectModal").classList.add("active");
+};
 
 // ===== ARTICLES =====
 async function loadArticles() {
-  const { data } = await supabase.from('articles').select('*').order('created_at', { ascending: false })
-  const tbody = document.getElementById('articlesTableBody')
-  tbody.innerHTML = data.map(a => `
+  const { data } = await supabase
+    .from("articles")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const tbody = document.getElementById("articlesTableBody");
+  tbody.innerHTML = data
+    .map(
+      (a) => `
     <tr>
       <td>${a.title}</td>
-      <td>${a.published ? '✅ Published' : '⏳ Draft'}</td>
+      <td>${a.published ? "✅ Published" : "⏳ Draft"}</td>
       <td>
         <div class="table-actions">
           <button class="btn btn-outline btn-sm" onclick="editArticle('${a.id}')">Edit</button>
@@ -565,111 +720,131 @@ async function loadArticles() {
         </div>
       </td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 }
 
-document.getElementById('addArticleBtn').addEventListener('click', () => {
-  document.getElementById('articleForm').reset()
-  if (articleEditor) articleEditor.value('')
-  document.getElementById('articleId').value = ''
-  document.getElementById('articleModal').classList.add('active')
-})
+document.getElementById("addArticleBtn").addEventListener("click", () => {
+  document.getElementById("articleForm").reset();
+  if (articleEditor) articleEditor.value("");
+  document.getElementById("articleId").value = "";
+  document.getElementById("articleModal").classList.add("active");
+});
 
-document.getElementById('articleForm').addEventListener('submit', async e => {
-  e.preventDefault()
-  const id = document.getElementById('articleId').value
-  const btn = e.target.querySelector('button[type="submit"]')
-  const originalBtnText = btn.innerHTML
+document.getElementById("articleForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const id = document.getElementById("articleId").value;
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalBtnText = btn.innerHTML;
 
-  const content = articleEditor ? articleEditor.value() : document.getElementById('articleContent').value;
+  const content = articleEditor
+    ? articleEditor.value()
+    : document.getElementById("articleContent").value;
   if (!content.trim()) {
-    showCustomAlert('error', 'Konten artikel tidak boleh kosong!');
+    showCustomAlert("error", "Konten artikel tidak boleh kosong!");
     return;
   }
 
   try {
-    btn.disabled = true
-    btn.innerHTML = '<span>Menyimpan...</span>'
+    btn.disabled = true;
+    btn.innerHTML = "<span>Menyimpan...</span>";
 
-    let thumbUrl = document.getElementById('articleThumb').value
-    const fileInput = document.getElementById('articleThumbFile')
+    let thumbUrl = document.getElementById("articleThumb").value;
+    const fileInput = document.getElementById("articleThumbFile");
 
     if (fileInput.files.length > 0) {
-      const file = fileInput.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `articles/${fileName}`
+      const file = fileInput.files[0];
+      if (!validateUploadFile(file, ALLOWED_IMAGE_TYPES, "Thumbnail artikel")) {
+        return;
+      }
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `articles/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type
-      })
-      if (uploadError) throw uploadError
+      const { error: uploadError } = await supabase.storage
+        .from("portfolio")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type,
+        });
+      if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
-      thumbUrl = urlData.publicUrl
+      const { data: urlData } = supabase.storage
+        .from("portfolio")
+        .getPublicUrl(filePath);
+      thumbUrl = urlData.publicUrl;
     }
 
     const payload = {
-      title: document.getElementById('articleTitle').value,
-      slug: document.getElementById('articleSlug').value,
+      title: document.getElementById("articleTitle").value,
+      slug: document.getElementById("articleSlug").value,
       thumbnail: thumbUrl,
       content: content,
-      category: document.getElementById('articleCategory').value,
-      published: document.getElementById('articlePublished').checked,
-    }
+      category: document.getElementById("articleCategory").value,
+      published: document.getElementById("articlePublished").checked,
+    };
 
-    if (id) await supabase.from('articles').update(payload).eq('id', id)
-    else await supabase.from('articles').insert(payload)
+    if (id) await supabase.from("articles").update(payload).eq("id", id);
+    else await supabase.from("articles").insert(payload);
 
-    document.getElementById('articleThumbFile').value = '' // Clear file input
-    logActivity(`Menyimpan artikel: ${payload.title}`)
-    closeModal('articleModal')
-    loadArticles()
-    showCustomAlert('success', 'Artikel berhasil disimpan!')
+    document.getElementById("articleThumbFile").value = ""; // Clear file input
+    logActivity(`Menyimpan artikel: ${payload.title}`);
+    closeModal("articleModal");
+    loadArticles();
+    showCustomAlert("success", "Artikel berhasil disimpan!");
   } catch (err) {
-    console.error(err)
-    showCustomAlert('error', 'Terjadi kesalahan saat menyimpan artikel.')
+    console.error(err);
+    showCustomAlert("error", "Terjadi kesalahan saat menyimpan artikel.");
   } finally {
-    btn.disabled = false
-    btn.innerHTML = originalBtnText
+    btn.disabled = false;
+    btn.innerHTML = originalBtnText;
   }
-})
+});
 
-window.editArticle = async id => {
-  const { data: a } = await supabase.from('articles').select('*').eq('id', id).single()
-  document.getElementById('articleId').value = a.id
-  document.getElementById('articleTitle').value = a.title
-  document.getElementById('articleSlug').value = a.slug
-  document.getElementById('articleThumb').value = a.thumbnail
-  if (articleEditor) articleEditor.value(a.content || '')
-  else document.getElementById('articleContent').value = a.content
-  document.getElementById('articleCategory').value = a.category
-  document.getElementById('articlePublished').checked = a.published
-  document.getElementById('articleModal').classList.add('active')
-}
+window.editArticle = async (id) => {
+  const { data: a } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("articleId").value = a.id;
+  document.getElementById("articleTitle").value = a.title;
+  document.getElementById("articleSlug").value = a.slug;
+  document.getElementById("articleThumb").value = a.thumbnail;
+  if (articleEditor) articleEditor.value(a.content || "");
+  else document.getElementById("articleContent").value = a.content;
+  document.getElementById("articleCategory").value = a.category;
+  document.getElementById("articlePublished").checked = a.published;
+  document.getElementById("articleModal").classList.add("active");
+};
 
 // ===== GENERAL DELETE =====
 window.deleteItem = async (table, id) => {
-  if (confirm('Hapus item ini?')) {
-    await supabase.from(table).delete().eq('id', id)
-    if (table === 'projects') loadProjects()
-    else if (table === 'articles') loadArticles()
-    else if (table === 'chatbot_keywords') loadChatbot()
-    else if (table === 'certificates') loadCertificates()
-    else if (table === 'experience' || table === 'education') loadResume()
-    else if (table === 'testimonials') loadTestimonials()
-    else if (table === 'messages') loadMessages()
+  if (confirm("Hapus item ini?")) {
+    await supabase.from(table).delete().eq("id", id);
+    if (table === "projects") loadProjects();
+    else if (table === "articles") loadArticles();
+    else if (table === "chatbot_keywords") loadChatbot();
+    else if (table === "certificates") loadCertificates();
+    else if (table === "experience" || table === "education") loadResume();
+    else if (table === "testimonials") loadTestimonials();
+    else if (table === "messages") loadMessages();
   }
-}
+};
 
 // ===== CHATBOT KEYWORDS =====
 async function loadChatbot() {
-  const { data } = await supabase.from('chatbot_keywords').select('*').order('created_at', { ascending: false })
-  const tbody = document.getElementById('chatbotTableBody')
-  if (!tbody) return
-  tbody.innerHTML = data.map(k => `
+  const { data } = await supabase
+    .from("chatbot_keywords")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const tbody = document.getElementById("chatbotTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = data
+    .map(
+      (k) => `
     <tr>
       <td>${k.keyword}</td>
       <td>${k.response.substring(0, 50)}...</td>
@@ -680,48 +855,62 @@ async function loadChatbot() {
         </div>
       </td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 }
 
-document.getElementById('addKeywordBtn')?.addEventListener('click', () => {
-  document.getElementById('chatbotForm').reset()
-  document.getElementById('keywordId').value = ''
-  document.getElementById('chatbotModal').classList.add('active')
-})
+document.getElementById("addKeywordBtn")?.addEventListener("click", () => {
+  document.getElementById("chatbotForm").reset();
+  document.getElementById("keywordId").value = "";
+  document.getElementById("chatbotModal").classList.add("active");
+});
 
-document.getElementById('chatbotForm')?.addEventListener('submit', async e => {
-  e.preventDefault()
-  const id = document.getElementById('keywordId').value
-  const payload = {
-    keyword: document.getElementById('botKeyword').value,
-    response: document.getElementById('botResponse').value,
-  }
+document
+  .getElementById("chatbotForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("keywordId").value;
+    const payload = {
+      keyword: document.getElementById("botKeyword").value,
+      response: document.getElementById("botResponse").value,
+    };
 
-  if (id) await supabase.from('chatbot_keywords').update(payload).eq('id', id)
-  else await supabase.from('chatbot_keywords').insert(payload)
+    if (id)
+      await supabase.from("chatbot_keywords").update(payload).eq("id", id);
+    else await supabase.from("chatbot_keywords").insert(payload);
 
-  closeModal('chatbotModal')
-  loadChatbot()
-})
+    closeModal("chatbotModal");
+    loadChatbot();
+  });
 
-window.editKeyword = async id => {
-  const { data: k } = await supabase.from('chatbot_keywords').select('*').eq('id', id).single()
-  document.getElementById('keywordId').value = k.id
-  document.getElementById('botKeyword').value = k.keyword
-  document.getElementById('botResponse').value = k.response
-  document.getElementById('chatbotModal').classList.add('active')
-}
+window.editKeyword = async (id) => {
+  const { data: k } = await supabase
+    .from("chatbot_keywords")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("keywordId").value = k.id;
+  document.getElementById("botKeyword").value = k.keyword;
+  document.getElementById("botResponse").value = k.response;
+  document.getElementById("chatbotModal").classList.add("active");
+};
 
 // ===== CERTIFICATES =====
 async function loadCertificates() {
-  const { data } = await supabase.from('certificates').select('*').order('created_at', { ascending: false })
-  const tbody = document.getElementById('certificatesTableBody')
-  if (!tbody) return
-  tbody.innerHTML = data.map(c => `
+  const { data } = await supabase
+    .from("certificates")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const tbody = document.getElementById("certificatesTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = data
+    .map(
+      (c) => `
     <tr>
       <td>${c.title}</td>
       <td>${c.issuer}</td>
-      <td>${c.year || '-'}</td>
+      <td>${c.year || "-"}</td>
       <td>
         <div class="table-actions">
           <button class="btn btn-outline btn-sm" onclick="editCertificate('${c.id}')">Edit</button>
@@ -729,179 +918,211 @@ async function loadCertificates() {
         </div>
       </td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 }
 
-document.getElementById('addCertificateBtn')?.addEventListener('click', () => {
-  document.getElementById('certificateForm').reset()
-  document.getElementById('certificateId').value = ''
-  document.getElementById('certificateModal').classList.add('active')
-})
+document.getElementById("addCertificateBtn")?.addEventListener("click", () => {
+  document.getElementById("certificateForm").reset();
+  document.getElementById("certificateId").value = "";
+  document.getElementById("certificateModal").classList.add("active");
+});
 
-document.getElementById('certificateForm')?.addEventListener('submit', async e => {
-  e.preventDefault()
-  const btn = e.target.querySelector('button[type="submit"]')
-  const originalBtnText = btn.innerHTML
+document
+  .getElementById("certificateForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = btn.innerHTML;
 
-  const id = document.getElementById('certificateId').value
-  const file = document.getElementById('certFile').files[0]
-  let imageUrl = document.getElementById('certImage').value
+    const id = document.getElementById("certificateId").value;
+    const file = document.getElementById("certFile").files[0];
+    let imageUrl = document.getElementById("certImage").value;
 
-  try {
-    btn.disabled = true
-    btn.innerHTML = '<span>Mengunggah...</span>'
+    try {
+      btn.disabled = true;
+      btn.innerHTML = "<span>Mengunggah...</span>";
 
-    // Handle File Upload
-    if (file) {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `certificates/${fileName}`
+      // Handle File Upload
+      if (file) {
+        if (
+          !validateUploadFile(
+            file,
+            [...ALLOWED_IMAGE_TYPES, ...ALLOWED_PDF_TYPES],
+            "File sertifikat",
+          )
+        ) {
+          return;
+        }
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `certificates/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('portfolio')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
-        })
+        const { error: uploadError } = await supabase.storage
+          .from("portfolio")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
 
-      if (uploadError) {
-        showCustomAlert('error', 'Gagal upload file: ' + uploadError.message)
-        return
+        if (uploadError) {
+          showCustomAlert("error", "Gagal upload file: " + uploadError.message);
+          return;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("portfolio")
+          .getPublicUrl(filePath);
+
+        imageUrl = urlData.publicUrl;
       }
 
-      const { data: urlData } = supabase.storage
-        .from('portfolio')
-        .getPublicUrl(filePath)
+      const payload = {
+        title: document.getElementById("certTitle").value,
+        issuer: document.getElementById("certIssuer").value,
+        year: document.getElementById("certYear").value,
+        image_url: imageUrl,
+        credential_url: document.getElementById("certCredential").value,
+      };
 
-      imageUrl = urlData.publicUrl
+      if (id) await supabase.from("certificates").update(payload).eq("id", id);
+      else await supabase.from("certificates").insert(payload);
+
+      document.getElementById("certFile").value = ""; // Clear file input
+      closeModal("certificateModal");
+      loadCertificates();
+      showCustomAlert("success", "Sertifikat berhasil disimpan!");
+    } catch (err) {
+      console.error(err);
+      showCustomAlert("error", "Terjadi kesalahan.");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalBtnText;
     }
+  });
 
-    const payload = {
-      title: document.getElementById('certTitle').value,
-      issuer: document.getElementById('certIssuer').value,
-      year: document.getElementById('certYear').value,
-      image_url: imageUrl,
-      credential_url: document.getElementById('certCredential').value,
-    }
-
-    if (id) await supabase.from('certificates').update(payload).eq('id', id)
-    else await supabase.from('certificates').insert(payload)
-
-    document.getElementById('certFile').value = '' // Clear file input
-    closeModal('certificateModal')
-    loadCertificates()
-    showCustomAlert('success', 'Sertifikat berhasil disimpan!')
-  } catch (err) {
-    console.error(err)
-    showCustomAlert('error', 'Terjadi kesalahan.')
-  } finally {
-    btn.disabled = false
-    btn.innerHTML = originalBtnText
-  }
-})
-
-window.editCertificate = async id => {
-  const { data: c } = await supabase.from('certificates').select('*').eq('id', id).single()
-  document.getElementById('certificateId').value = c.id
-  document.getElementById('certTitle').value = c.title
-  document.getElementById('certIssuer').value = c.issuer
-  document.getElementById('certYear').value = c.year || ''
-  document.getElementById('certImage').value = c.image_url || ''
-  document.getElementById('certCredential').value = c.credential_url || ''
-  document.getElementById('certificateModal').classList.add('active')
-}
-
-
+window.editCertificate = async (id) => {
+  const { data: c } = await supabase
+    .from("certificates")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("certificateId").value = c.id;
+  document.getElementById("certTitle").value = c.title;
+  document.getElementById("certIssuer").value = c.issuer;
+  document.getElementById("certYear").value = c.year || "";
+  document.getElementById("certImage").value = c.image_url || "";
+  document.getElementById("certCredential").value = c.credential_url || "";
+  document.getElementById("certificateModal").classList.add("active");
+};
 
 // ===== PROFILE =====
 async function loadProfile() {
-  const { data: p } = await supabase.from('profile').select('*').single()
+  const { data: p } = await supabase.from("profile").select("*").single();
   if (p) {
-    document.getElementById('profileName').value = p.name
-    document.getElementById('profileTitle').value = p.title
-    document.getElementById('profileBio').value = p.bio
-    document.getElementById('profileEmail').value = p.email
-    document.getElementById('profileWhatsapp').value = p.whatsapp
-    document.getElementById('profileGithub').value = p.github
-    document.getElementById('profileLinkedin').value = p.linkedin
-    document.getElementById('profileCvUrl').value = p.cv_url
+    document.getElementById("profileName").value = p.name;
+    document.getElementById("profileTitle").value = p.title;
+    document.getElementById("profileBio").value = p.bio;
+    document.getElementById("profileEmail").value = p.email;
+    document.getElementById("profileWhatsapp").value = p.whatsapp;
+    document.getElementById("profileGithub").value = p.github;
+    document.getElementById("profileLinkedin").value = p.linkedin;
+    document.getElementById("profileCvUrl").value = p.cv_url;
   }
 }
 
-document.getElementById('profileForm').addEventListener('submit', async e => {
-  e.preventDefault()
-  const btn = e.target.querySelector('button[type="submit"]')
-  const originalBtnText = btn.innerHTML
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalBtnText = btn.innerHTML;
 
   try {
-    btn.disabled = true
-    btn.innerHTML = '<span>Menyimpan...</span>'
+    btn.disabled = true;
+    btn.innerHTML = "<span>Menyimpan...</span>";
 
-    let cvUrl = document.getElementById('profileCvUrl').value
-    const fileInput = document.getElementById('profileCvFile')
+    let cvUrl = document.getElementById("profileCvUrl").value;
+    const fileInput = document.getElementById("profileCvFile");
 
     if (fileInput.files.length > 0) {
-      const file = fileInput.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random()}.${fileExt}`
-      const filePath = `cv/${fileName}`
+      const file = fileInput.files[0];
+      if (!validateUploadFile(file, ALLOWED_PDF_TYPES, "File CV")) {
+        return;
+      }
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `cv/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type
-      })
-      if (uploadError) throw uploadError
+      const { error: uploadError } = await supabase.storage
+        .from("portfolio")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type,
+        });
+      if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(filePath)
-      cvUrl = urlData.publicUrl
+      const { data: urlData } = supabase.storage
+        .from("portfolio")
+        .getPublicUrl(filePath);
+      cvUrl = urlData.publicUrl;
     }
 
     const payload = {
-      name: document.getElementById('profileName').value,
-      title: document.getElementById('profileTitle').value,
-      bio: document.getElementById('profileBio').value,
-      email: document.getElementById('profileEmail').value,
-      whatsapp: document.getElementById('profileWhatsapp').value,
-      github: document.getElementById('profileGithub').value,
-      linkedin: document.getElementById('profileLinkedin').value,
+      name: document.getElementById("profileName").value,
+      title: document.getElementById("profileTitle").value,
+      bio: document.getElementById("profileBio").value,
+      email: document.getElementById("profileEmail").value,
+      whatsapp: document.getElementById("profileWhatsapp").value,
+      github: document.getElementById("profileGithub").value,
+      linkedin: document.getElementById("profileLinkedin").value,
       cv_url: cvUrl,
-    }
-    const { data: existing } = await supabase.from('profile').select('id').maybeSingle()
-    if (existing) await supabase.from('profile').update(payload).eq('id', existing.id)
-    else await supabase.from('profile').insert(payload)
+    };
+    const { data: existing } = await supabase
+      .from("profile")
+      .select("id")
+      .maybeSingle();
+    if (existing)
+      await supabase.from("profile").update(payload).eq("id", existing.id);
+    else await supabase.from("profile").insert(payload);
 
-    document.getElementById('profileCvFile').value = ''
-    document.getElementById('profileCvUrl').value = cvUrl
-    logActivity(`Memperbarui profile`)
-    showCustomAlert('success', 'Profile disimpan!')
+    document.getElementById("profileCvFile").value = "";
+    document.getElementById("profileCvUrl").value = cvUrl;
+    logActivity(`Memperbarui profile`);
+    showCustomAlert("success", "Profile disimpan!");
   } catch (err) {
-    console.error(err)
-    showCustomAlert('error', 'Terjadi kesalahan saat menyimpan profile.')
+    console.error(err);
+    showCustomAlert("error", "Terjadi kesalahan saat menyimpan profile.");
   } finally {
-    btn.disabled = false
-    btn.innerHTML = originalBtnText
+    btn.disabled = false;
+    btn.innerHTML = originalBtnText;
   }
-})
+});
 
 // ===== MESSAGES =====
 async function loadMessages() {
-  const { data } = await supabase.from('messages').select('*').order('created_at', { ascending: false })
-  const tbody = document.getElementById('messagesTableBody')
-  if (!tbody) return
+  const { data } = await supabase
+    .from("messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const tbody = document.getElementById("messagesTableBody");
+  if (!tbody) return;
 
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">Belum ada pesan masuk.</td></tr>'
-    return
+    tbody.innerHTML =
+      '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">Belum ada pesan masuk.</td></tr>';
+    return;
   }
 
-  tbody.innerHTML = data.map(m => `
+  tbody.innerHTML = data
+    .map(
+      (m) => `
     <tr>
       <td style="font-weight:600;">${m.name}</td>
       <td>${m.email}</td>
       <td style="max-width:300px; white-space:normal; font-size:0.85rem;">${m.message}</td>
-      <td style="font-size:0.8rem; color:var(--text-muted);">${new Date(m.created_at).toLocaleString('id-ID')}</td>
+      <td style="font-size:0.8rem; color:var(--text-muted);">${new Date(m.created_at).toLocaleString("id-ID")}</td>
       <td>
         <div class="table-actions">
           <a href="mailto:${m.email}?subject=Balasan dari Ayek Portfolio" class="btn btn-outline btn-sm">Balas</a>
@@ -909,22 +1130,32 @@ async function loadMessages() {
         </div>
       </td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 }
 
 // ===== RESUME (EXP & EDU) =====
 async function loadResume() {
-  const { data: exp } = await supabase.from('experience').select('*').order('sort_order', { ascending: true })
-  const { data: edu } = await supabase.from('education').select('*').order('sort_order', { ascending: true })
+  const { data: exp } = await supabase
+    .from("experience")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  const { data: edu } = await supabase
+    .from("education")
+    .select("*")
+    .order("sort_order", { ascending: true });
 
-  const expTbody = document.getElementById('experienceTableBody')
+  const expTbody = document.getElementById("experienceTableBody");
   if (expTbody) {
-    expTbody.innerHTML = (exp || []).map(e => `
+    expTbody.innerHTML = (exp || [])
+      .map(
+        (e) => `
       <tr data-id="${e.id}">
         <td class="drag-handle" style="cursor:grab; color:var(--text-muted);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg></td>
         <td>${e.role}</td>
         <td>${e.company}</td>
-        <td>${e.duration || '-'}</td>
+        <td>${e.duration || "-"}</td>
         <td>
           <div class="table-actions">
             <button class="btn btn-outline btn-sm" onclick="editExperience('${e.id}')">Edit</button>
@@ -932,17 +1163,21 @@ async function loadResume() {
           </div>
         </td>
       </tr>
-    `).join('')
+    `,
+      )
+      .join("");
   }
 
-  const eduTbody = document.getElementById('educationTableBody')
+  const eduTbody = document.getElementById("educationTableBody");
   if (eduTbody) {
-    eduTbody.innerHTML = (edu || []).map(e => `
+    eduTbody.innerHTML = (edu || [])
+      .map(
+        (e) => `
       <tr data-id="${e.id}">
         <td class="drag-handle" style="cursor:grab; color:var(--text-muted);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg></td>
         <td>${e.degree}</td>
         <td>${e.institution}</td>
-        <td>${e.year || '-'}</td>
+        <td>${e.year || "-"}</td>
         <td>
           <div class="table-actions">
             <button class="btn btn-outline btn-sm" onclick="editEducation('${e.id}')">Edit</button>
@@ -950,81 +1185,100 @@ async function loadResume() {
           </div>
         </td>
       </tr>
-    `).join('')
+    `,
+      )
+      .join("");
   }
 }
 
-document.getElementById('addExpBtn')?.addEventListener('click', () => {
-  document.getElementById('experienceForm').reset()
-  document.getElementById('expId').value = ''
-  document.getElementById('experienceModal').classList.add('active')
-})
+document.getElementById("addExpBtn")?.addEventListener("click", () => {
+  document.getElementById("experienceForm").reset();
+  document.getElementById("expId").value = "";
+  document.getElementById("experienceModal").classList.add("active");
+});
 
-document.getElementById('experienceForm')?.addEventListener('submit', async e => {
-  e.preventDefault()
-  const id = document.getElementById('expId').value
-  const payload = {
-    role: document.getElementById('expTitle').value,
-    company: document.getElementById('expCompany').value,
-    duration: document.getElementById('expYear').value,
-    description: document.getElementById('expDesc').value,
-  }
-  if (id) await supabase.from('experience').update(payload).eq('id', id)
-  else await supabase.from('experience').insert(payload)
-  closeModal('experienceModal')
-  loadResume()
-})
+document
+  .getElementById("experienceForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("expId").value;
+    const payload = {
+      role: document.getElementById("expTitle").value,
+      company: document.getElementById("expCompany").value,
+      duration: document.getElementById("expYear").value,
+      description: document.getElementById("expDesc").value,
+    };
+    if (id) await supabase.from("experience").update(payload).eq("id", id);
+    else await supabase.from("experience").insert(payload);
+    closeModal("experienceModal");
+    loadResume();
+  });
 
-window.editExperience = async id => {
-  const { data: e } = await supabase.from('experience').select('*').eq('id', id).single()
-  document.getElementById('expId').value = e.id
-  document.getElementById('expTitle').value = e.role
-  document.getElementById('expCompany').value = e.company
-  document.getElementById('expYear').value = e.duration || ''
-  document.getElementById('expDesc').value = e.description || ''
-  document.getElementById('experienceModal').classList.add('active')
-}
+window.editExperience = async (id) => {
+  const { data: e } = await supabase
+    .from("experience")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("expId").value = e.id;
+  document.getElementById("expTitle").value = e.role;
+  document.getElementById("expCompany").value = e.company;
+  document.getElementById("expYear").value = e.duration || "";
+  document.getElementById("expDesc").value = e.description || "";
+  document.getElementById("experienceModal").classList.add("active");
+};
 
-document.getElementById('addEduBtn')?.addEventListener('click', () => {
-  document.getElementById('educationForm').reset()
-  document.getElementById('eduId').value = ''
-  document.getElementById('educationModal').classList.add('active')
-})
+document.getElementById("addEduBtn")?.addEventListener("click", () => {
+  document.getElementById("educationForm").reset();
+  document.getElementById("eduId").value = "";
+  document.getElementById("educationModal").classList.add("active");
+});
 
-document.getElementById('educationForm')?.addEventListener('submit', async e => {
-  e.preventDefault()
-  const id = document.getElementById('eduId').value
-  const payload = {
-    degree: document.getElementById('eduDegree').value,
-    institution: document.getElementById('eduInstitution').value,
-    year: document.getElementById('eduYear').value,
-    description: document.getElementById('eduDesc').value,
-  }
-  if (id) await supabase.from('education').update(payload).eq('id', id)
-  else await supabase.from('education').insert(payload)
-  closeModal('educationModal')
-  loadResume()
-})
+document
+  .getElementById("educationForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("eduId").value;
+    const payload = {
+      degree: document.getElementById("eduDegree").value,
+      institution: document.getElementById("eduInstitution").value,
+      year: document.getElementById("eduYear").value,
+      description: document.getElementById("eduDesc").value,
+    };
+    if (id) await supabase.from("education").update(payload).eq("id", id);
+    else await supabase.from("education").insert(payload);
+    closeModal("educationModal");
+    loadResume();
+  });
 
-window.editEducation = async id => {
-  const { data: e } = await supabase.from('education').select('*').eq('id', id).single()
-  document.getElementById('eduId').value = e.id
-  document.getElementById('eduDegree').value = e.degree
-  document.getElementById('eduInstitution').value = e.institution
-  document.getElementById('eduYear').value = e.year || ''
-  document.getElementById('eduDesc').value = e.description || ''
-  document.getElementById('educationModal').classList.add('active')
-}
+window.editEducation = async (id) => {
+  const { data: e } = await supabase
+    .from("education")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("eduId").value = e.id;
+  document.getElementById("eduDegree").value = e.degree;
+  document.getElementById("eduInstitution").value = e.institution;
+  document.getElementById("eduYear").value = e.year || "";
+  document.getElementById("eduDesc").value = e.description || "";
+  document.getElementById("educationModal").classList.add("active");
+};
 
 // ===== TESTIMONIALS =====
 async function loadTestimonials() {
-  const { data } = await supabase.from('testimonials').select('*').order('created_at', { ascending: false })
-  const tbody = document.getElementById('testimonialsTableBody')
-  if (!tbody) return
-  tbody.innerHTML = data.map(t => `
+  const { data } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const tbody = document.getElementById("testimonialsTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = data
+    .map(
+      (t) => `
     <tr>
       <td>${t.client_name}</td>
-      <td>${t.client_role || '-'}</td>
+      <td>${t.client_role || "-"}</td>
       <td>${t.content.substring(0, 50)}...</td>
       <td>
         <div class="table-actions">
@@ -1033,84 +1287,102 @@ async function loadTestimonials() {
         </div>
       </td>
     </tr>
-  `).join('')
+  `,
+    )
+    .join("");
 }
 
-document.getElementById('addTestiBtn')?.addEventListener('click', () => {
-  document.getElementById('testimonialForm').reset()
-  document.getElementById('testiId').value = ''
-  document.getElementById('testimonialModal').classList.add('active')
-})
+document.getElementById("addTestiBtn")?.addEventListener("click", () => {
+  document.getElementById("testimonialForm").reset();
+  document.getElementById("testiId").value = "";
+  document.getElementById("testimonialModal").classList.add("active");
+});
 
-document.getElementById('testimonialForm')?.addEventListener('submit', async e => {
-  e.preventDefault()
-  const id = document.getElementById('testiId').value
-  const payload = {
-    client_name: document.getElementById('testiName').value,
-    client_role: document.getElementById('testiRole').value,
-    content: document.getElementById('testiContent').value,
-  }
-  if (id) await supabase.from('testimonials').update(payload).eq('id', id)
-  else await supabase.from('testimonials').insert(payload)
-  closeModal('testimonialModal')
-  loadTestimonials()
-})
+document
+  .getElementById("testimonialForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("testiId").value;
+    const payload = {
+      client_name: document.getElementById("testiName").value,
+      client_role: document.getElementById("testiRole").value,
+      content: document.getElementById("testiContent").value,
+    };
+    if (id) await supabase.from("testimonials").update(payload).eq("id", id);
+    else await supabase.from("testimonials").insert(payload);
+    closeModal("testimonialModal");
+    loadTestimonials();
+  });
 
-window.editTestimonial = async id => {
-  const { data: t } = await supabase.from('testimonials').select('*').eq('id', id).single()
-  document.getElementById('testiId').value = t.id
-  document.getElementById('testiName').value = t.client_name
-  document.getElementById('testiRole').value = t.client_role || ''
-  document.getElementById('testiContent').value = t.content
-  document.getElementById('testimonialModal').classList.add('active')
-}
+window.editTestimonial = async (id) => {
+  const { data: t } = await supabase
+    .from("testimonials")
+    .select("*")
+    .eq("id", id)
+    .single();
+  document.getElementById("testiId").value = t.id;
+  document.getElementById("testiName").value = t.client_name;
+  document.getElementById("testiRole").value = t.client_role || "";
+  document.getElementById("testiContent").value = t.content;
+  document.getElementById("testimonialModal").classList.add("active");
+};
 
 // ===== MEDIA LIBRARY =====
 async function loadMedia() {
-  const grid = document.getElementById('mediaGrid');
-  const loader = document.getElementById('mediaLoader');
+  const grid = document.getElementById("mediaGrid");
+  const loader = document.getElementById("mediaLoader");
   if (!grid) return;
 
-  grid.innerHTML = '';
-  loader.style.display = 'block';
+  grid.innerHTML = "";
+  loader.style.display = "block";
 
   try {
-    const folders = ['', 'projects', 'articles', 'certificates', 'cv'];
+    const folders = ["", "projects", "articles", "certificates", "cv"];
     let allFiles = [];
 
     for (const folder of folders) {
-      const { data, error } = await supabase.storage.from('portfolio').list(folder, {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: 'name', order: 'desc' }
-      });
+      const { data, error } = await supabase.storage
+        .from("portfolio")
+        .list(folder, {
+          limit: 100,
+          offset: 0,
+          sortBy: { column: "name", order: "desc" },
+        });
 
       if (error) throw error;
 
       if (data) {
-        data.filter(f => f.name !== '.emptyFolderPlaceholder').forEach(f => {
-          const path = folder ? `${folder}/${f.name}` : f.name;
-          const { data: urlData } = supabase.storage.from('portfolio').getPublicUrl(path);
-          allFiles.push({ ...f, path, url: urlData.publicUrl, folder });
-        });
+        data
+          .filter((f) => f.name !== ".emptyFolderPlaceholder")
+          .forEach((f) => {
+            const path = folder ? `${folder}/${f.name}` : f.name;
+            const { data: urlData } = supabase.storage
+              .from("portfolio")
+              .getPublicUrl(path);
+            allFiles.push({ ...f, path, url: urlData.publicUrl, folder });
+          });
       }
     }
 
-    loader.style.display = 'none';
+    loader.style.display = "none";
     if (allFiles.length === 0) {
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">Belum ada media diunggah.</div>';
+      grid.innerHTML =
+        '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">Belum ada media diunggah.</div>';
       return;
     }
 
-    grid.innerHTML = allFiles.map(f => `
+    grid.innerHTML = allFiles
+      .map(
+        (f) => `
       <div class="media-card" 
            onclick="openMediaPreview('${f.url}', '${f.name}', '${f.path}', '${f.metadata?.mimetype}')"
            style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; position: relative; transition: var(--transition); cursor: pointer;">
         <div style="height: 140px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
-          ${f.metadata?.mimetype?.startsWith('image/')
-        ? `<img src="${f.url}" style="width: 100%; height: 100%; object-fit: cover;">`
-        : `<div style="font-size: 2rem;">📄</div>`
-      }
+          ${
+            f.metadata?.mimetype?.startsWith("image/")
+              ? `<img src="${f.url}" style="width: 100%; height: 100%; object-fit: cover;">`
+              : `<div style="font-size: 2rem;">📄</div>`
+          }
         </div>
         <div style="padding: 10px;">
           <div style="font-size: 0.75rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px;" title="${f.name}">${f.name}</div>
@@ -1119,45 +1391,47 @@ async function loadMedia() {
             <button class="btn btn-danger btn-sm" style="flex: 0 0 32px; padding: 4px;" onclick="event.stopPropagation(); deleteMedia('${f.path}')">🗑️</button>
           </div>
         </div>
-        <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); font-size: 10px; padding: 2px 5px; border-radius: 4px; color: #fff;">${f.folder || 'root'}</div>
+        <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); font-size: 10px; padding: 2px 5px; border-radius: 4px; color: #fff;">${f.folder || "root"}</div>
       </div>
-    `).join('');
+    `,
+      )
+      .join("");
   } catch (err) {
-    console.error('Load media error:', err);
-    loader.textContent = 'Gagal memuat media.';
+    console.error("Load media error:", err);
+    loader.textContent = "Gagal memuat media.";
   }
 }
 
 window.copyToClipboard = (text) => {
   navigator.clipboard.writeText(text).then(() => {
-    showCustomAlert('success', 'URL disalin ke clipboard!');
+    showCustomAlert("success", "URL disalin ke clipboard!");
   });
-}
+};
 
 window.deleteMedia = async (path) => {
-  if (confirm('Hapus media ini secara permanen?')) {
-    const { error } = await supabase.storage.from('portfolio').remove([path]);
-    if (error) showCustomAlert('error', 'Gagal menghapus: ' + error.message);
+  if (confirm("Hapus media ini secara permanen?")) {
+    const { error } = await supabase.storage.from("portfolio").remove([path]);
+    if (error) showCustomAlert("error", "Gagal menghapus: " + error.message);
     else {
-      showCustomAlert('success', 'Media dihapus!');
-      closeModal('mediaPreviewModal');
+      showCustomAlert("success", "Media dihapus!");
+      closeModal("mediaPreviewModal");
       loadMedia();
     }
   }
-}
+};
 
 window.openMediaPreview = (url, name, path, mimeType) => {
-  const modal = document.getElementById('mediaPreviewModal');
-  const title = document.getElementById('previewTitle');
-  const content = document.getElementById('previewContent');
-  const copyBtn = document.getElementById('previewCopyBtn');
-  const deleteBtn = document.getElementById('previewDeleteBtn');
+  const modal = document.getElementById("mediaPreviewModal");
+  const title = document.getElementById("previewTitle");
+  const content = document.getElementById("previewContent");
+  const copyBtn = document.getElementById("previewCopyBtn");
+  const deleteBtn = document.getElementById("previewDeleteBtn");
 
   title.textContent = name;
 
-  if (mimeType && mimeType.startsWith('image/')) {
+  if (mimeType && mimeType.startsWith("image/")) {
     content.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; border-radius: var(--radius-sm);">`;
-  } else if (mimeType === 'application/pdf') {
+  } else if (mimeType === "application/pdf") {
     content.innerHTML = `<iframe src="${url}" style="width: 100%; height: 60vh; border: none;"></iframe>`;
   } else {
     content.innerHTML = `<div style="padding: 40px; background: var(--bg-secondary); border-radius: var(--radius-sm);">Pratinjau tidak tersedia untuk jenis file ini.<br><a href="${url}" target="_blank" style="color: var(--accent);">Buka di tab baru</a></div>`;
@@ -1166,62 +1440,105 @@ window.openMediaPreview = (url, name, path, mimeType) => {
   copyBtn.onclick = () => copyToClipboard(url);
   deleteBtn.onclick = () => deleteMedia(path);
 
-  modal.classList.add('active');
-}
+  modal.classList.add("active");
+};
 
 // ===== SETTINGS & THEME =====
 async function initSettings() {
-  const themeForm = document.getElementById('themeForm');
-  if (!themeForm) return;
+  const themeForm = document.getElementById("themeForm");
+  const profileForm = document.getElementById("profileSettingsForm");
+  if (!themeForm || !profileForm) return;
 
   // Load existing data
-  const { data: p } = await supabase.from('profile').select('*').single();
+  const { data: p } = await supabase.from("profile").select("*").single();
   if (p) {
     // Theme
-    document.getElementById('themePrimary').value = p.theme_primary || '#9333ea';
-    document.getElementById('themePrimaryHex').value = p.theme_primary || '#9333ea';
-    document.getElementById('themeFont').value = p.theme_font || "'Inter', sans-serif";
-    document.getElementById('themeRadius').value = p.theme_radius || "8px";
-    document.getElementById('themeGlass').checked = p.theme_glass || false;
+    document.getElementById("themePrimary").value =
+      p.theme_primary || "#9333ea";
+    document.getElementById("themePrimaryHex").value =
+      p.theme_primary || "#9333ea";
+    document.getElementById("themeFont").value =
+      p.theme_font || "'Inter', sans-serif";
+
+    // Profile
+    document.getElementById("profName").value = p.name || "";
+    document.getElementById("profTitle").value = p.title || "";
+    document.getElementById("profBio").value = p.bio || "";
 
     updateThemePreview();
   }
 
   // Live Preview Listeners
-  document.getElementById('themePrimary').addEventListener('input', (e) => {
-    document.getElementById('themePrimaryHex').value = e.target.value;
+  document.getElementById("themePrimary").addEventListener("input", (e) => {
+    document.getElementById("themePrimaryHex").value = e.target.value;
     updateThemePreview();
   });
 
-  document.getElementById('themePrimaryHex').addEventListener('input', (e) => {
+  document.getElementById("themePrimaryHex").addEventListener("input", (e) => {
     if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
-      document.getElementById('themePrimary').value = e.target.value;
+      document.getElementById("themePrimary").value = e.target.value;
       updateThemePreview();
     }
   });
 
-  document.getElementById('themeFont').addEventListener('change', updateThemePreview);
+  document
+    .getElementById("themeFont")
+    .addEventListener("change", updateThemePreview);
 
   // Save Theme
-  themeForm.addEventListener('submit', async (e) => {
+  themeForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
 
     try {
-      const { error } = await supabase.from('profile').update({
-        theme_primary: document.getElementById('themePrimary').value,
-        theme_font: document.getElementById('themeFont').value,
-        theme_radius: document.getElementById('themeRadius').value,
-        theme_glass: document.getElementById('themeGlass').checked
-      }).eq('id', p.id);
+      const { error } = await supabase
+        .from("profile")
+        .update({
+          theme_primary: document.getElementById("themePrimary").value,
+          theme_font: document.getElementById("themeFont").value,
+        })
+        .eq("id", p.id);
 
       if (error) throw error;
-      showCustomAlert('success', 'Tema berhasil disimpan! Website publik akan segera terupdate.');
-      logActivity('Mengubah tema portofolio');
+      showCustomAlert(
+        "success",
+        "Tema berhasil disimpan! Website publik akan segera terupdate.",
+      );
+      logActivity("Mengubah tema portofolio");
     } catch (err) {
       console.error(err);
-      showCustomAlert('error', 'Gagal menyimpan tema. Pastikan kolom "theme_primary" sudah ada di database.');
+      showCustomAlert(
+        "error",
+        'Gagal menyimpan tema. Pastikan kolom "theme_primary" sudah ada di database.',
+      );
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // Save Profile
+  profileForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+
+    try {
+      const { error } = await supabase
+        .from("profile")
+        .update({
+          name: document.getElementById("profName").value,
+          title: document.getElementById("profTitle").value,
+          bio: document.getElementById("profBio").value,
+        })
+        .eq("id", p.id);
+
+      if (error) throw error;
+      showCustomAlert("success", "Profil berhasil diupdate!");
+      logActivity("Update informasi profil");
+    } catch (err) {
+      console.error(err);
+      showCustomAlert("error", "Gagal update profil: " + err.message);
     } finally {
       btn.disabled = false;
     }
@@ -1229,64 +1546,72 @@ async function initSettings() {
 }
 
 function updateThemePreview() {
-  const color = document.getElementById('themePrimary').value;
-  const font = document.getElementById('themeFont').value;
-  const radius = document.getElementById('themeRadius').value;
-  const glass = document.getElementById('themeGlass').checked;
-  const preview = document.getElementById('themePreview');
+  const color = document.getElementById("themePrimary").value;
+  const font = document.getElementById("themeFont").value;
+  const preview = document.getElementById("themePreview");
 
   if (preview) {
     preview.style.backgroundColor = color;
     preview.style.fontFamily = font;
-    preview.style.borderRadius = radius;
-    preview.style.backdropFilter = glass ? 'blur(10px)' : 'none';
 
     // Apply to admin panel temporarily for real "live" feel
-    document.documentElement.style.setProperty('--accent', color);
-    document.documentElement.style.setProperty('--accent-light', color + 'CC');
-    document.documentElement.style.setProperty('--radius-md', radius);
+    document.documentElement.style.setProperty("--accent", color);
+    document.documentElement.style.setProperty("--accent-light", color + "CC");
   }
 }
 
-document.getElementById('mediaUploadInput')?.addEventListener('change', async (e) => {
-  const files = e.target.files;
-  if (!files || files.length === 0) return;
+document
+  .getElementById("mediaUploadInput")
+  ?.addEventListener("change", async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-  showCustomAlert('info', `Mengunggah ${files.length} file...`);
+    showCustomAlert("info", `Mengunggah ${files.length} file...`);
 
-  for (const file of files) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-    const filePath = `uploads/${fileName}`; // Put all admin uploads in an 'uploads' folder
+    for (const file of files) {
+      if (
+        !validateUploadFile(
+          file,
+          [...ALLOWED_IMAGE_TYPES, ...ALLOWED_PDF_TYPES],
+          file.name,
+        )
+      ) {
+        continue;
+      }
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+      const filePath = `uploads/${fileName}`; // Put all admin uploads in an 'uploads' folder
 
-    const { error } = await supabase.storage.from('portfolio').upload(filePath, file);
-    if (error) {
-      showCustomAlert('error', `Gagal upload ${file.name}: ${error.message}`);
+      const { error } = await supabase.storage
+        .from("portfolio")
+        .upload(filePath, file);
+      if (error) {
+        showCustomAlert("error", `Gagal upload ${file.name}: ${error.message}`);
+      }
     }
-  }
 
-  showCustomAlert('success', 'Semua file berhasil diunggah!');
-  loadMedia();
-  e.target.value = ''; // Reset input
-});
+    showCustomAlert("success", "Semua file berhasil diunggah!");
+    loadMedia();
+    e.target.value = ""; // Reset input
+  });
 
 // ===== AI ASSISTANT =====
 function initAI() {
-  const btn = document.getElementById('aiAssistantBtn');
-  const menu = document.getElementById('aiOptionsMenu');
+  const btn = document.getElementById("aiAssistantBtn");
+  const menu = document.getElementById("aiOptionsMenu");
   if (!btn || !menu) return;
 
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener("click", (e) => {
     e.stopPropagation();
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    menu.style.display = menu.style.display === "none" ? "block" : "none";
   });
 
-  document.addEventListener('click', () => {
-    menu.style.display = 'none';
+  document.addEventListener("click", () => {
+    menu.style.display = "none";
   });
 
-  document.querySelectorAll('.ai-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
+  document.querySelectorAll(".ai-opt").forEach((opt) => {
+    opt.addEventListener("click", () => {
       const task = opt.dataset.task;
       handleAIAction(task);
     });
@@ -1295,32 +1620,34 @@ function initAI() {
 
 async function handleAIAction(task) {
   if (!articleEditor) return;
-  
-  const selectedText = articleEditor.getSelection().trim();
   const originalText = articleEditor.value().trim();
-  const textToProcess = selectedText || originalText;
-
-  if (!textToProcess) {
-    showCustomAlert('warning', 'Tuliskan atau pilih teks terlebih dahulu agar AI bisa membantu.');
+  if (!originalText) {
+    showCustomAlert(
+      "warning",
+      "Tuliskan sesuatu terlebih dahulu agar AI bisa membantu.",
+    );
     return;
   }
 
-  const alertMsg = selectedText ? 'AI sedang memproses teks yang dipilih...' : 'AI sedang memproses seluruh teks Anda...';
-  showCustomAlert('info', alertMsg);
+  showCustomAlert("info", "AI sedang memproses teks Anda...");
 
   let prompt = "";
   switch (task) {
-    case 'improve':
-      prompt = "Perbaiki tata bahasa dan ejaan teks berikut tanpa mengubah maknanya. Pastikan hasilnya tetap dalam format Markdown.";
+    case "improve":
+      prompt =
+        "Perbaiki tata bahasa dan ejaan teks berikut tanpa mengubah maknanya. Pastikan hasilnya tetap dalam format Markdown.";
       break;
-    case 'professional':
-      prompt = "Ubah teks berikut agar terdengar lebih profesional, elegan, dan meyakinkan untuk audiens portofolio IT. Tetap gunakan format Markdown.";
+    case "professional":
+      prompt =
+        "Ubah teks berikut agar terdengar lebih profesional, elegan, dan meyakinkan untuk audiens portofolio IT. Tetap gunakan format Markdown.";
       break;
-    case 'shorten':
-      prompt = "Ringkas teks berikut agar lebih padat dan to-the-point namun tetap informatif. Gunakan format Markdown.";
+    case "shorten":
+      prompt =
+        "Ringkas teks berikut agar lebih padat dan to-the-point namun tetap informatif. Gunakan format Markdown.";
       break;
-    case 'translate':
-      prompt = "Jika teks berikut berbahasa Indonesia, terjemahkan ke Bahasa Inggris yang profesional. Jika berbahasa Inggris, terjemahkan ke Bahasa Indonesia yang baik dan benar. Tetap gunakan format Markdown.";
+    case "translate":
+      prompt =
+        "Jika teks berikut berbahasa Indonesia, terjemahkan ke Bahasa Inggris yang profesional. Jika berbahasa Inggris, terjemahkan ke Bahasa Indonesia yang baik dan benar. Tetap gunakan format Markdown.";
       break;
   }
 
@@ -1331,30 +1658,33 @@ async function handleAIAction(task) {
       body: JSON.stringify({
         model: "google/gemma-3n-e2b-it",
         messages: [
-          { role: "system", content: "Kamu adalah asisten penulis profesional. Bantu pengguna memperbaiki teks mereka untuk portofolio. Kembalikan HANYA teks hasilnya saja dalam format Markdown." },
-          { role: "user", content: `${prompt}\n\nTEKS:\n${textToProcess}` }
+          {
+            role: "system",
+            content:
+              "Kamu adalah asisten penulis profesional. Bantu pengguna memperbaiki teks mereka untuk portofolio. Kembalikan HANYA teks hasilnya saja dalam format Markdown.",
+          },
+          { role: "user", content: `${prompt}\n\nTEKS:\n${originalText}` },
         ],
-        temperature: 0.3
-      })
+        temperature: 0.3,
+      }),
     });
 
-    if (!response.ok) throw new Error('AI API Error');
+    if (!response.ok) throw new Error("AI API Error");
     const data = await response.json();
     const result = data.choices[0].message.content;
 
     if (result) {
-      if (selectedText) {
-        articleEditor.replaceSelection(result);
-      } else {
-        articleEditor.value(result);
-      }
-      showCustomAlert('success', 'Teks berhasil diperbarui oleh AI!');
+      articleEditor.value(result);
+      showCustomAlert("success", "Teks berhasil diperbarui oleh AI!");
     }
   } catch (err) {
-    console.error('AI Error:', err);
-    showCustomAlert('error', 'Gagal menghubungi AI. Pastikan koneksi internet stabil.');
+    console.error("AI Error:", err);
+    showCustomAlert(
+      "error",
+      "Gagal menghubungi AI. Pastikan koneksi internet stabil.",
+    );
   }
 }
 
 // ===== INIT =====
-initAuth()
+initAuth();

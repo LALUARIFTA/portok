@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://ayek.dev/sitemap.xml
+User-agent: *
+Allow: /
+
 Sitemap: https://portok.gawahkocak.workers.dev/sitemap.xml

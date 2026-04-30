@@ -7,27 +7,33 @@
 
   <!-- SEO & Security Tags -->
   <meta name="description"
-    content="Portfolio profesional Ayek, seorang IT Enthusiast dengan keahlian di bidang Web Development (Full-Stack), UI/UX Design, dan Network Engineering. Lihat karya, pengalaman, dan hubungi saya untuk kolaborasi."
+    content="Portfolio profesional Lalu Arif Trasna Ashari, IT Professional dengan keahlian Web Development (Full-Stack), UI/UX Design, dan Network Engineering."
     id="metaDescription" />
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self' https://xgsuoivedppftgmewlcx.supabase.co https://challenges.cloudflare.com; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://xgsuoivedppftgmewlcx.supabase.co https://via.placeholder.com; connect-src 'self' https://xgsuoivedppftgmewlcx.supabase.co wss://xgsuoivedppftgmewlcx.supabase.co https://api.emailjs.com https://integrate.api.nvidia.com https://generativelanguage.googleapis.com https://static.cloudflareinsights.com;" />
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <meta name="keywords"
     content="Portfolio, IT Professional, Web Developer, UI/UX Designer, Network Engineer, Ayek, Lalu Arif Trasna Ashari, Lalu Arif Trasna Ashari portfolio, Arif Trasna Ashari, Lalu Arif, CV Lalu Arif Trasna Ashari, Resume Lalu Arif Trasna Ashari, Lalu Arif Trasna Ashari IT, Lalu Arif Trasna Ashari Developer" />
-  <meta name="author" content="Ayek (Lalu Arif Trasna Ashari)" />
+  <meta name="author" content="Lalu Arif Trasna Ashari" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://ayek.dev" />
 
-  <meta property="og:title" content="Ayek — IT Professional Portfolio" id="ogTitle" />
+  <meta property="og:title" content="Lalu Arif Trasna Ashari — IT Professional Portfolio" id="ogTitle" />
   <meta property="og:description"
     content="Seorang IT Enthusiast yang passionate di bidang Web Development, UI/UX Design, dan Network Engineering."
     id="ogDescription" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://ayek.dev" />
   <meta property="og:image" content="/og-image.webp" />
+  <meta property="og:site_name" content="Lalu Arif Trasna Ashari Portfolio" />
+  <meta property="og:locale" content="id_ID" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lalu Arif Trasna Ashari — IT Professional Portfolio" />
+  <meta name="twitter:description"
+    content="Portfolio profesional Lalu Arif Trasna Ashari: Web Development, UI/UX Design, dan Network Engineering." />
+  <meta name="twitter:image" content="https://ayek.dev/og-image.webp" />
 
-  <title>Ayek — IT Professional Portfolio</title>
+  <title>Lalu Arif Trasna Ashari — IT Professional Portfolio</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,13 +59,13 @@
     "@graph": [
       {
         "@type": "WebSite",
-        "url": "https://LALUARIFTA.SITE",
-        "name": "Lalu Arif Trasna Ashari - IT Support Portfolio",
-        "description": "Portfolio Support Ayek, seorang IT Enthusiast dengan keahlian di bidang Web Development, UI/UX Design, dan Network Engineering."
+        "url": "https://ayek.dev",
+        "name": "Lalu Arif Trasna Ashari Portfolio",
+        "description": "Portfolio profesional Lalu Arif Trasna Ashari di bidang Web Development, UI/UX Design, dan Network Engineering."
       },
       {
         "@type": "Person",
-        "name": "Ayek (Lalu Arif Trasna Ashari)",
+        "name": "Lalu Arif Trasna Ashari",
         "jobTitle": "IT Professional",
         "url": "https://ayek.dev",
         "image": "https://ayek.dev/og-image.webp",
@@ -101,6 +107,7 @@
           <li><a href="#about" class="nav-link" data-section="about" data-i18n="nav_about">About</a></li>
           <li><a href="#resume" class="nav-link" data-section="resume" data-i18n="nav_resume">Resume</a></li>
           <li><a href="#projects" class="nav-link" data-section="projects" data-i18n="nav_projects">Projects</a></li>
+          <li><a href="/services.html" class="nav-link" data-section="services">Services</a></li>
           <li><a href="/blog.html" class="nav-link" data-section="blog" data-i18n="nav_blog">Blog</a></li>
           <li><a href="#contact" class="nav-link" data-section="contact" data-i18n="nav_contact">Contact</a></li>
           <li><a href="/admin.html" class="nav-link" data-section="admin" data-i18n="nav_admin">Admin</a></li>
@@ -458,8 +465,16 @@
                   autocomplete="off"></div>
               <div class="form-group"><label for="contactMessage" data-i18n="form_msg">Pesan</label><textarea
                   id="contactMessage" rows="5" required placeholder="Tuliskan pesan Anda di sini..."></textarea></div>
+              <div class="form-meta-row">
+                <small id="contactFormHint">Biasanya dibalas dalam 24 jam.</small>
+                <small id="contactCharCount">0/500</small>
+              </div>
               <button type="submit" class="btn btn-primary btn-full"><span data-i18n="form_btn">Kirim
                   Pesan</span></button>
+              <div class="contact-success-panel" id="contactSuccessPanel" aria-live="polite">
+                <strong>Pesan terkirim.</strong> Kamu juga bisa lanjut chat cepat via WhatsApp.
+                <a href="#" id="contactSuccessWaLink" target="_blank" rel="noopener noreferrer">Lanjut ke WhatsApp</a>
+              </div>
             </form>
 
 
@@ -537,6 +552,10 @@
                     style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
                     onmouseover="this.style.color='var(--accent)'"
                     onmouseout="this.style.color='var(--text-muted)'">Networking</a></li>
+                <li><a href="/services.html"
+                    style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                    onmouseover="this.style.color='var(--accent)'"
+                    onmouseout="this.style.color='var(--text-muted)'">All Services</a></li>
               </ul>
             </div>
             <div>
@@ -577,6 +596,11 @@
         </div>
       </div>
     </footer>
+  </div>
+
+  <div class="mobile-lead-bar" id="mobileLeadBar">
+    <a href="#contact" class="btn btn-outline">Hubungi</a>
+    <a href="#" id="mobileWaCta" class="btn btn-primary" target="_blank" rel="noopener noreferrer">WhatsApp</a>
   </div>
 
   <!-- PDF PREVIEW MODAL -->

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Layanan profesional Lalu Arif Trasna Ashari: Web Development, UI/UX Design, dan Network Engineering untuk bisnis dan personal brand." />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Lalu Arif Trasna Ashari" />
+  <link rel="canonical" href="https://ayek.dev/services.html" />
+  <meta property="og:title" content="Layanan Lalu Arif Trasna Ashari — Web, UI/UX, Network" />
+  <meta property="og:description"
+    content="Temukan layanan Web Development, UI/UX Design, dan Network Engineering untuk membantu kebutuhan digital Anda." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ayek.dev/services.html" />
+  <meta property="og:image" content="https://ayek.dev/og-image.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Layanan Lalu Arif Trasna Ashari — Web, UI/UX, Network" />
+  <meta name="twitter:description"
+    content="Layanan profesional untuk website, desain antarmuka, dan infrastruktur jaringan." />
+  <meta name="twitter:image" content="https://ayek.dev/og-image.webp" />
+  <title>Layanan — Lalu Arif Trasna Ashari Portfolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+  <meta name="theme-color" content="#06060a" />
+
+  <style>
+    .services-page {
+      padding-top: 120px;
+      min-height: 100vh;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 28px;
+    }
+
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: var(--transition);
+    }
+
+    .service-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 16px 30px rgba(124, 77, 255, 0.15);
+    }
+
+    .service-card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    .service-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+
+    .service-card ul {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .service-card li::before {
+      content: "• ";
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .services-cta {
+      margin-top: 38px;
+      padding: 22px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(124, 77, 255, 0.12), rgba(124, 77, 255, 0.03));
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <script>
+    (function () {
+      var t = localStorage.getItem('portfolio-theme') || 'dark';
+      document.body.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <div class="nav-overlay" id="navOverlay"></div>
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" aria-label="Ayek Home"><span class="logo-bracket">&lt;</span><span>Ayek</span><span
+          class="logo-bracket">/&gt;</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/#about" class="nav-link">About</a></li>
+        <li><a href="/#resume" class="nav-link">Resume</a></li>
+        <li><a href="/#projects" class="nav-link">Projects</a></li>
+        <li><a href="/services.html" class="nav-link active">Services</a></li>
+        <li><a href="/blog.html" class="nav-link">Blog</a></li>
+        <li><a href="/#contact" class="nav-link">Contact</a></li>
+        <li><a href="/admin.html" class="nav-link">Admin</a></li>
+        <li>
+          <button class="theme-toggle" id="themeToggle" aria-label="Ganti Tema">
+            <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <main class="services-page">
+    <section class="section">
+      <div class="section-container" style="max-width: 1100px; margin: 0 auto; padding: 0 24px;">
+        <div class="section-header" style="text-align:center;">
+          <span class="section-tag">&lt;services&gt;</span>
+          <h1 class="section-title">Layanan <span class="gradient-text">Profesional</span></h1>
+          <p style="max-width: 700px; margin: 12px auto 0; color: var(--text-secondary);">
+            Solusi digital untuk bantu bisnis dan personal brand kamu tumbuh lebih cepat, rapi, dan terukur.
+          </p>
+        </div>
+
+        <div class="services-grid">
+          <article class="service-card">
+            <h3>Web Development</h3>
+            <p>Pembuatan website modern yang cepat, SEO-ready, dan fokus ke konversi.</p>
+            <ul>
+              <li>Company profile / personal website</li>
+              <li>Landing page campaign</li>
+              <li>Optimasi performa & SEO teknis</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <h3>UI/UX Design</h3>
+            <p>Desain antarmuka yang clean, mudah digunakan, dan relevan dengan kebutuhan user.</p>
+            <ul>
+              <li>Wireframe & UI design system</li>
+              <li>User flow & mobile-first layout</li>
+              <li>Audit UX dan redesign</li>
+            </ul>
+          </article>
+
+          <article class="service-card">
+            <h3>Network Engineering</h3>
+            <p>Implementasi dan optimasi infrastruktur jaringan yang stabil dan aman.</p>
+            <ul>
+              <li>Setup routing & segmentasi jaringan</li>
+              <li>Troubleshooting konektivitas</li>
+              <li>Dokumentasi dan maintenance plan</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="services-cta">
+          <div>
+            <strong style="display:block; margin-bottom: 4px;">Butuh estimasi cepat?</strong>
+            <span style="color:var(--text-secondary); font-size:0.9rem;">Kirim kebutuhanmu, saya bantu rekomendasi scope
+              dan langkah awal.</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="/#contact" class="btn btn-primary">Diskusi Project</a>
+            <a href="/#projects" class="btn btn-outline">Lihat Portfolio</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer reveal"
+    style="background:linear-gradient(180deg,var(--bg-primary) 0%,var(--bg-secondary) 100%);border-top:1px solid var(--border);margin-top:60px;">
+    <div style="max-width:1200px;margin:0 auto;padding:48px 24px 0;">
+      <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;margin-bottom:40px;">
+        <div style="flex:1;min-width:280px;">
+          <a href="/" style="text-decoration:none;">
+            <h3 class="footer-logo" style="font-size:1.8rem;margin-bottom:12px;">
+              <span class="logo-bracket">&lt;</span><span id="footerName">Ayek</span><span class="logo-bracket">/&gt;</span>
+            </h3>
+          </a>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.7;max-width:380px;" id="footerBio">
+            IT Professional specializing in Web Development, UI/UX Design, and Network Engineering. Building digital
+            solutions with precision and passion.
+          </p>
+          <div id="footerSocials" style="display:flex;gap:10px;margin-top:16px;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;flex:1;min-width:300px;">
+          <div>
+            <h4
+              style="font-size:0.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">
+              Navigasi</h4>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+              <li><a href="/"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Home</a>
+              </li>
+              <li><a href="/#about"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">About</a></li>
+              <li><a href="/#projects"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">Projects</a></li>
+              <li><a href="/blog.html"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">Blog</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4
+              style="font-size:0.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">
+              Layanan</h4>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+              <li><a href="/services.html"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">Web Development</a></li>
+              <li><a href="/services.html"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">UI/UX Design</a></li>
+              <li><a href="/services.html"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">Network Engineering</a></li>
+              <li><a href="/services.html"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">All Services</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4
+              style="font-size:0.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">
+              Lainnya</h4>
+            <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+              <li><a href="/#contact"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">Contact</a></li>
+              <li><a href="/admin.html"
+                  style="color:var(--text-muted);text-decoration:none;font-size:0.82rem;transition:color 0.2s;"
+                  onmouseover="this.style.color='var(--accent)'"
+                  onmouseout="this.style.color='var(--text-muted)'">Dashboard</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div
+        style="border-top:1px solid var(--border);padding:20px 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;">
+        <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">&copy; <span id="currentYear">2026</span> Ayek
+          Portfolio.</p>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <a href="#"
+            style="color:var(--text-muted);text-decoration:none;font-size:0.75rem;transition:color 0.2s;"
+            onmouseover="this.style.color='var(--accent)'"
+            onmouseout="this.style.color='var(--text-muted)'">Privacy</a>
+          <a href="#"
+            style="color:var(--text-muted);text-decoration:none;font-size:0.75rem;transition:color 0.2s;"
+            onmouseover="this.style.color='var(--accent)'"
+            onmouseout="this.style.color='var(--text-muted)'">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
