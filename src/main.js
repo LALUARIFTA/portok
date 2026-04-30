@@ -232,14 +232,17 @@ function showSkeletons(containerId, count = 3) {
 function updateArticleSEO(article) {
   if (!article) return;
 
-  const articleUrl = `https://ayek.dev/article.html?id=${article.id}`;
+  const articleUrl = `https://laluarifta.site/article.html?id=${article.id}`;
   const fallbackDesc = "Baca artikel lengkap dari Lalu Arif Trasna Ashari.";
   const rawDesc =
     article.excerpt ||
     article.content?.replace(/[#>*`_-]/g, " ").replace(/\s+/g, " ").trim() ||
     fallbackDesc;
   const description = rawDesc.substring(0, 160);
-  const imageUrl = article.image_url || article.thumbnail || "https://ayek.dev/og-image.webp";
+  const imageUrl =
+    article.image_url ||
+    article.thumbnail ||
+    "https://laluarifta.site/og-image.webp";
   const title = `${article.title} — Lalu Arif Trasna Ashari Portfolio`;
 
   document.title = title;
@@ -285,7 +288,7 @@ function updateArticleSEO(article) {
         author: {
           "@type": "Person",
           name: "Lalu Arif Trasna Ashari",
-          url: "https://ayek.dev",
+          url: "https://laluarifta.site",
         },
         publisher: {
           "@type": "Person",
